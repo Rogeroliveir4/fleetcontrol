@@ -1,0 +1,498 @@
+{% extends "core/base.html" %}
+{% block title %}Movimentações{% endblock %}
+{% block mobile_title %}Movimentações{% endblock %}
+{% load l10n humanize %}
+
+{% block content %}
+<!-- Custom styles para responsividade mobile -->
+<style>
+    /* Estilos específicos para tela de movimentações */
+    .touch-filter-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .mobile-form-input {
+        font-size: 16px !important; /* Previne zoom no iOS */
+        min-height: 48px;
+    }
+    
+    .mobile-action-btn {
+        min-height: 48px;
+        font-size: 0.875rem;
+    }
+    
+    /* Scroll horizontal otimizado para mobile */
+    .mobile-filter-scroll {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .mobile-filter-scroll::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Ajuste para inputs date no mobile */
+    @media (max-width: 768px) {
+        input[type="date"] {
+            min-height: 44px;
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            padding: 8px;
+            cursor: pointer;
+        }
+    }
+    
+    /* Safe area adjustments */
+    @supports (padding: max(0px)) {
+        .mobile-safe-padding {
+            padding-left: max(0.5rem, env(safe-area-inset-left));
+            padding-right: max(0.5rem, env(safe-area-inset-right));
+        }
+        
+        .mobile-safe-bottom {
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+    }
+    
+    /* Loading animation */
+    .loading-pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+</style>
+
+<!-- =======================================================================
+    MOBILE
+======================================================================= -->
+<div class="lg:hidden min-h-screen bg-white dark:bg-gray-900 mobile-safe-padding">
+    <!-- HEADER MOBILE -->
+    <div class="pt-3 sm:pt-4 pb-2">
+        <div class="bg-[#00594C] rounded-xl p-4 mb-3 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-1">Movimentações</h2>
+            <p class="text-xs sm:text-sm text-green-100 opacity-90">Controle de entradas e saídas</p>
+        </div>
+    </div>
+
+    <!-- FILTROS HORIZONTAIS - Scroll horizontal para mobile -->
+    <div class="mobile-filter-scroll overflow-x-auto -mx-4 px-4 mb-3 pb-1">
+        <div class="flex gap-1.5 min-w-max">
+            <button onclick="filtrarPorStatus('transito')" data-status="transito" 
+                    class="touch-filter-btn rounded-full px-4 py-2.5 transition-all whitespace-nowrap text-sm font-medium
+                           {% if status == 'transito' %}bg-blue-600 text-white shadow-sm
+                           {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                Em Trânsito ({{ total_transito }})
+            </button>
+            <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
+                    class="touch-filter-btn rounded-full px-4 py-2.5 transition-all whitespace-nowrap text-sm font-medium
+                           {% if status == 'finalizada' %}bg-blue-600 text-white shadow-sm
+                           {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                Finalizadas ({{ total_finalizada }})
+            </button>
+            <button onclick="filtrarPorStatus('')" data-status=""
+                    class="touch-filter-btn rounded-full px-4 py-2.5 transition-all whitespace-nowrap text-sm font-medium
+                           {% if status == '' %}bg-blue-600 text-white shadow-sm
+                           {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                Todas ({{ total_geral }})
+            </button>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO MOBILE -->
+    <div class="mb-4">
+        <div class="relative mb-2">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input id="search-mobile" type="text" placeholder="Placa ou motorista..." value="{{ search }}"
+                   class="mobile-form-input w-full pl-9 pr-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <input id="inicio-mobile" type="date" value="{{ inicio }}"
+                   class="mobile-form-input px-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <input id="fim-mobile" type="date" value="{{ fim }}"
+                   class="mobile-form-input px-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+        </div>
+        <button type="button" onclick="aplicarFiltro()"
+                class="mobile-action-btn w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all
+                       active:scale-[0.98] active:opacity-90">
+            Filtrar
+        </button>
+    </div>
+
+    <!-- BOTÕES DE AÇÃO -->
+    <div class="flex gap-2 mb-4">
+        {% if perfilusuario and perfilusuario.nivel == "gestor" %}
+        <a href="{% url 'criar_movimentacao' %}"
+           class="mobile-action-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all
+                  active:scale-[0.98] active:opacity-90">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>Nova</span>
+        </a>
+    {% endif %}    
+        <a id="btn-exportar-mobile" href="{% url 'exportar_movimentacoes' %}?{{ request.GET.urlencode }}"
+           class="mobile-action-btn flex-1 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg 
+                  flex items-center justify-center gap-1.5 font-medium transition-all
+                  active:scale-[0.98] active:opacity-90">
+            <i class="fa-solid fa-download text-xs"></i>
+            <span>Exportar</span>
+        </a>
+    </div>
+
+    <!-- RESULTADOS MOBILE -->
+    <div id="resultados-mobile" class="mb-16 mobile-safe-bottom">
+        {% include "movimentacoes/partials/cards.html" %}
+    </div>
+
+    <!-- PAGINAÇÃO MOBILE -->
+    <div id="paginacao-mobile" class="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-3 pb-safe">
+        {% include "movimentacoes/partials/paginacao_mobile.html" %}
+    </div>
+</div>
+
+<!-- =======================================================================
+    DESKTOP - APENAS O HEADER E FILTROS
+======================================================================= -->
+<div class="hidden lg:block min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- HEADER DESKTOP -->
+    <div class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b dark:border-gray-800 shadow-sm">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Movimentações</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Controle de entradas e saídas dos veículos</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a id="btn-exportar-desktop" href="{% url 'exportar_movimentacoes' %}?{{ request.GET.urlencode }}"
+                       class="px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2 text-sm
+                              transition-all hover:shadow-md">
+                        <i class="fa-solid fa-file-export"></i>
+                        Exportar Excel
+                    </a>
+                    <!-- Botão de criar movimentação disponível apenas para gestores e Adms -->
+                    {% if perfilusuario and perfilusuario.nivel == "gestor" %}
+                    <a href="{% url 'criar_movimentacao' %}"
+                       class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 text-sm
+                              transition-all hover:shadow-md">
+                        <i class="fa-solid fa-plus"></i>
+                        Nova Movimentação
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS DESKTOP -->
+    <div class="sticky top-[88px] z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 py-4 px-6">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="flex gap-2">
+                <button onclick="filtrarPorStatus('transito')" data-status="transito"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                               {% if status == 'transito' %}bg-amber-500 text-white shadow-sm
+                               {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                    Em Trânsito ({{ total_transito }})
+                </button>
+                <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                               {% if status == 'finalizada' %}bg-emerald-500 text-white shadow-sm
+                               {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                    Finalizadas ({{ total_finalizada }})
+                </button>
+                <!---->
+                <button onclick="filtrarPorStatus('')" data-status=""
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                               {% if status == '' %}bg-blue-600 text-white shadow-sm
+                               {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                    Todas ({{ total_geral }})
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="flex-1 max-w-lg">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input id="search-desktop" type="text" placeholder="Placa, motorista ou destino..." value="{{ search }}"
+                           class="w-full h-10 pl-9 pr-3 rounded-lg border dark:border-gray-700 
+                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="inicio-desktop" type="date" value="{{ inicio }}"
+                       class="h-10 px-3 rounded-lg border dark:border-gray-700 
+                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+                <span class="text-gray-400">até</span>
+                <input id="fim-desktop" type="date" value="{{ fim }}"
+                       class="h-10 px-3 rounded-lg border dark:border-gray-700 
+                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+            </div>
+            <button onclick="aplicarFiltro()"
+                    class="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all">
+                Filtrar
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULTADOS DESKTOP -->
+    <div class="px-6 py-6">
+        <div id="resultados-desktop">
+            {% include "movimentacoes/partials/cards.html" %}
+        </div>
+
+        <!-- PAGINAÇÃO DESKTOP -->
+        <div id="paginacao-desktop" class="mt-6">
+            {% include "movimentacoes/partials/paginacao_desktop.html" %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // JavaScript otimizado para mobile
+    let timeoutId;
+    let currentStatus = "{{ status|default:'' }}";
+    let isApplyingFilter = false;
+
+    // Atualizar cores dos botões de status
+    function atualizarCoresStatus(novoStatus) {
+        currentStatus = novoStatus;
+        const isMobile = window.innerWidth < 1024;
+
+        document.querySelectorAll('[data-status]').forEach(btn => {
+            const btnStatus = btn.getAttribute('data-status');
+            
+            // Remover classes de cor
+            btn.classList.remove(
+                // Mobile
+                'bg-blue-600', 'text-white', 'shadow-sm',
+                'bg-gray-100', 'bg-gray-800', 'text-gray-700', 'text-gray-300',
+                
+                // Desktop
+                'bg-amber-500', 'bg-emerald-500',
+                'bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300'
+            );
+
+            if (isMobile) {
+                // Mobile: azul para ativo, cinza para inativo
+                if (btnStatus === novoStatus) {
+                    btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+                } else {
+                    btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                }
+            } else {
+                // Desktop: cores diferentes por status
+                if (btnStatus === novoStatus) {
+                    switch(novoStatus) {
+                        case 'transito':
+                            btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm');
+                            break;
+                        case 'finalizada':
+                            btn.classList.add('bg-emerald-500', 'text-white', 'shadow-sm');
+                            break;
+                        case '':
+                            btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+                            break;
+                    }
+                } else {
+                    btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                }
+            }
+        });
+    }
+
+    // Filtrar por status
+    function filtrarPorStatus(status) {
+        if (isApplyingFilter) return;
+        
+        atualizarCoresStatus(status);
+        aplicarFiltro();
+    }
+
+    // Coletar dados dos filtros
+    function coletarDadosFiltro() {
+        const isMobile = window.innerWidth < 1024;
+
+        return {
+            status: currentStatus,
+            search: isMobile
+                ? document.getElementById('search-mobile')?.value || ''
+                : document.getElementById('search-desktop')?.value || '',
+            inicio: isMobile
+                ? document.getElementById('inicio-mobile')?.value || ''
+                : document.getElementById('inicio-desktop')?.value || '',
+            fim: isMobile
+                ? document.getElementById('fim-mobile')?.value || ''
+                : document.getElementById('fim-desktop')?.value || ''
+        };
+    }
+
+    // Aplicar filtros com debounce
+    function aplicarFiltro() {
+        if (isApplyingFilter) return;
+        isApplyingFilter = true;
+
+        const dados = coletarDadosFiltro();
+        const params = new URLSearchParams();
+
+        for (const [key, value] of Object.entries(dados)) {
+            if (value) params.append(key, value);
+        }
+
+        // Atualizar links de exportação
+        document.querySelectorAll('[id^="btn-exportar-"]').forEach(btn => {
+            btn.href = `/movimentacoes/exportar/?${params.toString()}`;
+        });
+
+        // Debounce para evitar múltiplas requisições
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            // Mostrar loading state
+            const resultadosContainer = window.innerWidth < 1024 
+                ? document.getElementById('resultados-mobile')
+                : document.getElementById('resultados-desktop');
+            
+            if (resultadosContainer) {
+                resultadosContainer.innerHTML = `
+                    <div class="text-center py-12 loading-pulse">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
+                            <i class="fas fa-spinner fa-spin text-gray-500"></i>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400">Carregando...</p>
+                    </div>
+                `;
+            }
+
+            fetch(`/movimentacoes/filtrar/?${params.toString()}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html_cards) {
+                        const isMobile = window.innerWidth < 1024;
+                        if (isMobile) {
+                            document.getElementById('resultados-mobile').innerHTML = data.html_cards;
+                            if (data.paginacao_mobile) {
+                                document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
+                            }
+                        } else {
+                            document.getElementById('resultados-desktop').innerHTML = data.html_cards;
+                            if (data.paginacao_desktop) {
+                                document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
+                            }
+                        }
+
+                        if (data.status !== undefined) {
+                            atualizarCoresStatus(data.status);
+                        }
+                    }
+                    window.history.pushState({}, '', `?${params.toString()}`);
+                })
+                .catch(() => {
+                    // Fallback para recarregamento completo
+                    window.location.href = `?${params.toString()}`;
+                })
+                .finally(() => {
+                    isApplyingFilter = false;
+                });
+        }, 350);
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar cores
+        atualizarCoresStatus(currentStatus);
+
+        // Configurar eventos de input com debounce
+        const setupInputEvents = (inputId) => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                let inputTimeout;
+                input.addEventListener('input', () => {
+                    clearTimeout(inputTimeout);
+                    inputTimeout = setTimeout(aplicarFiltro, 500);
+                });
+                input.addEventListener('change', aplicarFiltro);
+            }
+        };
+
+        // Configurar todos os inputs
+        ['search-mobile', 'search-desktop', 'inicio-mobile', 'fim-mobile', 'inicio-desktop', 'fim-desktop']
+            .forEach(setupInputEvents);
+
+        // Paginação via AJAX
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('a[href*="page="]');
+            if (link) {
+                e.preventDefault();
+                
+                const url = new URL(link.href);
+                const page = url.searchParams.get('page');
+                const dados = coletarDadosFiltro();
+                dados.page = page;
+
+                const params = new URLSearchParams();
+                for (const [key, value] of Object.entries(dados)) {
+                    if (value) params.append(key, value);
+                }
+
+                fetch(`/movimentacoes/filtrar/?${params.toString()}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.html_cards) {
+                            const isMobile = window.innerWidth < 1024;
+                            if (isMobile) {
+                                document.getElementById('resultados-mobile').innerHTML = data.html_cards;
+                                if (data.paginacao_mobile) {
+                                    document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
+                                }
+                            } else {
+                                document.getElementById('resultados-desktop').innerHTML = data.html_cards;
+                                if (data.paginacao_desktop) {
+                                    document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
+                                }
+                            }
+
+                            if (data.status !== undefined) {
+                                atualizarCoresStatus(data.status);
+                            }
+                        }
+                        window.history.pushState({}, '', `?${params.toString()}`);
+                    });
+            }
+        });
+
+        // Lidar com botões voltar/avançar do navegador
+        window.addEventListener('popstate', function () {
+            const params = new URLSearchParams(window.location.search);
+            const statusFromUrl = params.get('status') || '';
+            atualizarCoresStatus(statusFromUrl);
+            aplicarFiltro();
+        });
+
+        // Prevenir zoom em inputs no iOS
+        document.addEventListener('focusin', function(e) {
+            if (e.target.matches('input, select, textarea')) {
+                document.body.style.zoom = "100%";
+            }
+        });
+    });
+
+    // Detectar resize e ajustar layout
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            atualizarCoresStatus(currentStatus);
+        }, 250);
+    });
+</script>
+{% endblock %}

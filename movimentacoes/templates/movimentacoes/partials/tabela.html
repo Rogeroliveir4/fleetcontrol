@@ -1,0 +1,586 @@
+{% load l10n humanize %}
+
+<style>
+    /* ============================================================
+       ESTILOS DA TABELA - RESPONSIVO
+    ============================================================ */
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #1d4ed8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --text-light: #6b7280;
+        --text-dark: #111827;
+        --bg: #f3f4f6;
+        --card: #ffffff;
+        --border: #e6e7ea;
+        --shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+    }
+
+    .dark {
+        --primary: #60a5fa;
+        --primary-dark: #3b82f6;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --text-light: #9ca3af;
+        --text-dark: #f8fafc;
+        --bg: #0f1724;
+        --card: #111827;
+        --border: #27303b;
+        --shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+    }
+
+    .card {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-container {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* Header FIXO com contador e paginação */
+    .table-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-light);
+        background: var(--card);
+        flex-shrink: 0;
+        gap: 15px;
+    }
+
+    .header-info {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Paginação no topo - LADO DIREITO */
+    .pagination-top {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .page-link {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: var(--card);
+        color: var(--text-dark);
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .page-link:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .page-active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-active:hover {
+        background: var(--primary-dark);
+        color: white;
+    }
+
+    /* Container da tabela com scroll APENAS no corpo */
+    .table-wrapper {
+        overflow: auto;
+        flex: 1;
+        max-height: 400px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        /* MODIFICADO: Largura automática para responsividade */
+        min-width: fit-content;
+    }
+
+    /* LARGURAS RESPONSIVAS DAS COLUNAS */
+    .col-placa {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .col-motorista {
+        width: 80px;
+        min-width: 80px;
+    }
+
+    .col-destino {
+        width: 140px;
+        min-width: 140px;
+        max-width: 140px;
+    }
+
+    .col-km {
+        width: 90px;
+        min-width: 90px;
+    }
+
+    .col-data {
+        width: 110px;
+        min-width: 110px;
+    }
+
+    .col-status {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .col-acoes {
+        width: 70px;
+        min-width: 70px;
+    }
+
+    /* Cabeçalho fixo DENTRO do container de scroll */
+    thead th {
+        padding: 10px 8px;
+        background: var(--card);
+        border-bottom: 2px solid var(--border);
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-dark);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 13px;
+    }
+
+    tbody tr:hover {
+        background: rgba(59, 130, 246, 0.07);
+    }
+
+    .placa {
+        background: rgba(59, 130, 246, 0.10);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 12px;
+    }
+
+    /* MOTORISTA */
+    .motorista-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .motorista-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .dark .motorista-avatar {
+        background: #60a5fa;
+    }
+
+    /* DESTINO com truncamento */
+    .destino-cell {
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Badge KM */
+    .km-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--success);
+        font-weight: 700;
+        font-size: 11px;
+    }
+
+    /* Status */
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .status-finalizada {
+        background: rgba(16, 185, 129, .12);
+        color: var(--success);
+    }
+
+    .status-transito {
+        background: rgba(245, 158, 11, .12);
+        color: var(--warning);
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-light);
+        cursor: pointer;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+        color: var(--primary);
+    }
+
+    .btn-retorno {
+        background: var(--primary);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: .2s;
+        white-space: nowrap;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .btn-retorno i {
+        font-size: 10px;
+    }
+
+    .btn-retorno:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Estilização do scroll */
+    .table-wrapper::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: var(--bg);
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: var(--text-light);
+    }
+
+    /* RESPONSIVIDADE PARA TELAS PEQUENAS */
+    @media (max-width: 1400px) {
+        .col-placa {
+            width: 90px;
+            min-width: 90px;
+        }
+
+        .col-motorista {
+            width: 70px;
+            min-width: 70px;
+        }
+
+        .col-destino {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+        }
+
+        .col-km {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        .col-data {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .col-status {
+            width: 90px;
+            min-width: 90px;
+        }
+
+        .col-acoes {
+            width: 60px;
+            min-width: 60px;
+        }
+
+        thead th {
+            padding: 8px 6px;
+            font-size: 10px;
+        }
+
+        tbody td {
+            padding: 8px 6px;
+            font-size: 12px;
+        }
+
+        .table-header {
+            padding: 12px 16px;
+        }
+
+        .header-info {
+            font-size: 13px;
+        }
+
+        .page-link {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 1200px) {
+        .col-placa {
+            width: 85px;
+            min-width: 85px;
+        }
+
+        .col-motorista {
+            width: 65px;
+            min-width: 65px;
+        }
+
+        .col-destino {
+            width: 110px;
+            min-width: 110px;
+            max-width: 110px;
+        }
+
+        .col-km {
+            width: 75px;
+            min-width: 75px;
+        }
+
+        .col-data {
+            width: 95px;
+            min-width: 95px;
+        }
+
+        .col-status {
+            width: 85px;
+            min-width: 85px;
+        }
+
+        .col-acoes {
+            width: 55px;
+            min-width: 55px;
+        }
+    }
+</style>
+<div class="card">
+    <div class="table-container">
+        <!-- Header FIXO com contador e paginação -->
+        <div class="table-header">
+            <div class="header-info">
+                Mostrando {{ movimentacoes|length }} de {{ movimentacoes.paginator.count }} registros
+            </div>
+
+            <!-- Paginação FIXA no topo - LADO DIREITO -->
+            <div class="pagination-top">
+                {% if movimentacoes.has_previous %}
+                <button class="page-link" data-page="{{ movimentacoes.previous_page_number }}" title="Página anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                {% endif %}
+
+                {% for p in movimentacoes.paginator.page_range %}
+                {% if p == movimentacoes.number %}
+                <button class="page-link page-active" data-page="{{ p }}">
+                    {{ p }}
+                </button>
+                {% elif p >= movimentacoes.number|add:"-2" and p <= movimentacoes.number|add:"2" %} <button
+                    class="page-link" data-page="{{ p }}">
+                    {{ p }}
+                    </button>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if movimentacoes.has_next %}
+                    <button class="page-link" data-page="{{ movimentacoes.next_page_number }}" title="Próxima página">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    {% endif %}
+            </div>
+        </div>
+
+        <!-- Área de scroll APENAS para as linhas da tabela -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-placa">Placa</th>
+                        <th class="col-motorista">Motorista</th>
+                        <th class="col-destino">Destino</th>
+                        <th class="col-km text-center">KM Saída</th>
+                        <th class="col-km text-center">KM Retorno</th>
+                        <th class="col-km text-center">KM Percorrida</th>
+                        <th class="col-data text-center">Saída</th>
+                        <th class="col-data text-center">Entrada</th>
+                        <th class="col-acoes text-center">Detalhes</th>
+                        <th class="col-status text-center">Status</th>
+                        <th class="col-acoes text-center">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for mov in movimentacoes %}
+                    <tr>
+                        <!-- PLACA -->
+                        <td class="text-center">
+                            <span class="placa">{{ mov.veiculo.placa }}</span>
+                        </td>
+
+                        <!-- MOTORISTA -->
+                        <td class="motorista-cell">
+                            {% with mov.motorista.nome.split as partes %}
+                            {% with partes.0|slice:":1" as primeira %}
+                            {% with partes|last|slice:":1" as ultima %}
+                            <div class="motorista-avatar" title="{{ mov.motorista.nome }}">
+                                {{ primeira }}{{ ultima }}
+                            </div>
+                            {% endwith %}
+                            {% endwith %}
+                            {% endwith %}
+                        </td>
+
+                        <!-- DESTINO -->
+                        <td class="destino-cell">{{ mov.destino.capitalize|capfirst|truncatechars:20 }}</td>
+
+                        <!-- KM SAÍDA - COM PONTO DECIMAL -->
+                        <td class="text-center">
+                            <span class="km-saida">{{ mov.km_saida|intcomma }}</span>
+                        </td>
+
+                        <!-- KM RETORNO - COM PONTO DECIMAL -->
+                        <td class="text-center">
+                            {% if mov.km_retorno %}
+                            <span class="km-retorno">{{ mov.km_retorno|intcomma }}</span> {% else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <!-- DISTÂNCIA PERCORRIDA - INTEIRO COM PONTO MILHAR -->
+                        <td class="text-center">
+                            {% if mov.distancia_percorrida %}
+                            <span class="km-badge km-distancia">{{ mov.distancia_percorrida }}</span> km 
+                            {%else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <!-- DATA SAÍDA -->
+                        <td class="text-center" title="{{ mov.data_saida|date:'d/m/Y H:i' }}">
+                            {{ mov.data_saida|date:"d/m H:i" }}
+                        </td>
+
+                        <!-- DATA ENTRADA -->
+                        <td class="text-center"
+                            title="{% if mov.data_retorno %}{{ mov.data_retorno|date:'d/m/Y H:i' }}{% endif %}">
+                            {% if mov.data_retorno %}
+                            {{ mov.data_retorno|date:"d/m H:i" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <!-- DETALHES -->
+                        <td class="text-center">
+                            <a href="{% url 'movimentacao_detalhe' mov.id %}" class="icon-btn">
+                                <i class="fa-regular fa-eye"></i>
+                            </a>
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="text-center">
+                            {% if mov.data_retorno %}
+                            <span class="status-badge status-finalizada">Finalizada</span>
+                            {% else %}
+                            <span class="status-badge status-transito">Em Trânsito</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- AÇÕES -->
+                        <td class="text-center">
+                            {% if not mov.data_retorno %}
+                            <a href="{% url 'registrar_retorno' mov.id %}" class="btn-retorno">
+                                <i class="fa-solid fa-rotate-left"></i> Retorno
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    // Script para paginação
+    document.querySelectorAll('.page-link').forEach(button => {
+        button.addEventListener('click', function () {
+            const page = this.getAttribute('data-page');
+            if (page) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+                window.location.href = url.toString();
+            }
+        });
+    });
+</script>

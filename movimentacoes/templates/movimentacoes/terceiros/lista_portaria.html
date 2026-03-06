@@ -1,0 +1,1250 @@
+{% extends "core/base.html" %}
+{% block title %}Veículos de Terceiros{% endblock %}
+{% block mobile_title %}Veículos de Terceiros{% endblock %}
+{% load l10n humanize %}
+
+{% block content %}
+<!-- Custom styles -->
+<style>
+    /* Animações e transições */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(-15px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+    
+    .animate-slide-in {
+        animation: slideIn 0.25s ease-out;
+    }
+    
+    .loading-pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    /* Layout principal */
+    .main-container {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        min-height: calc(100vh - 3rem);
+    }
+    
+    .dark .main-container {
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    }
+    
+    /* Header estilizado */
+    .page-header {
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    }
+    
+    .dark .page-header {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 100%);
+        border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    }
+    
+    .title-gradient {
+        background: linear-gradient(135deg, #00594C 0%, #0ea5e9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .dark .title-gradient {
+        background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Botão de ação principal */
+    .primary-action-btn {
+        background: linear-gradient(135deg, #00594C 0%, #0a7c6c 100%);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 89, 76, 0.2);
+    }
+    
+    .primary-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 89, 76, 0.3);
+    }
+    
+    .primary-action-btn:active {
+        transform: translateY(0);
+    }
+    
+    .primary-action-btn::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .primary-action-btn:hover::after {
+        left: 100%;
+    }
+    
+    /* Botão secundário */
+    .secondary-action-btn {
+        background: white;
+        color: #64748b;
+        padding: 0.5rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        transition: all 0.3s ease;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark .secondary-action-btn {
+        background: #334155;
+        color: #cbd5e1;
+        border-color: #475569;
+    }
+    
+    .secondary-action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-color: #00594C;
+        color: #00594C;
+    }
+    
+    .dark .secondary-action-btn:hover {
+        border-color: #10b981;
+        color: #10b981;
+    }
+    
+    /* Botão de limpar filtros */
+    .clear-filters-btn {
+        background: #f8fafc;
+        color: #64748b;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        transition: all 0.2s ease;
+        border: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .dark .clear-filters-btn {
+        background: #334155;
+        color: #94a3b8;
+        border-color: #475569;
+    }
+    
+    .clear-filters-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+    
+    .dark .clear-filters-btn:hover {
+        background: #475569;
+        border-color: #64748b;
+        color: #cbd5e1;
+    }
+    
+    .clear-filters-btn:active {
+        transform: scale(0.98);
+    }
+    
+    /* Filtros modernos */
+    .filter-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .dark .filter-card {
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .filter-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .dark .filter-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Inputs estilizados */
+    .styled-select {
+        appearance: none;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.75rem center;
+        background-size: 1.25em;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        width: 100%;
+        color: #334155;
+        font-size: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dark .styled-select {
+        background-color: #334155;
+        border-color: #475569;
+        color: #f1f5f9;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    }
+    
+    .styled-select:focus {
+        outline: none;
+        border-color: #00594C;
+        box-shadow: 0 0 0 3px rgba(0, 89, 76, 0.1);
+        background-color: white;
+    }
+    
+    .dark .styled-select:focus {
+        background-color: #475569;
+        box-shadow: 0 0 0 3px rgba(0, 89, 76, 0.3);
+    }
+    
+    .styled-input {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+        color: #334155;
+        font-size: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dark .styled-input {
+        background: #334155;
+        border-color: #475569;
+        color: #f1f5f9;
+    }
+    
+    .styled-input:focus {
+        outline: none;
+        border-color: #00594C;
+        box-shadow: 0 0 0 3px rgba(0, 89, 76, 0.1);
+        background-color: white;
+    }
+    
+    .dark .styled-input:focus {
+        background-color: #475569;
+        box-shadow: 0 0 0 3px rgba(0, 89, 76, 0.3);
+    }
+    
+    /* Container de input com botão de limpar */
+    .input-with-clear {
+        position: relative;
+    }
+    
+    .clear-date-btn {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0.125rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .clear-date-btn:hover {
+        color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .dark .clear-date-btn:hover {
+        color: #fca5a5;
+        background: rgba(239, 68, 68, 0.1);
+    }
+    
+    .clear-date-btn:active {
+        transform: translateY(-50%) scale(0.9);
+    }
+    
+    /* Cards de veículos */
+    .vehicle-card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .dark .vehicle-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .vehicle-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #cbd5e1;
+    }
+    
+    .dark .vehicle-card:hover {
+        border-color: #475569;
+    }
+    
+    /* Header do card */
+    .card-header {
+        padding: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header.entrada {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    }
+    
+    .card-header.saida {
+        background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+    }
+    
+    .placa-display {
+        background: rgba(0, 0, 0, 0.25);
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.875rem;
+        letter-spacing: 0.75px;
+        display: inline-block;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-transform: uppercase;
+    }
+    
+    .status-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.625rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+    
+    .status-badge.entrada {
+        background: rgba(255, 255, 255, 0.9);
+        color: #059669;
+    }
+    
+    .status-badge.saida {
+        background: rgba(255, 255, 255, 0.9);
+        color: #475569;
+    }
+    
+    /* Body do card */
+    .card-body {
+        padding: 1rem;
+        flex-grow: 1;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .dark .info-item {
+        border-bottom-color: #334155;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .info-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #00594C;
+    }
+    
+    .dark .info-icon {
+        background: #334155;
+        color: #10b981;
+    }
+    
+    .info-content {
+        flex-grow: 1;
+    }
+    
+    .info-label {
+        font-size: 0.625rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .dark .info-label {
+        color: #94a3b8;
+    }
+    
+    .info-value {
+        font-size: 0.75rem;
+        color: #1e293b;
+        font-weight: 600;
+        margin-top: 0.125rem;
+    }
+    
+    .dark .info-value {
+        color: #f1f5f9;
+    }
+    
+    /* Footer do card */
+    .card-footer {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .dark .card-footer {
+        background: #0f172a;
+        border-top-color: #334155;
+    }
+    
+    .action-button {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+    }
+    
+    .action-button.entrada {
+        background: linear-gradient(135deg, #00594C 0%, #0a7c6c 100%);
+        color: white;
+        box-shadow: 0 2px 10px rgba(0, 89, 76, 0.2);
+    }
+    
+    .action-button.entrada:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 89, 76, 0.3);
+    }
+    
+    .action-button.saida {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .dark .action-button.saida {
+        background: #334155;
+        color: #94a3b8;
+        border-color: #475569;
+    }
+    
+
+    /* Empty state */
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        background: white;
+        border-radius: 14px;
+        border: 2px dashed #e2e8f0;
+    }
+    
+    .dark .empty-state {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: #94a3b8;
+    }
+    
+    .dark .empty-icon {
+        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        color: #64748b;
+    }
+
+     /* Container principal */
+    .filter-actions {
+        display: flex;
+        gap: 0.75rem;StatusEx
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+    }
+    
+    /* Botão de exportação COMPACTO */
+    .export-btn {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        height: 36px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        line-height: 1;
+    }
+    
+    /* Botão Limpar Filtros */
+    .clear-filters-btn {
+        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 4px rgba(107, 114, 128, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        height: 36px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        line-height: 1;
+    }
+
+
+
+    
+    /* Responsividade - Mobile First */
+    @media (max-width: 640px) {
+        .main-container {
+            padding: 0.375rem;
+        }
+        
+        .page-header {
+            padding: 0.75rem;
+            margin: -0.375rem -0.375rem 0.75rem -0.375rem;
+            border-radius: 0;
+        }
+        
+        .filter-card {
+            padding: 0.75rem;
+        }
+        
+        .vehicle-card {
+            margin-bottom: 0.75rem;
+        }
+        
+        .primary-action-btn,
+        .secondary-action-btn,
+        .export-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.6875rem;
+        }
+        
+        .cards-grid {
+            gap: 0.5rem;
+        }
+        
+        .clear-filters-btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 0.375rem;
+        }
+        
+        .clear-date-btn {
+            right: 0.375rem;
+        }
+    }
+    
+    @media (min-width: 641px) and (max-width: 768px) {
+        .main-container {
+            padding: 0.5rem;
+        }
+        
+        .filter-card {
+            padding: 1rem;
+        }
+        
+        .cards-grid {
+            gap: 0.75rem;
+        }
+    }
+    
+    /* Safe areas para mobile */
+    @supports (padding: max(0px)) {
+        .mobile-safe-padding {
+            padding-left: max(0.375rem, env(safe-area-inset-left));
+            padding-right: max(0.375rem, env(safe-area-inset-right));
+        }
+        
+        .mobile-safe-bottom {
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+        }
+    }
+    
+    /* Grid responsivo */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 0.75rem;
+    }
+    
+    @media (min-width: 640px) {
+        .cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .cards-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+    }
+    
+    @media (min-width: 1280px) {
+        .cards-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    
+    /* Controles de filtro responsivos */
+    .filters-grid {
+        display: grid;
+        gap: 0.75rem;
+    }
+    
+    @media (max-width: 639px) {
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-actions {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+    }
+    
+    @media (min-width: 640px) {
+        .filters-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .filters-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .filter-actions {
+            grid-column: span 2;
+            display: flex;
+            gap: 0.5rem;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .filters-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+        
+        .filter-actions {
+            grid-column: span 2;
+        }
+    }
+</style>
+
+
+<div class="main-container animate-fade-in mobile-safe-padding">
+    <div class="max-w-5xl xl:max-w-6xl mx-auto py-4 mobile-safe-bottom">
+        <!-- Header da página -->
+        <div class="page-header rounded-xl mb-6 p-4 animate-slide-in">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 rounded-lg bg-gradient-to-r from-[#00594C] to-emerald-600 shadow">
+                            <i class="fa-solid fa-truck-moving text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl lg:text-2xl font-bold title-gradient">
+                                Veículos de Terceiros
+                            </h1>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Controle de entrada e saída do pátio da empresa
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <!-- Botão de nova entrada -->
+            <a href="{% url 'terceiro_entrada' %}"
+            class="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-[#00594C] to-emerald-600 hover:from-emerald-600 hover:to-[#00594C] dark:from-emerald-600 dark:to-emerald-500 dark:hover:from-emerald-500 dark:hover:to-emerald-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm">
+                <i class="fa-solid fa-plus-circle text-xs"></i>
+                Registrar Entrada
+            </a>       
+            
+            <!-- Botão Excel -->
+            <a href="{% url 'exportar_terceiros_excel' %}?{{ request.GET.urlencode }}"
+            class="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-emerald-500 hover:to-green-600 dark:from-emerald-700 dark:to-green-600 dark:hover:from-green-600 dark:hover:to-emerald-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm">
+                <i class="fa-solid fa-file-excel text-xs"></i>
+                Exportar Excel
+            </a>
+        </div>
+            
+        </div>
+
+<!-- Filtros -->
+<form method="get" class="filter-card mb-6 animate-slide-in" id="filterForm" style="animation-delay: 0.1s">
+    <div class="filters-grid">
+        <!-- Status -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <i class="fa-solid fa-filter mr-1.5 text-[#00594C] text-xs"></i>
+                Status
+            </label>
+            <select name="status" class="styled-select">
+                <option value="abertos" {% if status_atual == "abertos" %}selected{% endif %}>
+                    🟢 No pátio
+                </option>
+                <option value="finalizados" {% if status_atual == "finalizados" %}selected{% endif %}>
+                    🔵 Finalizados
+                </option>
+                <option value="todos" {% if status_atual == "todos" %}selected{% endif %}>
+                    📋 Todos os registros
+                </option>
+            </select>
+        </div>
+
+        <!-- Data início -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <i class="fa-solid fa-calendar-alt mr-1.5 text-[#00594C] text-xs"></i>
+                Data inicial
+            </label>
+            <div class="input-with-clear">
+                <input type="date" 
+                       name="inicio" 
+                       value="{{ inicio }}" 
+                       class="styled-input pr-10"
+                       id="dataInicio">
+                {% if inicio %}
+                <button type="button" 
+                        class="clear-date-btn" 
+                        data-target="dataInicio"
+                        title="Limpar data inicial">
+                    <i class="fa-solid fa-times text-xs"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Data fim -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <i class="fa-solid fa-calendar-check mr-1.5 text-[#00594C] text-xs"></i>
+                Data final
+            </label>
+            <div class="input-with-clear">
+                <input type="date" 
+                       name="fim" 
+                       value="{{ fim }}" 
+                       class="styled-input pr-10"
+                       id="dataFim">
+                {% if fim %}
+                <button type="button" 
+                        class="clear-date-btn" 
+                        data-target="dataFim"
+                        title="Limpar data final">
+                    <i class="fa-solid fa-times text-xs"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Ações dos filtros -->
+        <div class="filter-actions">
+            <div>
+                <!-- Label sempre visível -->
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    <i class="fa-solid fa-sliders-h mr-1 text-[#00594C] text-xs"></i>
+                    Ações
+                </label>
+                
+                <!-- Botão Limpar Filtros (compacto) -->
+                <button type="button" 
+                        onclick="clearAllFilters()"
+                        id="clearAllFiltersBtn"
+                        class="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium bg-gradient-to-r from-gray-500 to-gray-400 hover:from-gray-600 hover:to-gray-500 dark:from-gray-600 dark:to-gray-500 dark:hover:from-gray-700 dark:hover:to-gray-600 text-white rounded-md disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 whitespace-nowrap"
+                        {% if not inicio and not fim and status_atual == 'abertos' %}disabled{% endif %}>
+                    <i class="fa-solid fa-broom text-xs"></i>
+                    <span>Limpar Filt</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Indicador de filtros ativos -->
+{% if inicio or fim or status_atual != 'abertos' %}
+<div class="mb-2 animate-fade-in">
+    <div class="flex flex-wrap items-center gap-1 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 
+                dark:from-blue-900/20 dark:to-indigo-900/20 rounded border border-blue-200 
+                dark:border-blue-800">
+        <span class="text-[11px] font-medium text-blue-700 dark:text-blue-300 mr-1">
+            <i class="fa-solid fa-filter text-[10px] mr-0.5"></i>
+            Filtros:
+        </span>
+        
+        <div class="flex flex-wrap gap-1">
+            {% if status_atual == 'finalizados' %}
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[11px] 
+                        font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                Finalizados
+                <button type="button" class="ml-0.5 text-blue-600 hover:text-blue-800" 
+                        onclick="clearFilter('status')">
+                    <i class="fa-solid fa-times text-[9px]"></i>
+                </button>
+            </span>
+            {% elif status_atual == 'todos' %}
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[11px] 
+                        font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                Todos
+                <button type="button" class="ml-0.5 text-blue-600 hover:text-blue-800" 
+                        onclick="clearFilter('status')">
+                    <i class="fa-solid fa-times text-[9px]"></i>
+                </button>
+            </span>
+            {% endif %}
+            
+            {% if inicio %}
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[11px] 
+                        font-medium bg-emerald-100 text-emerald-800 
+                        dark:bg-emerald-900 dark:text-emerald-300">
+                <i class="fa-solid fa-calendar-alt text-[9px]"></i>
+                {{ inicio|date:"d/m/Y" }}
+                <button type="button" class="ml-0.5 text-emerald-600 hover:text-emerald-800" 
+                        onclick="clearFilter('inicio')">Início
+                    <i class="fa-solid fa-times text-[9px]"></i>
+                </button>
+            </span>
+            {% endif %}
+            
+            {% if fim %}
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[11px] 
+                        font-medium bg-emerald-100 text-emerald-800 
+                        dark:bg-emerald-900 dark:text-emerald-300">
+                <i class="fa-solid fa-calendar-check text-[9px]"></i>
+                {{ fim|date:"d/m/Y" }}
+                <button type="button" class="ml-0.5 text-emerald-600 hover:text-emerald-800" 
+                        onclick="clearFilter('fim')">Final
+                    <i class="fa-solid fa-times text-[9px]"></i>
+                </button>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+        <!-- Listagem de veículos -->
+        {% if movimentacoes %}
+            <div class="cards-grid animate-fade-in" style="animation-delay: 0.2s">
+                {% for mov in movimentacoes %}
+                    <div class="vehicle-card">
+                        <!-- Header do card -->
+                        <div class="card-header {% if mov.status == 'ENTRADA' %}entrada{% else %}saida{% endif %}">
+                            <div class="flex justify-between items-center">
+                                <span class="placa-display">{{ mov.placa }}</span>
+                                <span class="status-badge {% if mov.status == 'ENTRADA' %}entrada{% else %}saida{% endif %}">
+                                    {% if mov.status == "ENTRADA" %}
+                                        <i class="fa-solid fa-circle text-[8px] mr-0.5"></i> ATIVO
+                                    {% else %}
+                                        <i class="fa-solid fa-check-circle mr-0.5 text-xs"></i> FINALIZADO
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Body do card -->
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fa-solid fa-building text-xs"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-label">Empresa</div>
+                                        <div class="info-value">{{ mov.empresa }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fa-solid fa-id-card text-xs"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-label">Motorista</div>
+                                        <div class="info-value">{{ mov.motorista_nome }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fa-solid fa-sign-in-alt text-xs"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-label">Entrada</div>
+                                        <div class="info-value">{{ mov.data_entrada|date:"d/m/Y H:i" }}</div>
+                                    </div>
+                                </div>
+
+                                {% if mov.status == "SAIDA" %}
+                                    <div class="info-item">
+                                        <div class="info-icon">
+                                            <i class="fa-solid fa-sign-out-alt text-xs"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <div class="info-label">Saída</div>
+                                            <div class="info-value">{{ mov.data_saida|date:"d/m/Y H:i" }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        
+                        <!-- Footer do card -->
+                        <div class="card-footer pt-2">
+                            <div class="flex gap-1.5">
+                                <!-- Botão de detalhes -->
+                                <a href="{% url 'terceiros_detalhe' mov.id %}"
+                                class="flex-1 action-button saida py-1 px-1.5 text-[11px] font-medium">
+                                    <i class="fa-solid fa-eye text-[10px] mr-1"></i>
+                                    Detalhes
+                                </a>
+
+                                <!-- Botão de ação principal -->
+                                {% if mov.status == "ENTRADA" %}
+                                    <a href="{% url 'terceiro_saida' mov.id %}"
+                                    class="flex-1 action-button entrada py-1 px-1.5 text-[11px] font-medium">
+                                        <i class="fa-solid fa-sign-out-alt text-[10px] mr-1"></i>
+                                        Saída
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty state -->
+            <div class="empty-state animate-fade-in" style="animation-delay: 0.3s">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-truck text-lg"></i>
+                </div>
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1.5">
+                    Nenhum registro encontrado
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
+                    {% if status_atual == "abertos" %}
+                        Não há veículos de terceiros atualmente no pátio.
+                    {% elif status_atual == "finalizados" %}
+                        Não há registros finalizados para o período selecionado.
+                    {% else %}
+                        Não há registros para os filtros aplicados.
+                    {% endif %}
+                </p>
+                <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                    <a href="{% url 'terceiro_entrada' %}" 
+                       class="primary-action-btn inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus-circle text-xs"></i>
+                        Registrar entrada
+                    </a>
+                    {% if inicio or fim or status_atual != 'abertos' %}
+                    <button type="button" 
+                            onclick="clearAllFilters()"
+                            class="secondary-action-btn inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-broom text-xs"></i>
+                        Limpar filtros
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Contador de registros -->
+        {% if movimentacoes %}
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <div class="text-gray-600 dark:text-gray-400">
+                        <i class="fa-solid fa-info-circle text-[#00594C] mr-1.5 text-xs"></i>
+                        Mostrando {{ movimentacoes|length }} registro{{ movimentacoes|length|pluralize }}
+                        {% if status_atual == "abertos" %}
+                            de veículos atualmente no pátio
+                        {% elif status_atual == "finalizados" %}
+                            de registros finalizados
+                        {% else %}
+                            no total
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fa-solid fa-clock text-xs"></i>
+                        Última atualização: {{ now|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript para funcionalidades de filtro -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Formulário e elementos
+    const form = document.getElementById('filterForm');
+    const inputs = form.querySelectorAll('select, input[type="date"]');
+    const clearAllBtn = document.getElementById('clearAllFiltersBtn');
+    let timeout;
+    
+    // Atualizar estado do botão Limpar Filtros
+    function updateClearButtonState() {
+        if (!clearAllBtn) return;
+        
+        const statusSelect = form.querySelector('[name="status"]');
+        const inicioInput = document.getElementById('dataInicio');
+        const fimInput = document.getElementById('dataFim');
+        
+        // Verificar se há filtros ativos
+        const hasActiveFilters = 
+            (statusSelect && statusSelect.value !== 'abertos') ||
+            (inicioInput && inicioInput.value) ||
+            (fimInput && fimInput.value);
+        
+        if (hasActiveFilters) {
+            clearAllBtn.disabled = false;
+            clearAllBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+        } else {
+            clearAllBtn.disabled = true;
+            clearAllBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
+        }
+    }
+    
+    // Verificar estado inicial do botão
+    updateClearButtonState();
+    
+    // Auto-submit dos filtros com debounce
+    inputs.forEach(input => {
+        input.addEventListener("change", () => {
+            clearTimeout(timeout);
+            // Atualizar estado do botão
+            updateClearButtonState();
+            timeout = setTimeout(() => {
+                showLoading();
+                setTimeout(() => form.submit(), 100);
+            }, 350);
+        });
+    });
+    
+    // Limpar datas individuais
+    document.querySelectorAll('.clear-date-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetInput = document.getElementById(targetId);
+            if (targetInput) {
+                targetInput.value = '';
+                // Atualizar visualmente removendo o botão de limpar
+                this.remove();
+                // Atualizar estado do botão
+                updateClearButtonState();
+                // Disparar change para submit
+                targetInput.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+    
+    // Mostrar loading
+    function showLoading() {
+        // Remover overlay existente se houver
+        const existingOverlay = document.getElementById('loading-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-10 z-50 flex items-center justify-center';
+        overlay.id = 'loading-overlay';
+        overlay.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg flex items-center gap-2">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00594C]"></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300">Aplicando filtros...</span>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+    
+    // Remover overlay de loading após algum tempo (segurança)
+    setTimeout(() => {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.remove();
+    }, 5000);
+    
+    // Efeitos visuais nos cards
+    const cards = document.querySelectorAll('.vehicle-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-4px) scale(1.01)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+
+// Função para limpar filtro individual (chamada pelos badges)
+function clearFilter(filterName) {
+    const form = document.getElementById('filterForm');
+    const input = form.querySelector(`[name="${filterName}"]`);
+    if (input) {
+        if (filterName === 'status') {
+            input.value = 'abertos'; // Valor padrão
+        } else {
+            input.value = '';
+        }
+        showLoading();
+        // Forçar atualização do DOM antes do submit
+        setTimeout(() => {
+            form.submit();
+        }, 150);
+    }
+}
+
+// Função para limpar todos os filtros
+function clearAllFilters() {
+    // Verificar se o botão está desabilitado
+    const clearBtn = document.getElementById('clearAllFiltersBtn');
+    if (clearBtn && clearBtn.disabled) {
+        return; // Não fazer nada se estiver desabilitado
+    }
+    
+    const form = document.getElementById('filterForm');
+    
+    // Resetar status para padrão
+    const statusSelect = form.querySelector('[name="status"]');
+    if (statusSelect) statusSelect.value = 'abertos';
+    
+    // Limpar datas
+    const dateInputs = form.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        input.value = '';
+        // Remover botões de limpar individualmente se existirem
+        const clearBtn = input.nextElementSibling;
+        if (clearBtn && clearBtn.classList.contains('clear-date-btn')) {
+            clearBtn.remove();
+        }
+    });
+    
+    showLoading();
+    
+    // Submeter o formulário (irá recarregar a página sem parâmetros)
+    setTimeout(() => {
+        form.submit();
+    }, 150);
+}
+
+// Função showLoading (agora definida globalmente)
+function showLoading() {
+    // Remover overlay existente se houver
+    const existingOverlay = document.getElementById('loading-overlay');
+    if (existingOverlay) existingOverlay.remove();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-10 z-50 flex items-center justify-center backdrop-blur-sm';
+    overlay.id = 'loading-overlay';
+    overlay.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center gap-2">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00594C]"></div>
+            <span class="text-sm text-gray-700 dark:text-gray-300">Processando...</span>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+</script>
+{% endblock %}

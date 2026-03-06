@@ -1,0 +1,196 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Saída de Veículo de Terceiro{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            Saída de Veículo de Terceiro
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Confirmação de liberação do veículo pela portaria
+        </p>
+    </div>
+
+    <form method="POST" id="saidaForm"
+          class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {% csrf_token %}
+
+        <!-- ======================================================
+             COLUNA PRINCIPAL — RESUMO
+        ====================================================== -->
+        <div class="xl:col-span-2 space-y-6">
+
+            <!-- CARD RESUMO -->
+            <div class="
+                rounded-2xl p-6
+                bg-gradient-to-br from-gray-50 to-gray-100
+                dark:from-[#020617] dark:to-[#0f172a]
+                border border-gray-200 dark:border-gray-800
+                shadow-sm
+            ">
+
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-[#00594C]"></i>
+                        Identificação do Veículo
+                    </h2>
+
+                    <span class="
+                        px-4 py-1.5 rounded-full text-sm font-bold tracking-widest
+                        bg-gray-900 text-white
+                        dark:bg-gray-100 dark:text-gray-900
+                    ">
+                        {{ mov.placa }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- EMPRESA -->
+                    <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
+                        <p class="text-xs uppercase text-gray-500 font-semibold">Empresa</p>
+                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">
+                            {{ mov.empresa }}
+                        </p>
+                    </div>
+
+                    <!-- MOTORISTA -->
+                    <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
+                        <p class="text-xs uppercase text-gray-500 font-semibold">Motorista</p>
+                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">
+                            {{ mov.motorista_nome }}
+                        </p>
+                    </div>
+
+                    <!-- TIPO -->
+                    <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
+                        <p class="text-xs uppercase text-gray-500 font-semibold">Tipo de Veículo</p>
+                        <p class="text-base text-gray-900 dark:text-white mt-1">
+                            {{ mov.tipo_veiculo }}
+                        </p>
+                    </div>
+
+                    <!-- DATA -->
+                    <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
+                        <p class="text-xs uppercase text-gray-500 font-semibold">Entrada no Pátio</p>
+                        <p class="text-base text-gray-900 dark:text-white mt-1">
+                            {{ mov.data_entrada|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+
+                    {% if mov.descricao_veiculo %}
+                    <div class="md:col-span-2 rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
+                        <p class="text-xs uppercase text-gray-500 font-semibold">Descrição do Veículo</p>
+                        <p class="text-sm text-gray-900 dark:text-white mt-1">
+                            {{ mov.descricao_veiculo }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    {% if mov.tags %}
+                    <div class="md:col-span-2">
+                        <span class="
+                            inline-flex items-center gap-2 px-4 py-2 rounded-full
+                            bg-[#00594C]/10 text-[#00594C]
+                            dark:bg-[#00594C]/20 dark:text-emerald-300
+                            text-sm font-semibold
+                        ">
+                            <i class="fa-solid fa-tag text-xs"></i>
+                            {{ mov.tags }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- MOTIVO -->
+            <div class="
+                rounded-2xl p-6
+                bg-white dark:bg-[#020617]
+                border border-gray-200 dark:border-gray-800
+                shadow-sm
+            ">
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400 mb-3">
+                    Motivo da Entrada
+                </h3>
+                <p class="text-gray-900 dark:text-gray-200 text-sm leading-relaxed">
+                    {{ mov.motivo }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ======================================================
+             COLUNA LATERAL — CONFIRMAÇÃO
+        ====================================================== -->
+        <div class="
+            rounded-3xl p-6
+            bg-gradient-to-br from-red-50 to-red-100
+            dark:from-red-900/20 dark:to-red-950/30
+            border border-red-200 dark:border-red-900/40
+            shadow-xl
+        ">
+
+            <h2 class="text-lg font-bold text-red-700 dark:text-red-300 flex items-center gap-2 mb-6">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Confirmação de Saída
+            </h2>
+
+            <!-- OBS -->
+            <div class="mb-6">
+                <label class="block text-xs uppercase font-semibold mb-2 text-gray-600 dark:text-gray-400">
+                    Observações da Saída
+                </label>
+                <textarea name="observacoes" rows="4"
+                          placeholder="Ex: veículo saiu carregado, portão lateral..."
+                          class="
+                              w-full rounded-xl px-4 py-3 text-sm
+                              bg-white dark:bg-[#020617]
+                              text-gray-900 dark:text-white
+                              border border-gray-300 dark:border-gray-700
+                              focus:outline-none focus:ring-2 focus:ring-red-500
+                              transition
+                          "></textarea>
+            </div>
+
+            <!-- ALERTA -->
+            <div class="rounded-xl p-4 bg-red-600 text-white text-sm leading-relaxed mb-8">
+                <strong>Atenção:</strong> após confirmar, o veículo será removido da lista de veículos no pátio.
+                Essa ação é definitiva.
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="space-y-3">
+                <button type="submit"
+                        class="
+                            w-full py-3 rounded-xl font-semibold
+                            bg-red-600 hover:bg-red-700
+                            text-white
+                            shadow-lg shadow-red-600/30
+                            transition-all
+                        ">
+                    <i class="fa-solid fa-check mr-2"></i>
+                    Confirmar Saída
+                </button>
+
+                <a href="{% url 'terceiros_portaria_lista' %}"
+                   class="
+                       w-full block text-center py-3 rounded-xl
+                       border border-gray-300 dark:border-gray-700
+                       text-gray-700 dark:text-gray-300
+                       hover:bg-gray-100 dark:hover:bg-gray-800
+                       transition
+                   ">
+                    Cancelar
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

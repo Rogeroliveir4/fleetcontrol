@@ -1,0 +1,289 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}  
+ 
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+
+  <!-- TÍTULO -->
+  <div class="sticky top-0 z-50 bg-gray-100 dark:bg-gray-900 pb-4 pt-2 shadow-sm text-center mb-4">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+      Dashboard
+    </h1> 
+    <p class="text-gray-600 dark:text-gray-400">
+      Visão geral do controle de frotas
+    </p>
+  </div>
+
+  <!-- CARDS GRANDES -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+
+    <!-- Total de Veículos -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Total de Veículos</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+          {{ total_veiculos }}
+        </p>
+      </div>
+
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#2b654d]/10 text-[#2b654d]">
+        <i class="fa-solid fa-car-side text-2xl"></i>
+      </div>
+    </div>
+
+    <!-- Em Trânsito -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Em Trânsito</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+          {{ movimentacoes_abertas }}
+        </p>
+      </div>
+
+      <div
+        class="w-12 h-12 rounded-xl flex items-center justify-center bg-orange-100 dark:bg-orange-900/40 text-orange-500">
+        <i class="fa-solid fa-arrow-right-arrow-left text-2xl"></i>
+      </div>
+    </div>
+
+    <!-- Motoristas Ativos -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Motoristas Ativos</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+          {{ total_motoristas }}
+        </p>
+      </div>
+
+      <div
+        class="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/40 text-emerald-500">
+        <i class="fa-solid fa-id-card text-2xl"></i>
+      </div>
+    </div>
+
+    <!-- Saídas Hoje -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Saídas Hoje</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+          {{ saidas_hoje }}
+        </p>
+      </div>
+      <div
+        class="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-100 dark:bg-purple-900/40 text-purple-500">
+        <i class="fa-solid fa-clock text-2xl"></i>
+      </div>
+    </div>
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Veículos Disponíveis</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+          {{ saidas_hoje }}
+        </p>
+      </div>
+      <div
+        class="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-100 dark:bg-purple-900/40 text-purple-500">
+        <i class="fa-solid fa-car-side text-2xl"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEÍCULOS PRÓPRIOS E LOCADOS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+
+    <!-- Próprios -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Veículos Próprios</p>
+        <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+          {{ veiculos_proprios }}
+        </p>
+      </div>
+
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-[#2b654d]/10 text-[#2b654d]">
+        <i class="fa-solid fa-warehouse text-xl"></i>
+      </div>
+    </div>
+
+    <!-- Locados -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase">Veículos Locados</p>
+        <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+          {{ veiculos_locados }}
+        </p>
+      </div>
+
+      <div
+        class="w-11 h-11 rounded-xl flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/40 text-indigo-500">
+        <i class="fa-solid fa-file-contract text-xl"></i>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VEÍCULOS EM TRÂNSITO + DISTRIBUIÇÃO -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- VEÍCULOS EM TRÂNSITO -->
+    <div
+      class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+        <i class="fa-solid fa-car-side text-[#2b654d]"></i>
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100">Veículos em Trânsito</h2>
+      </div>
+
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        {% if veiculos_em_transito %}
+        {% for mov in veiculos_em_transito %}
+        <div class="px-5 py-4 flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-[#2b654d]/10 flex items-center justify-center text-[#2b654d]">
+            <i class="fa-solid fa-car-side text-lg"></i>
+          </div>
+
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-gray-900 dark:text-white">
+                  {{ mov.veiculo.placa }}
+                </p>
+
+                <p class="text-xs text-gray-500 dark:text-gray-300">
+                  <i class="fa-solid fa-id-card text-xs mr-1"></i>
+                  {{ mov.motorista.nome }}
+                </p>
+
+                {% if mov.destino %}
+                <p class="text-xs text-gray-500 mt-1">
+                  Destino: {{ mov.destino }}
+                </p>
+                {% endif %}
+
+                <p class="text-xs text-gray-400 mt-1">
+                  Saída: {{ mov.data_saida|date:"d/m/Y H:i" }}
+                </p>
+              </div>
+
+              <span
+                class="text-xs font-semibold px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+                Em Trânsito
+              </span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="px-5 py-6 text-sm text-gray-500 dark:text-gray-300">
+          Nenhum veículo em trânsito no momento.
+        </p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- DISTRIBUIÇÃO DA FROTA -->
+    <div class="space-y-6">
+
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-[#2b654d]"></i>
+          <h2 class="font-semibold text-gray-800 dark:text-gray-100">Distribuição da Frota</h2>
+        </div>
+
+        <div class="px-5 py-4 space-y-4 text-sm">
+
+          <!-- Próprios -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                <span class="w-2 h-2 rounded-full bg-[#2b654d]"></span>
+                Próprios
+              </span>
+              <span class="font-semibold">{{ veiculos_proprios }}</span>
+            </div>
+
+            <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div class="h-2 rounded-full bg-[#2b654d]" style="width: {{ frota_propria_percent }}%;"></div>
+            </div>
+          </div>
+
+          <!-- Locados -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                Locados
+              </span>
+              <span class="font-semibold">{{ veiculos_locados }}</span>
+            </div>
+
+            <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div class="h-2 rounded-full bg-purple-500" style="width: {{ frota_locada_percent }}%;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Movimentações Recentes -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-[#2b654d]"></i>
+          <h2 class="font-semibold text-gray-800 dark:text-gray-100">Movimentações Recentes</h2>
+        </div>
+
+        <div class="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
+
+          {% if movimentacoes_recentes %}
+          {% for mov in movimentacoes_recentes %}
+          <div class="px-5 py-3 flex justify-between items-center">
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">
+                {{ mov.veiculo.placa }} → {{ mov.motorista.nome }}
+              </p>
+
+              <p class="text-xs text-gray-400 mt-1">
+                {{ mov.data_saida|date:"d/m/Y H:i" }}
+              </p>
+            </div>
+
+            {% if mov.km_retorno %}
+            <span
+              class="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+              Finalizada
+            </span>
+            {% else %}
+            <span
+              class="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+              Em Trânsito
+            </span>
+            {% endif %}
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="px-5 py-5 text-gray-500 dark:text-gray-300">
+            Nenhuma movimentação registrada recentemente.
+          </p>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

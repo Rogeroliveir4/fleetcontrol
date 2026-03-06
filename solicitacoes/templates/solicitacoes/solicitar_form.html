@@ -1,0 +1,219 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Solicitar Veículo{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto">
+
+    <!-- Banner -->
+    <div class="w-full bg-[#00594C] dark:bg-emerald-900 text-white rounded-2xl p-5 mb-6 shadow-sm text-center">
+        <h2 class="text-2xl font-bold">Solicitação de Veículo</h2>
+        <p class="text-sm opacity-80">Preencha as informações da sua solicitação</p>
+    </div>
+
+    <form method="POST" class="bg-white dark:bg-gray-800 rounded-2xl shadow dark:shadow-gray-900/30 p-6 space-y-6" id="solicitarForm">
+        {% csrf_token %}
+
+        <!-- Veículo -->
+        <div>
+            <label class="text-gray-700 dark:text-gray-300 font-semibold">Veículo</label>
+            <input type="text" value="{{ veiculo }}" disabled class="w-full mt-1 bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 rounded-xl px-3 py-2 
+                       cursor-not-allowed text-gray-800 dark:text-gray-300">
+        </div>
+
+        <!-- Motorista -->
+        <div>
+            <label class="text-gray-700 dark:text-gray-300 font-semibold">Motorista</label>
+            <input type="text" value="{{ motorista.nome }}" disabled class="w-full mt-1 bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 rounded-xl px-3 py-2 
+                       cursor-not-allowed text-gray-800 dark:text-gray-300">
+        </div>
+
+        <!-- Destino -->
+        <div>
+            <label class="text-gray-700 dark:text-gray-300 font-semibold">Destino *</label>
+            <input type="text" name="destino" required placeholder="Ex.: Cliente XPTO - São Paulo" class="w-full mt-1 border dark:border-gray-600 rounded-xl px-3 py-2 
+                       bg-white dark:bg-gray-700 
+                       text-gray-800 dark:text-gray-300
+                       focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 
+                       focus:border-green-600 dark:focus:border-green-500
+                       placeholder:text-gray-500 dark:placeholder:text-gray-400">
+        </div>
+
+        <!-- Data e Hora de Saída (hidden) -->
+        <input type="hidden" id="data_saida" value="{{ data_saida|date:'Y-m-d\TH:i' }}">
+
+        <!-- Previsão de Retorno -->
+        <div class="relative">
+            <label class="text-gray-700 dark:text-gray-300 font-semibold block mb-2">Previsão de Retorno *</label>
+            <div class="relative">
+                <input type="datetime-local" name="previsao_retorno" id="previsao_retorno" required 
+                       min="{{ data_saida|date:'Y-m-d\TH:i' }}"
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3
+                           bg-white dark:bg-gray-700 
+                           text-gray-800 dark:text-gray-300
+                           focus:ring-2 focus:ring-green-500 
+                           focus:border-green-500
+                           focus:outline-none transition-all duration-200
+                           appearance-none" 
+                       oninput="validarDataRetorno()" />
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Toque para selecionar data e hora</p>
+            <p id="erroData" class="text-sm text-red-500 dark:text-red-400 mt-1 hidden">A data de retorno deve ser igual ou posterior à data de saída ({{ data_saida|date:'d/m/Y H:i' }})</p>
+        </div>
+
+        <!-- Justificativa -->
+        <div>
+            <label class="text-gray-700 dark:text-gray-300 font-semibold">Justificativa *</label>
+            <textarea name="justificativa" rows="3" required placeholder="Descreva a finalidade do uso do veículo..."
+                class="w-full mt-1 border dark:border-gray-600 rounded-xl px-3 py-2 
+                       bg-white dark:bg-gray-700 
+                       text-gray-800 dark:text-gray-300
+                       focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 
+                       focus:border-green-600 dark:focus:border-green-500
+                       placeholder:text-gray-500 dark:placeholder:text-gray-400">
+            </textarea>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-between items-center pt-4">
+            <a href="{% url 'lista_veiculos' %}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
+                    rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                Voltar
+            </a>
+
+            <button type="submit" id="submitBtn" class="px-6 py-2 rounded-xl text-white bg-green-700 dark:bg-green-600 
+                    hover:bg-green-800 dark:hover:bg-green-700 shadow 
+                    transition-colors">
+                Enviar Solicitação
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- CSS específico para melhorar datetime-local no dark mode -->
+<style>
+    @media (max-width: 640px) {
+
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="time"] {
+            min-height: 48px;
+            font-size: 16px;
+        }
+    }
+
+    /* Ajustes para inputs no dark mode */
+    .dark input[type="datetime-local"] {
+        color-scheme: dark;
+    }
+
+    /* Estilização do placeholder no dark mode */
+    .dark input::placeholder,
+    .dark textarea::placeholder {
+        color: #9CA3AF;
+    }
+
+    /* Ajuste para o ícone do calendário no dark mode */
+    .dark .text-gray-400 {
+        color: #6B7280;
+    }
+</style>
+
+<script>
+    // Função para validar a data de retorno
+    function validarDataRetorno() {
+        const inputRetorno = document.getElementById('previsao_retorno');
+        const dataSaidaInput = document.getElementById('data_saida');
+        const erroData = document.getElementById('erroData');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (!inputRetorno.value || !dataSaidaInput.value) {
+            return;
+        }
+        
+        const dataSaida = new Date(dataSaidaInput.value);
+        const dataRetorno = new Date(inputRetorno.value);
+        
+        // Validação do ano (máximo 4 dígitos)
+        const anoRetorno = dataRetorno.getFullYear();
+        if (anoRetorno.toString().length > 4) {
+            erroData.textContent = 'O ano deve ter no máximo 4 dígitos';
+            erroData.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-green-700', 'dark:bg-green-600');
+            submitBtn.classList.add('bg-gray-400', 'dark:bg-gray-600', 'cursor-not-allowed');
+            return;
+        }
+        
+        // Validação se a data de retorno é posterior à data de saída
+        if (dataRetorno < dataSaida) {
+            erroData.textContent = `A data de retorno deve ser igual ou posterior à data de saída (${formatarData(dataSaida)})`;
+            erroData.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-green-700', 'dark:bg-green-600');
+            submitBtn.classList.add('bg-gray-400', 'dark:bg-gray-600', 'cursor-not-allowed');
+        } else {
+            erroData.classList.add('hidden');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'dark:bg-gray-600', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-green-700', 'dark:bg-green-600');
+        }
+    }
+    
+    // Função auxiliar para formatar data
+    function formatarData(data) {
+        const dia = String(data.getDate()).padStart(2, '0');
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const ano = data.getFullYear();
+        const horas = String(data.getHours()).padStart(2, '0');
+        const minutos = String(data.getMinutes()).padStart(2, '0');
+        
+        return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+    }
+    
+    // Validação no carregamento da página
+    document.addEventListener('DOMContentLoaded', function() {
+        validarDataRetorno();
+        
+        // Adicionar validação ao submeter o formulário
+        document.getElementById('solicitarForm').addEventListener('submit', function(e) {
+            const inputRetorno = document.getElementById('previsao_retorno');
+            const dataSaidaInput = document.getElementById('data_saida');
+            
+            if (!inputRetorno.value || !dataSaidaInput.value) {
+                e.preventDefault();
+                return;
+            }
+            
+            const dataSaida = new Date(dataSaidaInput.value);
+            const dataRetorno = new Date(inputRetorno.value);
+            const anoRetorno = dataRetorno.getFullYear();
+            
+            // Validação final do ano
+            if (anoRetorno.toString().length > 4) {
+                e.preventDefault();
+                alert('O ano deve ter no máximo 4 dígitos');
+                return;
+            }
+            
+            // Validação final da data
+            if (dataRetorno < dataSaida) {
+                e.preventDefault();
+                alert('A data de retorno deve ser igual ou posterior à data de saída');
+                return;
+            }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-xl font-semibold mb-4">
+        Gestão — Veículos de Terceiros
+    </h1>
+
+    <div class="bg-white dark:bg-gray-900 shadow rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                    <th class="p-3 text-left">Placa</th>
+                    <th class="p-3 text-left">Empresa</th>
+                    <th class="p-3 text-left">Contrato</th>
+                    <th class="p-3 text-left">Entrada</th>
+                    <th class="p-3 text-left">Saída</th>
+                    <th class="p-3 text-left">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in movimentacoes %}
+                <tr class="border-t dark:border-gray-800">
+                    <td class="p-3 font-medium">{{ mov.placa }}</td>
+                    <td class="p-3">{{ mov.empresa }}</td>
+                    <td class="p-3">{{ mov.contrato.nome }}</td>
+                    <td class="p-3">{{ mov.data_entrada|date:"d/m/Y H:i" }}</td>
+                    <td class="p-3">
+                        {% if mov.data_saida %}
+                            {{ mov.data_saida|date:"d/m/Y H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td class="p-3">
+                        {% if mov.status == "DENTRO" %}
+                            <span class="badge badge-warning">Dentro</span>
+                        {% else %}
+                            <span class="badge badge-success">Saiu</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="p-6 text-center text-gray-500">
+                        Nenhum registro encontrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

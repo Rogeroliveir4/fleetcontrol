@@ -1,0 +1,885 @@
+{% extends "core/base.html" %}
+{% block title %}Veículos{% endblock %}
+{% block mobile_title %}Veículos{% endblock %}
+{% load l10n humanize %}
+
+{% block content %}
+<!-- Custom styles para responsividade mobile -->
+<style>
+    /* Estilos específicos para tela de veículos */
+    .touch-filter-btn {
+        min-height: 40px !important;
+        min-width: 40px !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+    }
+
+    .mobile-form-input {
+        font-size: 16px !important;
+        /* Previne zoom no iOS */
+        min-height: 48px;
+    }
+
+    .mobile-action-btn {
+        min-height: 48px;
+        font-size: 0.875rem;
+    }
+
+    /* Scroll horizontal otimizado para mobile - COM ESPAÇO PARA SAFE AREAS */
+    .mobile-filter-scroll {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin-left: calc(-0.5rem - env(safe-area-inset-left, 0px));
+        margin-right: calc(-0.5rem - env(safe-area-inset-right, 0px));
+        padding-left: calc(0.5rem + env(safe-area-inset-left, 0px));
+        padding-right: calc(0.5rem + env(safe-area-inset-right, 0px));
+    }
+
+    .mobile-filter-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Container dos filtros */
+    .filters-container {
+        display: flex;
+        gap: 6px !important;
+        padding: 2px 0 8px 0;
+    }
+
+    /* Botões compactos para mobile */
+    .filter-chip {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        padding: 6px 10px;
+        font-size: 12px;
+        height: 32px;
+    }
+
+    .filter-chip.active {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Safe area adjustments */
+    @supports (padding: max(0px)) {
+        .mobile-safe-padding {
+            padding-left: max(0.5rem, env(safe-area-inset-left));
+            padding-right: max(0.5rem, env(safe-area-inset-right));
+        }
+
+        .mobile-safe-bottom {
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+    }
+
+    /* Loading animation */
+    .loading-pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+
+    /* Estilos para cards de veículos - COMUM */
+    .vehicle-card {
+        border-radius: 10px;
+        overflow: hidden;
+        background: white;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .vehicle-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: #d1d5db;
+    }
+
+    .vehicle-image {
+        height: 140px;
+        background: linear-gradient(135deg, #065f46 0%, #3a6859 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .vehicle-plate {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 1px;
+        backdrop-filter: blur(2px);
+    }
+
+    .vehicle-status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-disponivel {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .status-indisponivel {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .status-manutencao {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    /* Novo status para inativos */
+    .status-inativo {
+        background: #f3f4f6;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+    }
+
+    .vehicle-icon {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 42px;
+    }
+
+    /* Badge de categoria */
+    .category-badge {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* Indicador de KM */
+    .km-indicator {
+        width: 100%;
+        height: 4px;
+        background: #f3f4f6;
+        border-radius: 2px;
+        margin-top: 4px;
+        overflow: hidden;
+    }
+
+    .km-fill {
+        height: 100%;
+        border-radius: 2px;
+    }
+
+    .km-low {
+        background: #10b981;
+        width: 25%;
+    }
+
+    .km-medium {
+        background: #f59e0b;
+        width: 50%;
+    }
+
+    .km-high {
+        background: #ef4444;
+        width: 75%;
+    }
+
+    .km-very-high {
+        background: #dc2626;
+        width: 90%;
+    }
+
+    /* Grid responsivo para MOBILE */
+    .mobile-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* Grid responsivo para DESKTOP - 4 COLUNAS */
+    @media (min-width: 1024px) {
+        .desktop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /* Ajuste para cards mais compactos no desktop */
+        .desktop-grid .vehicle-card .vehicle-info {
+            padding: 14px;
+        }
+
+        .desktop-grid .vehicle-model {
+            font-size: 15px;
+            line-height: 1.3;
+        }
+
+        .desktop-grid .detail-value {
+            font-size: 13px;
+        }
+
+        .desktop-grid .detail-label {
+            font-size: 11px;
+        }
+
+        /* Ajuste para grid responsiva */
+        @media (max-width: 1400px) {
+            .desktop-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .desktop-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    }
+
+    /* Estilo para container vazio */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 48px 20px;
+    }
+
+    /* Botão de filtro com ícone em telas muito pequenas */
+    @media (max-width: 360px) {
+        .filter-chip {
+            padding: 6px 8px;
+            font-size: 11px;
+            height: 30px;
+        }
+
+        .filter-chip span:not(.count) {
+            display: none;
+        }
+
+        .filter-chip .count {
+            display: inline !important;
+            font-weight: 600;
+        }
+    }
+
+    /* Para telas entre 361px e 400px */
+    @media (min-width: 361px) and (max-width: 400px) {
+        .filter-chip {
+            padding: 6px 9px;
+            font-size: 11.5px;
+        }
+    }
+</style>
+
+<!-- =======================================================================
+    MOBILE
+======================================================================= -->
+<div class="lg:hidden min-h-screen bg-white dark:bg-gray-900 mobile-safe-padding">
+    <!-- HEADER MOBILE -->
+    <div class="pt-3 sm:pt-4 pb-2">
+        <div class="bg-primary dark:bg-primary-dark rounded-xl p-4 mb-3 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-1">Veículos</h2>
+            <p class="text-xs sm:text-sm text-white opacity-90">Gestão completa da frota</p>
+        </div>
+    </div>
+
+    <!-- FILTROS HORIZONTAIS - Scroll horizontal otimizado para mobile -->
+    <div class="mobile-filter-scroll overflow-x-auto mb-3">
+        <div class="filters-container">
+            {% if perfilusuario.nivel != "basico" %}
+                <!-- Filtro Disponíveis -->
+                <button onclick="filtrarPorStatus('disponivel')" 
+                        data-status="disponivel"
+                        class="filter-chip {% if status == 'disponivel' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Disponíveis</span>
+                    <span class="count ml-1">({{ total_disponivel }})</span>
+                </button>
+
+                <!-- Filtro Manutenção -->
+                <button onclick="filtrarPorStatus('manutencao')" 
+                        data-status="manutencao"
+                        class="filter-chip {% if status == 'manutencao' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Manutenção</span>
+                    <span class="count ml-1">({{ total_manutencao }})</span>
+                </button>
+
+                <!-- Filtro Em Aprovação -->
+                <button onclick="filtrarPorStatus('indisponivel')" 
+                        data-status="indisponivel"
+                        class="filter-chip {% if status == 'indisponivel' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Aprovação</span>
+                    <span class="count ml-1">({{ total_indisponivel }})</span>
+                </button>
+
+                <!-- Filtro Inativos -->
+                <button onclick="filtrarPorStatus('inativo')" 
+                        data-status="inativo"
+                        class="filter-chip {% if status == 'inativo' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Inativos</span>
+                    <span class="count ml-1">({{ total_inativos }})</span>
+                </button>
+
+                <!-- Filtro Todos -->
+                <button onclick="filtrarPorStatus('')" 
+                        data-status=""
+                        class="filter-chip {% if status == '' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Todos</span>
+                    <span class="count ml-1">({{ total_geral }})</span>
+                </button>
+            {% else %}
+                <!-- Para usuários básicos - menos opções -->
+                <button onclick="filtrarPorStatus('disponivel')" 
+                        data-status="disponivel"
+                        class="filter-chip {% if status == 'disponivel' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Disponíveis</span>
+                </button>
+
+                <button onclick="filtrarPorStatus('')" 
+                        data-status=""
+                        class="filter-chip {% if status == '' %}active bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %}">
+                    <span>Todos</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO MOBILE -->
+    <div class="mb-4">
+        <div class="relative mb-2">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input id="search-mobile" type="text" placeholder="Placa, modelo ou categoria..." value="{{ search }}"
+                class="mobile-form-input w-full pl-9 pr-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+        </div>
+
+        <button type="button" onclick="aplicarFiltro()" class="mobile-action-btn w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all
+                    active:scale-[0.98] active:opacity-90">
+            Filtrar
+        </button>
+    </div>
+
+    <!-- BOTÕES DE AÇÃO -->
+    <div class="flex gap-2 mb-4">
+        {% if perfilusuario.nivel != "basico" %}
+            <a href="{% url 'criar_veiculo' %}" class="mobile-action-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all
+                    active:scale-[0.98] active:opacity-90">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>Novo Veículo</span>
+            </a>
+        {% endif %}
+        
+        <!-- Botão Exportar (mobile) -->
+        {% if perfilusuario.nivel != "basico" %}
+            <a href="{% url 'exportar_excel' %}?{% if status %}status={{ status }}&{% endif %}{% if search %}search={{ search|urlencode }}&{% endif %}group_by=&city="
+                class="inline-flex lg:hidden items-center justify-center w-12 h-12 rounded-full bg-[#00594C] text-white shadow-md active:scale-[0.95]">
+                <i class="fa-solid fa-file-export"></i>
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- RESULTADOS MOBILE -->
+    <div id="resultados-mobile" class="mb-16 mobile-safe-bottom mobile-grid">
+        {% include "veiculos/partials/cards.html" %}
+    </div>
+
+    <!-- PAGINAÇÃO MOBILE -->
+    <div id="paginacao-mobile"
+        class="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-3 pb-safe">
+        {% include "veiculos/partials/paginacao_mobile.html" %}
+    </div>
+</div>
+
+<!-- =======================================================================
+    DESKTOP
+======================================================================= -->
+<div class="hidden lg:block min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- HEADER DESKTOP -->
+    <div class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b dark:border-gray-800 shadow-sm">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Veículos</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Gestão completa da frota de veículos</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Botão Exportar (desktop) -->
+                    {% if perfilusuario.nivel != "basico" %}
+                        <a href="{% url 'exportar_excel' %}?{% if status %}status={{ status }}&{% endif %}{% if search %}search={{ search|urlencode }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}{% if localizacao %}localizacao={{ localizacao }}&{% endif %}group_by=&city="
+                            class="hidden lg:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900">
+                            <i class="fa-solid fa-file-export"></i> Exportar
+                        </a>
+                    {% endif %}
+
+                    {% if perfilusuario.nivel != "basico" %}
+                        <a href="{% url 'criar_veiculo' %}" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 text-sm
+                                transition-all hover:shadow-md">
+                            <i class="fa-solid fa-plus"></i>
+                            Novo Veículo
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS DESKTOP -->
+    <div class="sticky top-[88px] z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 py-4 px-6">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="flex gap-2">
+                {% if perfilusuario.nivel != "basico" %}
+                    <button onclick="filtrarPorStatus('disponivel')" data-status="disponivel"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                                {% if status == 'disponivel' %}bg-emerald-500 text-white shadow-sm
+                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                        Disponíveis ({{ total_disponivel }})
+                    </button>
+
+                    <button onclick="filtrarPorStatus('manutencao')" data-status="manutencao"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                                {% if status == 'manutencao' %}bg-amber-500 text-white shadow-sm
+                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                        Manutenção ({{ total_manutencao }})
+                    </button>
+
+                    <button onclick="filtrarPorStatus('indisponivel')" data-status="indisponivel"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                                {% if status == 'indisponivel' %}bg-red-500 text-white shadow-sm
+                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                        Em Trânsito ({{ total_indisponivel }})
+                    </button>
+
+                    <button onclick="filtrarPorStatus('inativo')" data-status="inativo"
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                                {% if status == 'inativo' %}bg-gray-500 text-white shadow-sm
+                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                        Inativos ({{ total_inativos }})
+                    </button>
+
+                    <button onclick="filtrarPorStatus('')" data-status=""
+                        class="px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                                {% if status == '' %}bg-blue-600 text-white shadow-sm
+                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %}">
+                        Todos ({{ total_geral }})
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="flex-1 max-w-lg">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input id="search-desktop" type="text" placeholder="Placa, modelo ou categoria..."
+                        value="{{ search }}" class="w-full h-10 pl-9 pr-3 rounded-lg border dark:border-gray-700 
+                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+                </div>
+            </div>
+
+            <button onclick="aplicarFiltro()"
+                class="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all">
+                Filtrar
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULTADOS DESKTOP -->
+    <div class="px-6 py-6">
+        <!-- Grade responsiva para desktop - 4 COLUNAS -->
+        <div id="resultados-desktop" class="desktop-grid">
+            {% include "veiculos/partials/cards.html" %}
+        </div>
+
+        <!-- PAGINAÇÃO DESKTOP -->
+        <div id="paginacao-desktop" class="mt-6">
+            {% include "veiculos/partials/paginacao_desktop.html" %}
+        </div>
+    </div>
+</div>
+<script>
+    // JavaScript otimizado para mobile - COM DEBOUNCE ADEQUADO
+let timeoutId;
+let currentStatus = "{{ status|default:'' }}";
+let isApplyingFilter = false;
+let searchTimeoutId;
+let lastSearchValue = "";
+
+// Atualizar cores dos botões de status
+function atualizarCoresStatus(novoStatus) {
+    currentStatus = novoStatus;
+    const isMobile = window.innerWidth < 1024;
+
+    document.querySelectorAll('[data-status]').forEach(btn => {
+        const btnStatus = btn.getAttribute('data-status');
+
+        // Remover classes de cor
+        btn.classList.remove(
+            // Mobile - active
+            'active', 'bg-blue-600', 'text-white',
+            // Mobile - inactive
+            'bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300',
+            // Desktop - active
+            'bg-emerald-500', 'bg-amber-500', 'bg-red-500', 'bg-gray-500', 'bg-blue-600', 'text-white', 'shadow-sm',
+            // Desktop - inactive
+            'bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300'
+        );
+
+        if (isMobile) {
+            // Mobile
+            if (btnStatus === novoStatus) {
+                btn.classList.add('active', 'bg-blue-600', 'text-white');
+            } else {
+                btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+            }
+        } else {
+            // Desktop
+            if (btnStatus === novoStatus) {
+                switch (novoStatus) {
+                    case 'disponivel':
+                        btn.classList.add('bg-emerald-500', 'text-white', 'shadow-sm');
+                        break;
+                    case 'manutencao':
+                        btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm');
+                        break;
+                    case 'indisponivel':
+                        btn.classList.add('bg-red-500', 'text-white', 'shadow-sm');
+                        break;
+                    case 'inativo':
+                        btn.classList.add('bg-gray-500', 'text-white', 'shadow-sm');
+                        break;
+                    case '':
+                        btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+                        break;
+                }
+            } else {
+                btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+            }
+        }
+    });
+}
+
+// Filtrar por status
+function filtrarPorStatus(status) {
+    if (isApplyingFilter) return;
+    
+    // Feedback tátil para mobile
+    if (navigator.vibrate) {
+        navigator.vibrate(30);
+    }
+    
+    atualizarCoresStatus(status);
+    aplicarFiltro();
+}
+
+// Coletar dados dos filtros
+function coletarDadosFiltro() {
+    const isMobile = window.innerWidth < 1024;
+
+    return {
+        status: currentStatus,
+        search: isMobile
+            ? document.getElementById('search-mobile')?.value || ''
+            : document.getElementById('search-desktop')?.value || '',
+        categoria: isMobile
+            ? document.getElementById('categoria-mobile')?.value || ''
+            : document.getElementById('categoria-desktop')?.value || '',
+        localizacao: isMobile
+            ? document.getElementById('localizacao-mobile')?.value || ''
+            : document.getElementById('localizacao-desktop')?.value || ''
+    };
+}
+
+// Aplicar filtros com debounce otimizado
+function aplicarFiltro() {
+    if (isApplyingFilter) return;
+    isApplyingFilter = true;
+
+    const dados = coletarDadosFiltro();
+    const params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(dados)) {
+        if (value) params.append(key, value);
+    }
+
+    // Atualizar links de exportação
+    document.querySelectorAll('[id^="btn-exportar-"]').forEach(btn => {
+        btn.href = `/veiculos/exportar/?${params.toString()}`;
+    });
+
+    // Debounce para evitar múltiplas requisições
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+        // Mostrar loading state
+        const resultadosContainer = window.innerWidth < 1024
+            ? document.getElementById('resultados-mobile')
+            : document.getElementById('resultados-desktop');
+
+        if (resultadosContainer) {
+            resultadosContainer.innerHTML = `
+                <div class="text-center py-12 loading-pulse">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
+                        <i class="fas fa-spinner fa-spin text-gray-500"></i>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400">Carregando...</p>
+                </div>
+            `;
+        }
+
+        fetch(`/veiculos/filtrar/?${params.toString()}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.html_cards) {
+                    const isMobile = window.innerWidth < 1024;
+                    if (isMobile) {
+                        document.getElementById('resultados-mobile').innerHTML = data.html_cards;
+                        if (data.paginacao_mobile) {
+                            document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
+                        }
+                    } else {
+                        document.getElementById('resultados-desktop').innerHTML = data.html_cards;
+                        if (data.paginacao_desktop) {
+                            document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
+                        }
+                    }
+
+                    if (data.status !== undefined) {
+                        atualizarCoresStatus(data.status);
+                    }
+                }
+                window.history.pushState({}, '', `?${params.toString()}`);
+            })
+            .catch(() => {
+                // Fallback para recarregamento completo
+                window.location.href = `?${params.toString()}`;
+            })
+            .finally(() => {
+                isApplyingFilter = false;
+            });
+    }, 350);
+}
+
+// Função específica para busca com debounce maior
+function handleSearchInput(value) {
+    clearTimeout(searchTimeoutId);
+    
+    // Se o usuário apagou tudo, aplicar filtro imediatamente
+    if (value === "") {
+        aplicarFiltro();
+        return;
+    }
+    
+    // Se o valor atual é diferente do último
+    if (value !== lastSearchValue) {
+        lastSearchValue = value;
+        
+        // Aguardar 1500ms (1.5 segundos) após a última digitação
+        searchTimeoutId = setTimeout(() => {
+            aplicarFiltro();
+        }, 1500);
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar cores
+    atualizarCoresStatus(currentStatus);
+
+    // Configurar eventos de input com debounce OTIMIZADO
+    const setupSearchEvents = (inputId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            // Evento input com debounce maior
+            input.addEventListener('input', (e) => {
+                const value = e.target.value.trim();
+                handleSearchInput(value);
+            });
+            
+            // Evento change (quando perde foco ou Enter)
+            input.addEventListener('change', aplicarFiltro);
+            
+            // Evento keydown para Enter
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeoutId);
+                    aplicarFiltro();
+                }
+            });
+            
+            // Evento para limpar (botão X em alguns navegadores)
+            input.addEventListener('search', () => {
+                clearTimeout(searchTimeoutId);
+                aplicarFiltro();
+            });
+        }
+    };
+
+    // Configurar inputs de busca
+    ['search-mobile', 'search-desktop'].forEach(setupSearchEvents);
+
+    // Para outros inputs, manter comportamento original
+    const setupOtherInputEvents = (inputId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            let inputTimeout;
+            input.addEventListener('input', () => {
+                clearTimeout(inputTimeout);
+                inputTimeout = setTimeout(aplicarFiltro, 500);
+            });
+            input.addEventListener('change', aplicarFiltro);
+        }
+    };
+
+    ['categoria-mobile', 'categoria-desktop',
+        'localizacao-mobile', 'localizacao-desktop']
+        .forEach(setupOtherInputEvents);
+
+    // Paginação via AJAX
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('a[href*="page="]');
+        if (link) {
+            e.preventDefault();
+
+            const url = new URL(link.href);
+            const page = url.searchParams.get('page');
+            const dados = coletarDadosFiltro();
+            dados.page = page;
+
+            const params = new URLSearchParams();
+            for (const [key, value] of Object.entries(dados)) {
+                if (value) params.append(key, value);
+            }
+
+            fetch(`/veiculos/filtrar/?${params.toString()}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html_cards) {
+                        const isMobile = window.innerWidth < 1024;
+                        if (isMobile) {
+                            document.getElementById('resultados-mobile').innerHTML = data.html_cards;
+                            if (data.paginacao_mobile) {
+                                document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
+                            }
+                        } else {
+                            document.getElementById('resultados-desktop').innerHTML = data.html_cards;
+                            if (data.paginacao_desktop) {
+                                document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
+                            }
+                        }
+
+                        if (data.status !== undefined) {
+                            atualizarCoresStatus(data.status);
+                        }
+                    }
+                    window.history.pushState({}, '', `?${params.toString()}`);
+                });
+        }
+    });
+
+    // Lidar com botões voltar/avançar do navegador
+    window.addEventListener('popstate', function () {
+        const params = new URLSearchParams(window.location.search);
+        const statusFromUrl = params.get('status') || '';
+        atualizarCoresStatus(statusFromUrl);
+        aplicarFiltro();
+    });
+
+    // Prevenir zoom em inputs no iOS
+    document.addEventListener('focusin', function (e) {
+        if (e.target.matches('input, select, textarea')) {
+            document.body.style.zoom = "100%";
+        }
+    });
+    
+    // Indicador visual de que a busca está "ouvindo"
+    document.querySelectorAll('#search-mobile, #search-desktop').forEach(input => {
+        input.addEventListener('input', function(e) {
+            const value = e.target.value;
+            
+            // Adicionar indicador visual
+            const container = e.target.parentElement;
+            let indicator = container.querySelector('.search-indicator');
+            
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.className = 'search-indicator absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs hidden';
+                indicator.innerHTML = '⌛';
+                container.appendChild(indicator);
+            }
+            
+            if (value.trim().length > 0) {
+                indicator.classList.remove('hidden');
+                
+                // Atualizar contador
+                clearTimeout(indicator.timer);
+                indicator.timer = setTimeout(() => {
+                    indicator.classList.add('hidden');
+                }, 1500);
+            } else {
+                indicator.classList.add('hidden');
+            }
+        });
+    });
+});
+
+// Detectar resize e ajustar layout
+let resizeTimeout;
+window.addEventListener('resize', function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        atualizarCoresStatus(currentStatus);
+    }, 250);
+});
+
+// Adicionar CSS para o indicador de busca
+const style = document.createElement('style');
+style.textContent = `
+    .search-indicator {
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+{% endblock %}

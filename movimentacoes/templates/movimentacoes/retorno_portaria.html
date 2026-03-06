@@ -1,0 +1,694 @@
+{% extends "core/base.html" %}
+{% block title %}Registrar Retorno — Portaria{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto px-4 py-6">
+
+    <!-- CABEÇALHO -->
+    <div class="bg-[#00594C] text-white rounded-xl p-5 mb-6 shadow-sm">
+        <h1 class="text-2xl font-bold">Registrar Retorno</h1>
+        <p class="text-sm opacity-90 mt-1">Confirme o KM real, fotos do veículo e observações.</p>
+    </div>
+
+    <!-- CARD PRINCIPAL -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <form method="POST" enctype="multipart/form-data" id="retornoForm">
+            {% csrf_token %}
+
+            <!-- DADOS DO VEÍCULO -->
+            <div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2 bg-green-900 dark:bg-blue-900 rounded-lg">
+                       
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                            {{ mov.veiculo.tag_interna}}
+                        </h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ mov.veiculo.marca }} {{ mov.veiculo.modelo }} • {{ mov.veiculo.cor }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="space-y-1">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Motorista</p>
+                        <p class="text-gray-800 dark:text-gray-200">{{ mov.motorista.nome }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Destino</p>
+                        <p class="text-gray-800 dark:text-gray-200">{{ mov.destino }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Saída</p>
+                        <p class="text-gray-800 dark:text-gray-200">{{ mov.data_saida|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KM ATUAL E RETORNO -->
+            <div class="mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- KM Saída -->
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 mb-2 text-sm font-medium">
+                            🛣️ Quilometragem de Saída
+                        </label>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-700 text-2xl font-bold text-blue-700 dark:text-blue-300 text-center">
+                            {{ mov.veiculo.km_atual }}
+                        </div>
+                    </div>
+
+                    <!-- KM Retorno -->
+                    <div>
+                        <label for="km_retorno" class="block text-gray-700 dark:text-gray-300 mb-2 text-sm font-medium">
+                            📍 KM de Retorno (Real)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                name="km_retorno" 
+                                id="km_retorno"
+                                class="w-full p-4 rounded-lg bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-xl font-bold text-center"
+                                placeholder="Ex: 45.678"
+                                required
+                                pattern="^[0-9]{1,3}(\.[0-9]{3})*$"
+                                title="Digite no formato 123.456 (somente números e ponto)">
+                            <div class="absolute right-3 top-3 text-gray-400 text-sm">
+                                km
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distância Percorrida -->
+                <div class="mt-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2 text-sm font-medium">
+                        📏 Distância Percorrida
+                    </label>
+                    <div id="distancia"
+                        class="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-700 text-3xl font-bold text-green-700 dark:text-green-300 text-center">
+                        0 km
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DE FOTOS OBRIGATÓRIAS -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-blue-500"></i>
+                        Fotos do Retorno (Obrigatórias)
+                    </h3>
+                    <span class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                        Tirar foto diretamente
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- FOTO GERAL -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_geral" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            📸 Foto Geral do Veículo
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_geral" 
+                                   id="foto_retorno_geral"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   required
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_geral" 
+                                   class="block p-4 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-car text-blue-600 dark:text-blue-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto Geral
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Vista completa do veículo
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_geral" class="mt-2 hidden">
+                            <!-- Preview da foto geral -->
+                        </div>
+                    </div>
+
+                    <!-- FOTO PAINEL -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_painel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            📊 Foto do Painel/Odômetro
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_painel" 
+                                   id="foto_retorno_painel"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   required
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_painel" 
+                                   class="block p-4 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-gauge-high text-blue-600 dark:text-blue-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto do Painel
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Mostrando o KM atual
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_painel" class="mt-2 hidden">
+                            <!-- Preview da foto do painel -->
+                        </div>
+                    </div>
+
+                    <!-- FOTO AVARIA -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_avaria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ⚠️ Foto de Avaria (se houver)
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_avaria" 
+                                   id="foto_retorno_avaria"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_avaria" 
+                                   class="block p-4 border-2 border-dashed border-orange-300 dark:border-orange-600 rounded-lg text-center cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-triangle-exclamation text-orange-600 dark:text-orange-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto de Avaria
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Danos ou problemas
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_avaria" class="mt-2 hidden">
+                            <!-- Preview da foto de avaria -->
+                        </div>
+                    </div>
+
+                    <!-- FOTO EQUIPAMENTO -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_equipamento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            🔧 Foto do Equipamento
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_equipamento" 
+                                   id="foto_retorno_equipamento"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_equipamento" 
+                                   class="block p-4 border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg text-center cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-tools text-green-600 dark:text-green-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto do Equipamento
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Equipamentos do veículo
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_equipamento" class="mt-2 hidden">
+                            <!-- Preview da foto de equipamento -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DE FOTOS ESPECÍFICAS -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-images text-purple-500"></i>
+                    Fotos Específicas (Opcional)
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- FOTO CAÇAMBA -->
+                    {% if mov.com_cacamba %}
+                    <div class="space-y-2">
+                        <label for="foto_retorno_cacamba" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            🚛 Foto da Caçamba
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_cacamba" 
+                                   id="foto_retorno_cacamba"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_cacamba" 
+                                   class="block p-4 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-dumpster text-purple-600 dark:text-purple-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto da Caçamba
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Estado da caçamba
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_cacamba" class="mt-2 hidden">
+                            <!-- Preview da foto da caçamba -->
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- FOTO PRANCHA -->
+                    {% if mov.com_prancha %}
+                    <div class="space-y-2">
+                        <label for="foto_retorno_prancha" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            🚚 Foto da Prancha
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_prancha" 
+                                   id="foto_retorno_prancha"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_prancha" 
+                                   class="block p-4 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-trailer text-purple-600 dark:text-purple-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto da Prancha
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Estado da máquina
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_prancha" class="mt-2 hidden">
+                            <!-- Preview da foto da prancha -->
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- FOTO PORTA-MALAS -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_porta_malas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            🧳 Foto do Porta-malas
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_porta_malas" 
+                                   id="foto_retorno_porta_malas"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_porta_malas" 
+                                   class="block p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-suitcase text-gray-600 dark:text-gray-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto do Porta-malas
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Conteúdo interno
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_porta_malas" class="mt-2 hidden">
+                            <!-- Preview da foto do porta-malas -->
+                        </div>
+                    </div>
+
+                    <!-- FOTO COMBUSTÍVEL -->
+                    <div class="space-y-2">
+                        <label for="foto_retorno_combustivel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ⛽ Foto do Combustível
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_combustivel" 
+                                   id="foto_retorno_combustivel"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_combustivel" 
+                                   class="block p-4 border-2 border-dashed border-yellow-300 dark:border-yellow-600 rounded-lg text-center cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-gas-pump text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Foto do Combustível
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Nível do marcador
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_combustivel" class="mt-2 hidden">
+                            <!-- Preview da foto do combustível -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBSERVAÇÃO -->
+            <div class="mb-6">
+                <label for="observacao" class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard text-green-500"></i>
+                    Observações da Portaria
+                </label>
+                <textarea name="observacao" 
+                          id="observacao" 
+                          rows="4"
+                          class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20"
+                          placeholder="Anote qualquer detalhe importante sobre o retorno (estado do veículo, observações, etc.)..."></textarea>
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'portaria_retorno_list' %}"
+                   class="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium text-center transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Cancelar
+                </a>
+
+                <button type="submit"
+                        id="submitBtn"
+                        class="px-6 py-3 rounded-lg bg-gradient-to-r from-[#00594C] to-emerald-600 hover:from-[#00463C] hover:to-emerald-700 text-white font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i>
+                    Registrar Retorno
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Detectar se é dispositivo móvel
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Formatar número com separador de milhares
+    function formatarNumero(numero) {
+        return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Calcular distância percorrida
+    function calcDistancia() {
+        console.log('=== INICIANDO CÁLCULO ===');
+        
+        // Pegar KM Saída do template
+        let km_saida_text = "{{ mov.veiculo.km_atual }}";
+        console.log('KM Saída do template:', km_saida_text);
+        
+        // Converter KM Saída
+        const km_saida = parseFloat(km_saida_text.replace(/\./g, '').replace(',', '.')) || 0;
+        console.log('KM Saída convertido:', km_saida);
+        
+        // Pegar KM Retorno do input
+        const input = document.getElementById("km_retorno");
+        const inputValue = input.value;
+        console.log('KM Retorno digitado:', inputValue);
+        
+        // Converter KM Retorno
+        const km_retorno = parseFloat(inputValue.replace(/\./g, '').replace(',', '.')) || 0;
+        console.log('KM Retorno convertido:', km_retorno);
+        
+        // Calcular diferença
+        const diferencaKm = km_retorno - km_saida;
+        
+        console.log('Diferença calculada em km:', diferencaKm);
+        
+        // Atualizar display
+        const distanciaElement = document.getElementById("distancia");
+        if (distanciaElement) {
+            if (km_retorno === 0) {
+                distanciaElement.textContent = "0 km";
+                distanciaElement.className = "p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-3xl font-bold text-gray-500 dark:text-gray-400 text-center";
+            } else if (diferencaKm >= 0) {
+                // ✅ Aplicar formatação com separador de milhares
+                const diferencaFormatada = formatarNumero(Math.round(diferencaKm));
+                distanciaElement.textContent = diferencaFormatada + " km";
+                distanciaElement.className = "p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-700 text-3xl font-bold text-green-700 dark:text-green-300 text-center";
+            } else {
+                distanciaElement.textContent = "Valor inválido";
+                distanciaElement.className = "p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-700 text-3xl font-bold text-red-700 dark:text-red-300 text-center";
+            }
+        }
+        
+        console.log('=== FIM DO CÁLCULO ===');
+    }
+
+    // Configurar previews para todos os inputs de foto
+    const fotoInputs = [
+        'foto_retorno_geral',
+        'foto_retorno_painel', 
+        'foto_retorno_avaria',
+        'foto_retorno_equipamento',
+        'foto_retorno_cacamba',
+        'foto_retorno_prancha',
+        'foto_retorno_porta_malas',
+        'foto_retorno_combustivel'
+    ];
+
+    // Adicionar evento de change para cada input
+    fotoInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewId = `preview_${inputId.split('foto_retorno_')[1]}`;
+                const previewContainer = document.getElementById(previewId);
+                
+                if (file && previewContainer) {
+                    // Verificar se é imagem
+                    if (!file.type.startsWith('image/')) {
+                        alert(`O arquivo "${file.name}" não é uma imagem válida.`);
+                        input.value = '';
+                        return;
+                    }
+                    
+                    // Verificar tamanho (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(`A imagem "${file.name}" é muito grande. Tamanho máximo: 5MB.`);
+                        input.value = '';
+                        return;
+                    }
+                    
+                    // Criar preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContainer.innerHTML = `
+                            <div class="relative">
+                                <div class="aspect-square rounded-lg overflow-hidden border-2 border-green-300 dark:border-green-600">
+                                    <img src="${e.target.result}" 
+                                         alt="Preview" 
+                                         class="w-full h-full object-cover">
+                                </div>
+                                <button type="button" 
+                                        onclick="removerFoto('${inputId}', '${previewId}')"
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 hover:scale-110 shadow-md transition-all">
+                                    ×
+                                </button>
+                                <div class="text-xs text-gray-500 mt-1 truncate text-center">
+                                    ${file.name.substring(0, 15)}${file.name.length > 15 ? '...' : ''}
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+
+    // Função para remover foto específica
+    function removerFoto(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        
+        if (input && preview) {
+            input.value = '';
+            preview.innerHTML = '';
+            preview.classList.add('hidden');
+        }
+    }
+
+    // Máscara do KM
+    document.getElementById("km_retorno").addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, ""); // remove tudo que não é dígito
+
+        // Aplica o separador de milhar com ponto a cada 3 dígitos
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        e.target.value = value;
+        
+        // Calcular distância
+        calcDistancia();
+    });
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        calcDistancia();
+        
+        // Verificar inicialmente o botão de submit
+        const kmRetorno = document.getElementById('km_retorno').value;
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (!kmRetorno) {
+            submitBtn.disabled = true;
+        }
+        
+        // Remover atributo capture em desktop para permitir seleção de arquivos
+        if (!isMobileDevice()) {
+            fotoInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) input.removeAttribute('capture');
+            });
+        }
+        
+        // Adicionar validação ao formulário
+        document.getElementById('retornoForm').addEventListener('submit', function(e) {
+            const kmRetorno = document.getElementById('km_retorno').value;
+            
+            if (!kmRetorno) {
+                e.preventDefault();
+                alert('Por favor, informe o KM de retorno.');
+                document.getElementById('km_retorno').focus();
+                return false;
+            }
+            
+            // Validar KM mínimo
+            const kmSaida = parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g, '').replace(',', '.'));
+            const kmRetornoNum = parseFloat(kmRetorno.replace(/\./g, ''));
+            
+            if (kmRetornoNum <= kmSaida) {
+                e.preventDefault();
+                alert(`O KM de retorno (${kmRetornoNum}) deve ser maior que o KM de saída (${kmSaida}).`);
+                document.getElementById('km_retorno').focus();
+                return false;
+            }
+            
+            // Validar fotos obrigatórias
+            const fotoGeral = document.getElementById('foto_retorno_geral');
+            const fotoPainel = document.getElementById('foto_retorno_painel');
+            
+            if (!fotoGeral.files[0] || !fotoPainel.files[0]) {
+                e.preventDefault();
+                alert('Por favor, tire as fotos obrigatórias:\n1. Foto Geral do Veículo\n2. Foto do Painel/Odômetro');
+                return false;
+            }
+            
+            // Converter KM para formato correto antes de enviar
+            const kmValue = kmRetorno.replace(/\./g, '');
+            document.getElementById('km_retorno').value = kmValue;
+            
+            // Mostrar loading no botão
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Processando...';
+            
+            return true;
+        });
+        
+        // Habilitar botão quando KM for preenchido
+        document.getElementById('km_retorno').addEventListener('input', function() {
+            const kmValor = this.value.trim();
+            submitBtn.disabled = !kmValor;
+        });
+    });
+</script>
+
+<style>
+    /* Estilos para melhorar a experiência em dispositivos móveis */
+    @media (max-width: 640px) {
+        input, textarea {
+            font-size: 16px !important; /* Evita zoom em iOS */
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Animações suaves */
+    #distancia {
+        transition: all 0.3s ease;
+    }
+    
+    /* Estilo para os labels dos inputs de foto */
+    [id^="foto_retorno_"] + label {
+        transition: all 0.2s ease;
+    }
+    
+    [id^="foto_retorno_"] + label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilo para inputs obrigatórios */
+    [id^="foto_retorno_"]:required + label {
+        border-color: #3b82f6;
+        border-width: 2px;
+    }
+    
+    [id^="foto_retorno_"]:required + label:hover {
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+    
+    /* Estilo para previews */
+    #preview_geral,
+    #preview_painel,
+    #preview_avaria,
+    #preview_equipamento,
+    #preview_cacamba,
+    #preview_prancha,
+    #preview_porta_malas,
+    #preview_combustivel {
+        transition: all 0.3s ease;
+    }
+</style>
+
+{% endblock %} 

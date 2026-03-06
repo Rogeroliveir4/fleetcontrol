@@ -1,0 +1,218 @@
+{% load static %}
+
+<!-- ==========================================================
+    PERFIL USUÁRIO (BÁSICO)
+========================================================== -->
+{% if perfilusuario and perfilusuario.nivel == "basico" %}
+
+<a href="{% url 'dashboard_solicitante' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-chart-line text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Dashboard</span>
+</a>
+
+<a href="{% url 'minhas_solicitacoes' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-clipboard-list text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Minhas Solicitações</span>
+</a>
+
+<a href="/veiculos/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-file-circle-plus text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Solicitar Veículo</span>
+</a>
+
+{% endif %}
+
+
+<!-- ==========================================================
+    PERFIL GESTOR
+========================================================== -->
+{% if perfilusuario and perfilusuario.nivel == "gestor" %}
+
+<a href="{% url 'dashboard_gestor' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-chart-pie text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Dashboard</span>
+</a>
+
+<!-- Aprovações -->
+<div class="relative">
+  <a href="{% url 'gestor_solicitacoes' %}"
+    class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+    <div class="relative">
+      <i class="fa-solid fa-check-double text-base text-gray-500 group-hover:text-primary"></i>
+      {% if pendentes_aprovacao > 0 %}
+      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg animate-pulse">
+        {{ pendentes_aprovacao }}
+      </span>
+      {% endif %}
+    </div>
+    <span class="menuText font-medium">Aprovações</span>
+  </a>
+</div>
+
+<!-- Motoristas -->
+<a href="/motoristas/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-user-tie text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Motoristas</span>
+</a>
+
+<!-- Frota -->
+<a href="/veiculos/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-truck-field text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Frota</span>
+</a>
+
+<!-- Movimentações -->
+<a href="/movimentacoes/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-traffic-light text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Movimentações</span>
+</a>
+
+<!-- Terceiros -->
+<a href="{% url 'terceiros_portaria_lista' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-truck-front text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Terceiros</span>
+</a>
+
+{% endif %}
+
+
+
+<!-- PERFIL PORTARIA-->
+{% if perfilusuario and perfilusuario.nivel == "portaria" %}
+
+<!-- SEÇÃO PORTARIA -->
+<div class="px-4 py-2">
+  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Portaria</h3>
+</div>
+
+<a href="{% url 'listar_saidas_portaria' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-right-from-bracket text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Saídas Pendentes</span>
+</a>
+
+<a href="{% url 'lista_movimentacoes' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-road-circle-check text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Em Trânsito</span>
+</a>
+
+<!-- Controle de Acesso -->
+<div class="px-4 py-2 mt-4">
+  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Controle de Acesso</h3>
+</div>
+
+<a href="{% url 'terceiros_portaria_lista' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-truck-ramp-box text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Veículos Terceiros</span>
+</a>
+
+{% endif %}
+
+
+<!-- ==========================================================
+    PERFIL ADMINISTRADOR
+========================================================== -->
+{% if perfilusuario and perfilusuario.nivel == "adm" %}
+
+<!-- Dashboard Admin -->
+<a href="{% url 'dashboard' %}"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-chart-pie text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Dashboard</span>
+</a>
+
+<!-- Aprovações Admin -->
+<div class="relative">
+  <a href="{% url 'gestor_solicitacoes' %}"
+    class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+    <div class="relative">
+      <i class="fa-solid fa-file-circle-check text-base text-gray-500 group-hover:text-primary"></i>
+      {% if pendentes_aprovacao > 0 %}
+      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg">
+        {{ pendentes_aprovacao }}
+      </span>
+      {% endif %}
+    </div>
+    <span class="menuText font-medium">Aprovações</span>
+  </a>
+</div>
+
+<!-- Gestão de Pessoas -->
+<div class="px-4 py-2 mt-4">
+  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Gestão de Pessoas</h3>
+</div>
+
+<a href="/motoristas/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-users-gear text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Motoristas</span>
+</a>
+
+<!-- Gestão de Frota -->
+<div class="px-4 py-2 mt-4">
+  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Gestão de Frota</h3>
+</div>
+
+<a href="/veiculos/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-car-rear text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Veículos</span>
+</a>
+
+<a href="/movimentacoes/"
+  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+  <i class="fa-solid fa-route text-base text-gray-500 group-hover:text-primary"></i>
+  <span class="menuText font-medium">Movimentações</span>
+</a>
+
+<!-- Sistema -->
+<div class="px-4 py-2 mt-4">
+  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Sistema</h3>
+</div>
+
+<!-- Configurações com submenu -->
+<div class="relative">
+  <button onclick="toggleSubmenu()"
+    class="menu-item group flex w-full items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+    <i class="fa-solid fa-sliders text-base text-gray-500 group-hover:text-primary"></i>
+    <span class="menuText font-medium flex-1 text-left">Configurações</span>
+    <i id="submenuArrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
+  </button>
+
+  <div id="submenuAdm" class="ml-10 mt-1 space-y-1 hidden animate-fadeIn">
+    <a href="#" onclick="toggleTheme()"
+      class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-circle-half-stroke text-xs"></i>
+      <span>Alternar Tema</span>
+    </a>
+    
+    <a href="/admin/"
+      class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-user-shield text-xs"></i>
+      <span>Painel Admin</span>
+    </a>
+  </div>
+</div>
+
+{% endif %}
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+</style>

@@ -1,0 +1,137 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard {% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- HEADER -->
+    <div class="bg-gradient-to-r from-[#00594C] to-[#0a7c6c] text-white rounded-2xl p-6 shadow-sm">
+        <h2 class="text-2xl font-bold">
+            Olá, {{ request.user.first_name|default:request.user.username }}!
+        </h2>
+        <p class="text-sm opacity-80">
+            Aqui está um resumo das suas solicitações
+        </p>
+    </div>
+
+    <!-- RESUMO GERAL -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow border">
+            <p class="text-sm text-gray-500">Total de solicitações</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white">
+                {{ total }}
+            </p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow border">
+            <p class="text-sm text-gray-500">Pendentes</p>
+            <p class="text-3xl font-bold text-yellow-600">
+                {{ pendentes }}
+            </p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow border">
+            <p class="text-sm text-gray-500">Aprovadas / Em andamento</p>
+            <p class="text-3xl font-bold text-green-600">
+                {{ aprovadas }}
+            </p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow border">
+            <p class="text-sm text-gray-500">Reprovadas</p>
+            <p class="text-3xl font-bold text-red-600">
+                {{ reprovadas }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- PERÍODO -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border">
+            <p class="text-xs text-gray-500">Solicitações hoje</p>
+            <p class="text-2xl font-bold text-[#00594C]">
+                {{ hoje }}
+            </p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border">
+            <p class="text-xs text-gray-500">Esta semana</p>
+            <p class="text-2xl font-bold text-[#00594C]">
+                {{ semana }}
+            </p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border">
+            <p class="text-xs text-gray-500">Este mês</p>
+            <p class="text-2xl font-bold text-[#00594C]">
+                {{ mes }}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'minhas_solicitacoes' %}"
+           class="px-4 py-2 rounded-lg bg-[#00594C] text-white hover:bg-[#004238] text-sm font-semibold">
+            Minhas Solicitações
+        </a>
+
+        <a href="{% url 'lista_veiculos' %}"
+           class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-semibold">
+            Solicitar Veículo
+        </a>
+    </div>
+
+    <!-- SOLICITAÇÕES RECENTES -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow border p-5">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Solicitações recentes
+        </h3>
+
+        {% if recentes %}
+            <div class="divide-y">
+                {% for s in recentes %}
+                <div class="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            {{ s.veiculo }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            {{ s.destino }} • {{ s.data_criacao|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold
+                            {% if s.status == 'PENDENTE' %}
+                                bg-yellow-100 text-yellow-800
+                            {% elif s.status == 'FINALIZADA' %}
+                                bg-gray-200 text-gray-700
+                            {% else %}
+                                bg-green-100 text-green-800
+                            {% endif %}">
+                            {{ s.get_status_display }}
+                        </span>
+
+                        <a href="{% url 'solicitacao_detalhe' s.id %}"
+                           class="text-sm text-[#00594C] font-semibold hover:underline">
+                            Ver
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-sm text-gray-500">
+                Nenhuma solicitação encontrada.
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "core/base.html" %}
+{% block title %}Portaria — Registrar Retorno{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-6">
+
+    <!-- HEADER -->
+    <div class="bg-[#00594C] text-white rounded-xl p-4 mb-6 shadow-sm">
+        <h1 class="text-xl font-bold">Portaria — Retorno de Veículos</h1>
+        <p class="text-sm opacity-90">
+            Liste de movimentações em trânsito. Registre o retorno rapidamente.
+        </p>
+    </div>
+
+    {% if movimentacoes %}
+        <div class="space-y-4">
+
+            {% for mov in movimentacoes %}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-5 flex justify-between items-center">
+
+                <!-- INFO PRINCIPAL -->
+                <div class="space-y-1">
+
+                    <div class="text-sm text-gray-500">
+                        Mov. #{{ mov.id }} — {{ mov.veiculo.placa }}
+                    </div>
+
+                    <div class="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                        {{ mov.motorista.nome }}
+                    </div>
+
+                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                        Destino: {{ mov.destino }}
+                    </div>
+
+                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                        Saída: {{ mov.data_saida|date:"d/m/Y H:i" }}
+                    </div>
+
+                </div>
+
+                <!-- BOTÕES -->
+                <div class="flex flex-col gap-2">
+
+                    <a href="{% url 'registrar_retorno' mov.id %}"
+                        class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm shadow">
+                        Registrar Retorno
+                    </a>
+
+                    <a href="{% url 'movimentacao_detalhe' mov.id %}"
+                        class="text-xs text-gray-500 hover:underline text-right">
+                        Ver detalhes
+                    </a>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <div class="text-center text-gray-500 py-8">
+            Nenhuma movimentação em trânsito para registrar retorno.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

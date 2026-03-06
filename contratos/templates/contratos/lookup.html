@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-gray-100 dark:bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <title>Selecionar Contrato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full p-5">
+
+    <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
+
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-file-contract text-emerald-600"></i>
+            Selecionar Contrato
+        </h2>
+
+        <!-- Campo de busca -->
+        <div class="flex mb-4">
+            <input 
+                type="text" 
+                placeholder="Buscar por ID, nome ou cliente..."
+                value="{{ search }}"
+                onkeyup="filtrar(this.value)"
+                class="flex-1 p-3 border dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700 
+                       text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-emerald-600 outline-none"
+            />
+        </div>
+
+        <!-- Tabela -->
+        <div class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+            <table class="w-full text-left">
+                <thead class="bg-gray-100 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 text-gray-700 dark:text-gray-300">ID</th>
+                        <th class="px-4 py-2 text-gray-700 dark:text-gray-300">Nome</th>
+                        <th class="px-4 py-2 text-gray-700 dark:text-gray-300">Cliente</th>
+                        <th class="px-4 py-2 text-gray-700 dark:text-gray-300">Localização</th>
+                        <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-300">Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for c in contratos %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-200">{{ c.id }}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-200">{{ c.nome }}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-200">{{ c.cliente }}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-200">{{ c.localizacao }}</td>
+
+                        <td class="px-4 py-2 text-right">
+                            <button 
+                                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow"
+                                onclick="selecionarContrato('{{ c.id}}')"
+                            >
+                                Selecionar
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                            Nenhum contrato encontrado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="mt-5 flex justify-between">
+            <button 
+                onclick="window.close()"
+                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 
+                    text-gray-900 dark:text-gray-200 rounded-lg">
+                Fechar
+            </button>
+        </div>
+
+    </div>
+
+<script>
+function selecionarContrato(id) {
+    // Campo real
+    const real = window.opener.document.getElementById("id");
+
+    // Campo visual
+    const display = window.opener.document.getElementById("contrato_display");
+
+    if (real) real.value = id;
+    if (display) display.value = id;
+
+    window.close();
+}
+</script>
+
+
+
+    <script src="https://kit.fontawesome.com/4ad8d0385f.js" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<div class="p-4">
+    <h2 class="text-xl font-semibold mb-4">Selecionar Contrato</h2>
+
+    <input type="text" id="busca" placeholder="Buscar..."
+           value="{{ search }}"
+           class="w-full p-2 border rounded mb-3"
+           onkeyup="filtrarContratos(this.value)">
+
+    <table class="w-full border-collapse text-left">
+        <thead>
+            <tr class="border-b">
+                <th class="p-2">ID</th>
+                <th class="p-2">Nome</th>
+                <th class="p-2">Cliente</th>
+                <th class="p-2 text-right">Ação</th>
+            </tr>
+        </thead>
+        <tbody id="listaContratos">
+            {% for c in contratos %}
+            <tr class="border-b">
+                <td class="p-2">{{ c.id_contrato }}</td>
+                <td class="p-2">{{ c.nome }}</td>
+                <td class="p-2">{{ c.cliente }}</td>
+                <td class="p-2 text-right">
+                    <button class="px-3 py-1 bg-emerald-600 text-white rounded"
+                        onclick="selecionarContrato('{{ c.id_contrato }}')">
+                        Selecionar
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function selecionarContrato(id) {
+    window.opener.document.getElementById("id_contrato").value = id;
+    window.close();
+}
+
+function filtrarContratos(valor) {
+    window.location = "?search=" + valor;
+}
+</script>

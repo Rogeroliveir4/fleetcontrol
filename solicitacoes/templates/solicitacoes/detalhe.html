@@ -1,0 +1,573 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Detalhes da Solicitação #{{ solicitacao.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    
+    <!-- CABEÇALHO COM BREADCRUMB -->
+    <div class="mb-6 sm:mb-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                <li>
+                    <a href="{% url 'minhas_solicitacoes' %}" class="hover:text-[#00594C] dark:hover:text-green-400">
+                        <i class="fa-solid fa-list mr-1"></i>Solicitações
+                    </a>
+                </li>
+                <li><i class="fa-solid fa-chevron-right text-xs"></i></li>
+                <li class="font-medium text-gray-700 dark:text-gray-300">
+                    Solicitação #{{ solicitacao.id }}
+                </li>
+            </ol>
+        </nav>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg">
+                        <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                            Solicitação #{{ solicitacao.id }}
+                        </h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {{ solicitacao.destino|truncatechars:50 }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STATUS E AÇÕES -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                {% if solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
+                <span class="inline-flex items-center px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300 rounded-full text-sm font-semibold">
+                    <i class="fa-solid fa-clock mr-2"></i> Saída Pendente
+                </span>
+                {% elif solicitacao.status == 'EM_TRANSITO' %}
+                <span class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 rounded-full text-sm font-semibold">
+                    <i class="fa-solid fa-road mr-2"></i>Em Trânsito
+                </span>
+                {% elif solicitacao.status == 'FINALIZADA' %}
+                <span class="inline-flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 rounded-full text-sm font-semibold">
+                    <i class="fa-solid fa-check mr-2"></i>Finalizada
+                </span>
+                {% elif solicitacao.status == 'REPROVADA' %}
+                <span class="inline-flex items-center px-3 py-1.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300 rounded-full text-sm font-semibold">
+                    <i class="fa-solid fa-times mr-2"></i>Reprovada
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-semibold">
+                    {{ solicitacao.get_status_display }}
+                </span>
+                {% endif %}
+                
+            </div>
+        </div>
+        
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <a href="{% url 'minhas_solicitacoes' %}" 
+               class="inline-flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Voltar para Lista
+            </a>
+            
+            <button onclick="window.print()" 
+                    class="inline-flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <i class="fa-solid fa-print mr-2"></i>
+                Imprimir
+            </button>
+                        
+        </div>
+    </div>
+    
+    <!-- GRID PRINCIPAL -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        
+        <!-- COLUNA ESQUERDA (2/3) -->
+        <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+            
+            <!-- CARD: ROTA -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                            <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                                <i class="fa-solid fa-route text-[#00594C] dark:text-green-400"></i>
+                            </div>
+                            Rota da Viagem
+                        </h2>
+                        <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 rounded-full">
+                            ID: {{ solicitacao.id }}
+                        </span>
+                    </div>
+                    
+                    <!-- ÍCONE DE ROTA -->
+                    <div class="flex items-center justify-center my-6">
+                        <div class="relative w-full max-w-md">
+                            <div class="flex items-center justify-between">
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa-solid fa-location-dot text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Saída</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ solicitacao.contrato.nome|default:"Não informado" }}</p>
+                                </div>
+                                
+                                <div class="flex-1 px-4">
+                                    <div class="h-0.5 bg-gray-300 dark:bg-gray-600 relative">
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <i class="fa-solid fa-arrow-right text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 p-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa-solid fa-flag-checkered text-red-600 dark:text-red-400"></i>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Destino</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ solicitacao.destino }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DETALHES -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Contrato</label>
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-file-contract text-gray-400 dark:text-gray-500 mr-2"></i>
+                                <p class="text-gray-900 dark:text-white">{{ solicitacao.contrato.nome|default:"Não informado" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Previsão Retorno</label>
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-calendar-clock text-gray-400 dark:text-gray-500 mr-2"></i>
+                                <p class="text-gray-900 dark:text-white">
+                                    {% if solicitacao.previsao_retorno %}
+                                        {{ solicitacao.previsao_retorno|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        Não informada
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Justificativa</label>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mt-1">
+                                <p class="text-gray-900 dark:text-white">
+                                    {{ solicitacao.justificativa|default:"Não informada"|linebreaksbr }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CARD: TIMELINE -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-6">
+                        <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                            <i class="fa-solid fa-timeline text-[#00594C] dark:text-green-400"></i>
+                        </div>
+                        Timeline da Solicitação
+                    </h2>
+                    
+                    <div class="relative pl-8">
+                        <!-- Linha vertical -->
+                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+                        
+                        <!-- Item 1: Criação -->
+                        <div class="relative mb-8">
+                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                                <i class="fa-solid fa-plus text-white text-sm"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">Solicitação Criada</h3>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ solicitacao.data_criacao|date:"d/m/Y H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Por: {{ solicitacao.solicitante_nome|default:solicitacao.solicitante.get_full_name }}
+                                </p>
+                            </div>
+                        </div>
+
+                        {% if solicitacao.data_cancelamento %}
+                        <div class="relative mb-8">
+                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                                <i class="fa-solid fa-ban text-white text-sm"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">
+                                        Solicitação Cancelada
+                                    </h3>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ solicitacao.data_cancelamento|date:"d/m/Y H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Cancelado por: 
+                                    <strong>
+                                        {{ solicitacao.nome_cancelador }}
+                                    </strong>
+                                </p>
+                                {% if solicitacao.motivo_cancelamento %}
+                                <div class="mt-2 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-sm text-red-700 dark:text-red-300">
+                                    <strong>Motivo:</strong> {{ solicitacao.motivo_cancelamento }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Item 2: Aprovação -->
+                        {% if solicitacao.data_aprovacao %}
+                        <div class="relative mb-8">
+                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                <i class="fa-solid fa-check text-white text-sm"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">Aprovação</h3>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ solicitacao.data_aprovacao|date:"d/m/Y H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Por: {{ solicitacao.gestor_responsavel_nome|default:"Gestor" }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                              <!-- Item 2: Aprovação -->
+                        {% if solicitacao.data_aprovacao %}
+                        <div class="relative mb-8">
+                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                <i class="fa-solid fa-check text-white text-sm"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">Aprovação</h3>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ solicitacao.data_aprovacao|date:"d/m/Y H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Por: {{ solicitacao.gestor_responsavel_nome|default:"Gestor" }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Item 3: Saída -->
+                        {% if solicitacao.data_saida %}
+                        <div class="relative mb-8">
+                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
+                                <i class="fa-solid fa-door-open text-white text-sm"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">Saída Registrada</h3>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ solicitacao.data_saida|date:"d/m/Y H:i" }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Portaria: {{ solicitacao.portaria_registro_saida.get_full_name }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COLUNA DIREITA (1/3) -->
+        <div class="space-y-4 sm:space-y-6">
+            
+            <!-- CARD: MOTORISTA -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+                        <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                            <i class="fa-solid fa-id-card text-[#00594C] dark:text-green-400"></i>
+                        </div>
+                        Motorista
+                    </h2>
+                    
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#00594C] to-[#007462] flex items-center justify-center">
+                                <i class="fa-solid fa-user text-white text-2xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-900 dark:text-white">
+                                {{ solicitacao.motorista.nome }}
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ solicitacao.motorista.contrato|default:"Não informado" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">CNH</label>
+                            <p class="font-medium text-gray-900 dark:text-white">
+                                {{ solicitacao.motorista.cnh_numero|default:"-" }}
+                            </p>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Categoria</label>
+                            <p class="font-medium text-gray-900 dark:text-white">
+                                {{ solicitacao.motorista.cnh_categoria|default:"-" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CARD: VEÍCULO -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+                        <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                            <i class="fa-solid fa-car text-[#00594C] dark:text-green-400"></i>
+                        </div>
+                        Veículo
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">
+                                    {{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }}
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    {{ solicitacao.veiculo.km_atual|intcomma:"Ano não informado" }} km
+                                </p>
+                            </div>
+                            {% if solicitacao.veiculo.tag_interna %}
+                            <span class="px-5 py-3 bg-[#00594C] text-white font-bold rounded-lg text-sm whitespace-nowrap">
+                                {{ solicitacao.veiculo.tag_interna }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Placa -->
+                        <div class="text-left">
+                            <div class="inline-block bg-gray-100 dark:bg-gray-900 rounded-lg px-1 py-1">
+                                <span class="text-xs text-center text-gray-500 dark:text-gray-400 block">PLACA</span>
+                                <span class="text-2xl font-bold text-gray-900 dark:text-white tracking-wider">
+                                    {{ solicitacao.veiculo.placa }}
+                                </span>
+                            </div>
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CARD: CHECKLISTS -->
+            {% if tem_checklist_saida or tem_checklist_retorno %}
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+                        <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                            <i class="fa-solid fa-clipboard-list text-[#00594C] dark:text-green-400"></i>
+                        </div>
+                        Checklists
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Checklist Saída -->
+                        {% if tem_checklist_saida %}
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-100 dark:border-green-800">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Saída</h3>
+                                <span class="text-xs text-green-600 dark:text-green-400">
+                                    {{ checklist_saida.data_criacao|date:"H:i" }}
+                                </span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600 dark:text-gray-400">KM Inicial:</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ checklist_saida.km_inicial|default:"-" }}</span>
+                                </div>
+                                {% if checklist_saida.observacoes %}
+                                <div class="text-sm">
+                                    <span class="text-gray-600 dark:text-gray-400">Obs:</span>
+                                    <p class="text-gray-900 dark:text-white mt-1">{{ checklist_saida.observacoes|truncatechars:50 }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Checklist Retorno -->
+                        {% if tem_checklist_retorno %}
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Retorno</h3>
+                                <span class="text-xs text-blue-600 dark:text-blue-400">
+                                    {{ checklist_retorno.data_criacao|date:"H:i" }}
+                                </span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600 dark:text-gray-400">KM Final:</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ checklist_retorno.km_final|default:"-" }}</span>
+                                </div>
+                                {% if checklist_retorno.observacoes %}
+                                <div class="text-sm">
+                                    <span class="text-gray-600 dark:text-gray-400">Obs:</span>
+                                    <p class="text-gray-900 dark:text-white mt-1">{{ checklist_retorno.observacoes|truncatechars:50 }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- HISTÓRICO -->
+    {% if tem_historico %}
+    <div class="mt-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="p-4 sm:p-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
+                    <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                        <i class="fa-solid fa-history text-[#00594C] dark:text-green-400"></i>
+                    </div>
+                    Histórico de Alterações
+                </h2>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    {% for alteracao in historico %}
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="font-medium text-gray-900 dark:text-white text-sm">
+                                {{ alteracao.descricao }}
+                            </p>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                {{ alteracao.data_alteracao|date:"d/m H:i" }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                            <i class="fa-solid fa-user mr-1"></i>
+                            {{ alteracao.usuario.get_full_name|default:alteracao.usuario.username }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+</div>
+
+<style>
+/* Scrollbar personalizada */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Estilos para impressão */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        background: white !important;
+        color: black !important;
+    }
+    
+    .bg-white, .dark\:bg-gray-800 {
+        background: white !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .text-gray-900, .dark\:text-white {
+        color: black !important;
+    }
+    
+    .text-gray-600, .dark\:text-gray-400 {
+        color: #666 !important;
+    }
+}
+</style>
+
+<script>
+// Toggle para mostrar/ocultar histórico detalhado
+document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona funcionalidade de impressão
+    document.querySelector('button[onclick="window.print()"]').addEventListener('click', function() {
+        window.print();
+    });
+    
+    // Adiciona tooltips aos botões
+    const tooltips = {
+        'Voltar para Lista': 'Retorna à lista de solicitações',
+        'Imprimir': 'Imprimir detalhes da solicitação',
+        'Admin': 'Acessar área administrativa'
+    };
+    
+    // Adiciona classes responsivas adicionais
+    const cards = document.querySelectorAll('.bg-white, .dark\\:bg-gray-800');
+    cards.forEach(card => {
+        card.classList.add('transition-all', 'duration-200', 'hover:shadow-md');
+    });
+});
+</script>
+{% endblock %}

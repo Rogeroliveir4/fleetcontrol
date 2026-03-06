@@ -1,0 +1,174 @@
+<!-- Bloco do usuário (reaproveitável) -->
+<div class="flex items-center gap-2 mb-3">
+  <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+    <i class="fa-solid fa-user text-lg text-white/90"></i>
+  </div>
+
+  <div class="flex flex-col min-w-0 flex-1">
+    <p class="font-semibold text-white text-sm truncate">{{ request.user.username }}</p>
+    <p class="text-green-300 text-xs flex items-center gap-1">
+      <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse flex-shrink-0"></span>
+      <span class="truncate">Online</span>
+    </p>
+  </div>
+</div>
+
+<a href="{% url 'logout' %}"
+  class="flex items-center justify-center gap-1.5 w-full px-2 py-1.5 mb-1.5 rounded bg-red-600 hover:bg-red-700 transition text-white font-semibold text-sm">
+  <i class="fa-solid fa-power-off text-xs"></i>
+  <span class="truncate">Sair</span>
+</a>
+
+<button onclick="toggleTheme()"
+  class="flex items-center justify-center gap-1.5 w-full px-2 py-1.5 bg-black/20 hover:bg-black/30 rounded text-white text-sm">
+  <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
+  <span class="truncate">Tema</span>
+</button>
+
+<style>
+  /* Estilos responsivos para o bloco do usuário */
+  .user-block {
+    min-height: 40px;
+  }
+
+  .sidebar {
+    background-color: #00664e;
+  }
+
+  /* Responsividade para telas menores */
+  @media (max-width: 1400px) {
+    .flex.items-center.gap-2 {
+      gap: 8px;
+    }
+
+    .w-8.h-8 {
+      width: 32px;
+      height: 32px;
+    }
+
+    .fa-user {
+      font-size: 16px;
+    }
+
+    .text-sm {
+      font-size: 12px;
+    }
+
+    .text-xs {
+      font-size: 11px;
+    }
+
+    a,
+    button {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .fa-power-off,
+    .fa-moon {
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .flex.items-center.gap-2 {
+      gap: 6px;
+    }
+
+    .w-8.h-8 {
+      width: 28px;
+      height: 28px;
+    }
+
+    .fa-user {
+      font-size: 14px;
+    }
+
+    .text-sm {
+      font-size: 11px;
+    }
+
+    .text-xs {
+      font-size: 10px;
+    }
+
+    a,
+    button {
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+
+    .fa-power-off,
+    .fa-moon {
+      font-size: 10px;
+    }
+
+    .w-1\\.5.h-1\\.5 {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  /* Para quando o sidebar estiver recolhido */
+  .sidebar-collapsed .flex.items-center.gap-2 {
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sidebar-collapsed .flex.flex-col {
+    display: none;
+  }
+
+  .sidebar-collapsed a span,
+  .sidebar-collapsed button span {
+    display: none;
+  }
+
+  .sidebar-collapsed a,
+  .sidebar-collapsed button {
+    padding: 8px;
+    justify-content: center;
+  }
+
+  .sidebar-collapsed .w-8.h-8 {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebar-collapsed .fa-user {
+    font-size: 18px;
+  }
+</style>
+
+<script>
+  // Função para alternar tema (mantida da sua implementação original)
+  function toggleTheme() {
+    const html = document.documentElement;
+    const themeIcon = document.getElementById('themeIcon');
+
+    if (html.classList.contains('dark')) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      themeIcon.className = 'fa-solid fa-sun text-xs';
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      themeIcon.className = 'fa-solid fa-moon text-xs';
+    }
+  }
+
+  // Aplicar tema salvo ao carregar a página
+  document.addEventListener('DOMContentLoaded', function () {
+    const savedTheme = localStorage.getItem('theme');
+    const themeIcon = document.getElementById('themeIcon');
+
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      themeIcon.className = 'fa-solid fa-moon text-xs';
+    } else {
+      document.documentElement.classList.remove('dark');
+      themeIcon.className = 'fa-solid fa-sun text-xs';
+    }
+  });
+</script>

@@ -1,0 +1,41 @@
+<!-- paginacao_desktop.html -->
+{% if veiculos.has_other_pages %}
+<div class="flex items-center justify-between">
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+        Mostrando {{ veiculos.start_index }}-{{ veiculos.end_index }} de {{ veiculos.paginator.count }}
+    </div>
+    <div class="flex gap-2">
+        {% if veiculos.has_previous %}
+        {% with request.GET.urlencode as query_params %}
+        <a href="?page=1{% if query_params %}&{{ query_params|cut:" &page=" }}{% endif %}"
+            class="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm">
+            Primeira
+        </a>
+        <a href="?page={{ veiculos.previous_page_number }}{% if query_params %}&{{ query_params|cut:"
+            &page=" }}{% endif %}"
+            class="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm">
+            Anterior
+        </a>
+        {% endwith %}
+        {% endif %}
+
+        <span class="px-3 py-2 text-gray-700 dark:text-gray-300 text-sm">
+            Página {{ veiculos.number }} de {{ veiculos.paginator.num_pages }}
+        </span>
+
+        {% if veiculos.has_next %}
+        {% with request.GET.urlencode as query_params %}
+        <a href="?page={{ veiculos.next_page_number }}{% if query_params %}&{{ query_params|cut:" &page=" }}{% endif %}"
+            class="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm">
+            Próxima
+        </a>
+        <a href="?page={{ veiculos.paginator.num_pages }}{% if query_params %}&{{ query_params|cut:"
+            &page=" }}{% endif %}"
+            class="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm">
+            Última
+        </a>
+        {% endwith %}
+        {% endif %}
+    </div>
+</div>
+{% endif %}

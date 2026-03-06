@@ -1,0 +1,126 @@
+{% extends "core/base.html" %}
+{% block title %}Checklist de Saída{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Banner -->
+    <div class="bg-[#00594C] text-white rounded-xl p-5 shadow-sm">
+        <h1 class="text-xl font-bold">Checklist de Saída</h1>
+        <p class="text-sm opacity-90 mt-1">
+            Veículo: {{ solicitacao.veiculo.placa }} — {{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }}
+        </p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- CARD: Itens obrigatórios -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">Itens de Verificação</h2>
+
+            <div class="space-y-3">
+
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="pneus_ok" class="h-5 w-5 rounded">
+                    <span class="text-gray-800 dark:text-gray-200">Pneus em bom estado</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="luzes_ok" class="h-5 w-5 rounded">
+                    <span class="text-gray-800 dark:text-gray-200">Luzes funcionando</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="documentos_ok" class="h-5 w-5 rounded">
+                    <span class="text-gray-800 dark:text-gray-200">Documentos do veículo conferidos</span>
+                </label>
+
+            </div>
+        </div>
+
+        <!-- CARD: Avarias -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-3">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100">Avarias encontradas</h2>
+
+            <textarea name="avarias" rows="3"
+                class="w-full rounded-xl border border-gray-300 bg-gray-100 dark:bg-gray-700 
+                    dark:border-gray-700 dark:text-white px-3 py-2 
+                    focus:ring-2 focus:ring-[#00594C] focus:bg-gray-200 
+                    dark:focus:bg-gray-600 transition"></textarea>
+
+        </div>
+
+        <!-- CARD: Observações -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-3">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100">Observações adicionais</h2>
+
+            <textarea name="observacoes" rows="3"
+                class="w-full rounded-xl border border-gray-300 bg-gray-100 dark:bg-gray-700 
+                    dark:border-gray-700 dark:text-white px-3 py-2 
+                    focus:ring-2 focus:ring-[#00594C] focus:bg-gray-200 
+                    dark:focus:bg-gray-600 transition"></textarea>
+
+        </div>
+
+        <!-- CARD: Upload de Fotos -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100">Fotos do Veículo</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto do Painel</label>
+                    <input type="file" name="foto_painel" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto da Frente</label>
+                    <input type="file" name="foto_frente" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto Traseira</label>
+                    <input type="file" name="foto_traseira" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto Lado Esquerdo</label>
+                    <input type="file" name="foto_lado_esq" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto Lado Direito</label>
+                    <input type="file" name="foto_lado_dir" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>
+            
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Foto do Checklist manual Assinado/label>
+                    <input type="file" name="chek-assinado" accept="image/*" capture="camera"
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                </div>    
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-between items-center pt-4">
+            <a href="{% url 'dashboard_solicitante' %}"
+                class="px-4 py-2 rounded-lg bg-gray-300 text-gray-900 hover:bg-gray-400 transition">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                class="px-6 py-2 rounded-lg bg-[#00594C] text-white font-semibold hover:bg-[#00483D] transition shadow">
+                Enviar Checklist
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

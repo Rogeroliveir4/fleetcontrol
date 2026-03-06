@@ -1,0 +1,31 @@
+{% if movimentacoes.paginator.num_pages > 1 %}
+<div class="flex justify-center items-center gap-2 py-3 pagination-top-mobile">
+
+    {% if movimentacoes.has_previous %}
+    <button class="page-link w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700"
+        data-page="{{ movimentacoes.previous_page_number }}">
+        <i class="fas fa-chevron-left text-sm"></i>
+    </button>
+    {% endif %}
+
+    {% for p in movimentacoes.paginator.page_range %}
+    {% if p == movimentacoes.number %}
+    <button class="page-link w-9 h-9 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold shadow" data-page="{{ p }}">
+        {{ p }}
+    </button>
+
+    {% elif p >= movimentacoes.number|add:"-2" and p <= movimentacoes.number|add:"2" %} <button class="page-link w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700" data-page="{{ p }}">
+        {{ p }}
+        </button>
+        {% endif %}
+        {% endfor %}
+
+        {% if movimentacoes.has_next %}
+        <button class="page-link w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700"
+            data-page="{{ movimentacoes.next_page_number }}">
+            <i class="fas fa-chevron-right text-sm"></i>
+        </button>
+        {% endif %}
+
+</div>
+{% endif %}

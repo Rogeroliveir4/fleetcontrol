@@ -1,0 +1,329 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard do Gestor{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- HEADER COM GRADIENTE -->
+    <div class="w-full rounded-2xl p-6 mb-8 bg-gradient-to-br 
+                from-[#00594C] via-[#007a62] to-[#003d36] shadow-lg text-white">
+
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold">Dashboard do Gestor</h1>
+                <p class="opacity-90 text-sm mt-1">Contrato: {{ contrato.nome|default:"Todos" }}</p>
+            </div>
+            <a href="{% url 'gestor_solicitacoes' %}" 
+               class="flex items-center gap-2 px-4 py-2.5 bg-white/20 backdrop-blur-sm 
+                      rounded-xl hover:bg-white/30 transition-colors">
+                <i class="fa-solid fa-list-check"></i>
+                <span class="hidden sm:inline">Ver Todas as Solicitações</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- GRID DE ESTATÍSTICAS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+        <!-- CARD PENDENTES -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700
+                    hover:shadow-xl transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Pendentes</p>
+                    <p class="text-2xl md:text-3xl font-bold text-yellow-600 dark:text-yellow-500 mt-1">{{ pendentes }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {% if pendentes_list %}
+                            {{ pendentes_list.count }} aguardam aprovação
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 
+                          flex items-center justify-center">
+                    <i class="fa-solid fa-clock text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                </div>
+            </div>
+            {% if pendentes_list %}
+            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ações pendentes:</p>
+                {% for s in pendentes_list|slice:":3" %}
+                <div class="flex items-center justify-between mb-2 last:mb-0">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900/30 
+                                  flex items-center justify-center">
+                            <i class="fa-solid fa-car text-xs text-yellow-600 dark:text-yellow-400"></i>
+                        </div>
+                        <span class="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[120px]">
+                            {{ s.veiculo.placa }}
+                        </span>
+                    </div>
+                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" 
+                       class="text-xs text-[#00594C] dark:text-[#0A7C6C] hover:underline">
+                        Ver
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- CARD APROVADAS -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700
+                    hover:shadow-xl transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Aprovadas</p>
+                    <p class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-500 mt-1">{{ aprovadas }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ em_transito }} em trânsito</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 
+                          flex items-center justify-center">
+                    <i class="fa-solid fa-circle-check text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD REPROVADAS -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700
+                    hover:shadow-xl transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Reprovadas</p>
+                    <p class="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-500 mt-1">{{ reprovadas }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 
+                          flex items-center justify-center">
+                    <i class="fa-solid fa-circle-xmark text-red-600 dark:text-red-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD TOTAL -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700
+                    hover:shadow-xl transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Solicitações</p>
+                    <p class="text-2xl md:text-3xl font-bold text-[#00594C] dark:text-[#0A7C6C] mt-1">{{ total }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ hoje }} hoje • {{ semana }} esta semana</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-[#00594C]/10 dark:bg-[#0A7C6C]/20 
+                          flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-[#00594C] dark:text-[#0A7C6C] text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRID INFERIOR -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- SOLICITAÇÕES RECENTES -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white">Solicitações Recentes</h2>
+                    <a href="{% url 'gestor_solicitacoes' %}" 
+                       class="text-sm text-[#00594C] dark:text-[#0A7C6C] hover:underline flex items-center gap-1">
+                        Ver todas <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                {% if recentes %}
+                <div class="space-y-3">
+                    {% for s in recentes %}
+                    <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 
+                                hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-[#00594C] to-[#0A7C6C] 
+                                              flex items-center justify-center">
+                                        <i class="fa-solid fa-car text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 dark:text-white text-sm">
+                                            {{ s.motorista.nome }}
+                                        </p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-300">
+                                            {{ s.veiculo.marca }} {{ s.veiculo.modelo }} • {{ s.veiculo.placa }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="ml-11">
+                                    <p class="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                                        <i class="fa-solid fa-location-dot mr-1 text-[#00594C]"></i>
+                                        {{ s.destino|truncatechars:40 }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        <i class="fa-solid fa-clock mr-1"></i>
+                                        {{ s.data_criacao|date:"d/m H:i" }} → {{ s.previsao_retorno|date:"d/m H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Badge -->
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                {% if s.status == 'PENDENTE' %}
+                                    bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                {% elif s.status == 'AGUARDANDO_CHECKLIST' %}
+                                    bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+                                {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
+                                    bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300
+                                {% elif s.status == 'EM_TRANSITO' %}
+                                    bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
+                                {% elif s.status == 'AGUARDANDO_CHECKLIST_RETORNO' %}
+                                    bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300
+                                {% elif s.status == 'FINALIZADA' %}
+                                    bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                {% elif s.status == 'REPROVADA' %}
+                                    bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                                {% endif %}">
+                                {{ s.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        <!-- Ações -->
+                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                            <div class="flex gap-2">
+                                <a href="{% url 'detalhes_solicitacao' s.id %}" 
+                                   class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 
+                                          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
+                                          transition-colors flex items-center gap-1">
+                                    <i class="fa-solid fa-eye"></i> Detalhes
+                                </a>
+                                {% if s.status == "PENDENTE" %}
+                                <a href="{% url 'aprovar_solicitacao' s.id %}" 
+                                   class="text-xs px-3 py-1.5 rounded-lg bg-green-600 text-white 
+                                          hover:bg-green-700 transition-colors flex items-center gap-1">
+                                    <i class="fa-solid fa-check"></i> Aprovar
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full 
+                              bg-gray-100 dark:bg-gray-800 mb-4">
+                        <i class="fa-solid fa-car text-2xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400">Nenhuma solicitação recente</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SIDEBAR COM TOPs -->
+        <div class="space-y-6">
+
+            <!-- TOP VEÍCULOS -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Veículos Mais Solicitados</h2>
+                
+                {% if veiculos_top %}
+                <div class="space-y-3">
+                    {% for veiculo in veiculos_top %}
+                    <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-[#00594C] to-[#0A7C6C] 
+                                      flex items-center justify-center">
+                                <i class="fa-solid fa-car text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-white text-sm">
+                                    {{ veiculo.veiculo__modelo|default:"Modelo" }}
+                                </p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">{{ veiculo.veiculo__placa }}</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full bg-[#00594C]/10 dark:bg-[#0A7C6C]/20 
+                                   text-[#00594C] dark:text-[#0A7C6C] text-xs font-semibold">
+                            {{ veiculo.total }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">
+                    Nenhum dado disponível
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- TOP MOTORISTAS -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Motoristas Mais Ativos</h2>
+                
+                {% if motoristas_top %}
+                <div class="space-y-3">
+                    {% for motorista in motoristas_top %}
+                    <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] 
+                                      flex items-center justify-center">
+                                <i class="fa-solid fa-user text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-white text-sm">
+                                    {{ motorista.motorista__nome|truncatechars:15 }}
+                                </p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">
+                                    {{ motorista.motorista__cpf|slice:":3" }}***.***-**
+                                </p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full bg-[#00594C]/10 dark:bg-[#0A7C6C]/20 
+                                   text-[#00594C] dark:text-[#0A7C6C] text-xs font-semibold">
+                            {{ motorista.total }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">
+                    Nenhum dado disponível
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="bg-gradient-to-br from-[#00594C] to-[#0A7C6C] rounded-2xl shadow-lg p-5 text-white">
+                <h2 class="text-lg font-bold mb-4">Ações Rápidas</h2>
+                <div class="space-y-3">
+                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" 
+                       class="flex items-center justify-between p-3 rounded-xl bg-white/10 hover:bg-white/20 
+                              transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-clock"></i>
+                            <span class="text-sm">Ver Pendentes</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                    
+                    <a href="{% url 'exportar_excel_solicitacoes' %}" 
+                       class="flex items-center justify-between p-3 rounded-xl bg-white/10 hover:bg-white/20 
+                              transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span class="text-sm">Exportar Dados</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

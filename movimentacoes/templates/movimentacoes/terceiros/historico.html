@@ -1,0 +1,28 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+{% for mov in movimentacoes %}
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow">
+    <div class="p-4 flex justify-between items-center
+                {% if mov.status == 'ENTRADA' %}bg-emerald-600{% else %}bg-gray-700{% endif %}
+                text-white">
+        <span class="font-bold">{{ mov.placa }}</span>
+        <span class="text-xs">{{ mov.status }}</span>
+    </div>
+
+    <div class="p-4 text-sm space-y-1">
+        <p><strong>Empresa:</strong> {{ mov.empresa }}</p>
+        <p><strong>Motorista:</strong> {{ mov.motorista_nome }}</p>
+        <p><strong>Entrada:</strong> {{ mov.data_entrada|date:"d/m/Y H:i" }}</p>
+        {% if mov.data_saida %}
+            <p><strong>Saída:</strong> {{ mov.data_saida|date:"d/m/Y H:i" }}</p>
+        {% endif %}
+    </div>
+
+    <div class="p-4 border-t dark:border-gray-700">
+        <a href="{% url 'terceiros_detalhe' mov.id %}"
+           class="block text-center py-2 rounded-lg bg-[#00594C] text-white">
+           Ver detalhes
+        </a>
+    </div>
+  </div>
+{% endfor %}
+</div>

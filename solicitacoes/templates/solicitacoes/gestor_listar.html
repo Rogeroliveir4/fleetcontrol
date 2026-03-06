@@ -1,0 +1,841 @@
+{% extends "core/base.html" %}
+
+{% block title %}Solicitações de Veículos{% endblock %}
+
+{% block content %}
+
+<!-- MAIN CONTAINER -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
+
+    <!-- HEADER SECTION -->
+    <div class="mb-6">
+        <!-- BANNER -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00594C] via-[#0A7C6C] to-[#00594C] p-6 md:p-8 text-white shadow-xl mb-6">
+            <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold mb-2">Solicitações de Veículos</h1>
+                        <p class="text-sm md:text-base opacity-90">Gerencie todas as solicitações de veículos da frota</p>
+                    </div>
+                    <div class="hidden md:flex items-center gap-3">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                            <span class="text-sm font-semibold">{{ solicitacoes.count }} solicitações</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- STATS BAR -->
+                <div class="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <a href="?status=PENDENTE" class="stat-card bg-white/20 backdrop-blur-sm rounded-xl p-3 hover:bg-white/30 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs opacity-80">Pendentes</p>
+                                <p class="text-xl font-bold">{{ pendentes_count|default:0 }}</p>
+                            </div>
+                            <i class="fa-solid fa-clock text-lg"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="?status=APROVADA" class="stat-card bg-white/20 backdrop-blur-sm rounded-xl p-3 hover:bg-white/30 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs opacity-80">Aprovadas</p>
+                                <p class="text-xl font-bold">{{ aprovadas_count|default:0 }}</p>
+                            </div>
+                            <i class="fa-solid fa-check-circle text-lg"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="?status=EM_TRANSITO" class="stat-card bg-white/20 backdrop-blur-sm rounded-xl p-3 hover:bg-white/30 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs opacity-80">Em Trânsito</p>
+                                <p class="text-xl font-bold">{{ em_transito_count|default:0 }}</p>
+                            </div>
+                            <i class="fa-solid fa-car text-lg"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="?status=FINALIZADA" class="stat-card bg-white/20 backdrop-blur-sm rounded-xl p-3 hover:bg-white/30 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs opacity-80">Finalizadas</p>
+                                <p class="text-xl font-bold">{{ finalizadas_count|default:0 }}</p>
+                            </div>
+                            <i class="fa-solid fa-flag-checkered text-lg"></i>
+                        </div>
+                    </a>
+                    
+                    <div class="stat-card bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs opacity-80">Total</p>
+                                <p class="text-xl font-bold">{{ solicitacoes_count|default:0  }}</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DECORATIVE ELEMENTS -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+        </div>
+
+        <!-- CONTROL BAR -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 md:p-6 mb-6">
+            <form method="get">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <!-- SEARCH BAR -->
+                    <div class="flex-1">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                name="search"
+                                value="{{ request.GET.search|default:'' }}"
+                                placeholder="Buscar por motorista, veículo, destino..." 
+                                class="w-full pl-12 pr-10 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700
+                                       bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                       focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20
+                                       transition-all duration-200 text-sm md:text-base"
+                            >
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            
+                            {% if request.GET.search %}
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}"
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- ACTIONS BUTTONS -->
+                    <div class="flex items-center gap-3">
+                        <!-- FILTER DROPDOWN -->
+                        <div class="relative" x-data="{ open: false, isMobile: false }" 
+                             x-init="isMobile = window.innerWidth <= 768; $watch('open', (value) => { 
+                                 if (value && isMobile) {
+                                     document.body.style.overflow = 'hidden';
+                                 } else {
+                                     document.body.style.overflow = '';
+                                 }
+                             })">
+                            <button type="button" @click="open = !open" 
+                                    class="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold
+                                           bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300
+                                           border-2 border-gray-200 dark:border-gray-600
+                                           hover:border-gray-300 dark:hover:border-gray-500
+                                           shadow-sm hover:shadow-md transition-all">
+                                <i class="fa-solid fa-filter"></i>
+                                <span class="hidden md:inline">Filtrar</span>
+                                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" 
+                                   :class="{'rotate-180': open}"></i>
+                            </button>
+
+                            <!-- MOBILE MODAL -->
+                            <template x-if="open && isMobile">
+                                <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                                    <!-- Backdrop -->
+                                    <div class="absolute inset-0 bg-black/50" @click="open = false"></div>
+                                    
+                                    <!-- Modal Content -->
+                                    <div class="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+                                        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white">
+                                            <div class="flex items-center justify-between">
+                                                <p class="text-sm font-semibold">Filtros Avançados</p>
+                                                <button type="button" @click="open = false" class="p-1 hover:bg-white/20 rounded-lg transition-colors">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+                                            <!-- STATUS -->
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                                                <select name="status"
+                                                    class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                                    <option value="">Todos os status</option>
+                                                    {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
+                                                        <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
+                                                            {{ label }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+                                            <!-- DATA INICIAL -->
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data inicial</label>
+                                                <input type="date" name="inicio" value="{{ request.GET.inicio }}"
+                                                    class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                            </div>
+
+                                            <!-- DATA FINAL -->
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data final</label>
+                                                <input type="date" name="fim" value="{{ request.GET.fim }}"
+                                                    class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                            </div>
+
+                                            <!-- BOTÕES -->
+                                            <div class="flex gap-2 pt-2">
+                                                <button type="submit"
+                                                    class="flex-1 px-4 py-2 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
+                                                    Aplicar Filtros
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- DROPDOWN NORMAL PARA DESKTOP -->
+                            <div x-show="open && !isMobile" x-transition 
+                                 @click.outside="open = false"
+                                 class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 
+                                        rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 
+                                        overflow-hidden z-50 p-4">
+                                <div class="space-y-4">
+                                    <!-- STATUS -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                                        <select name="status"
+                                            class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                            <option value="">Todos os status</option>
+                                            {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
+                                                <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <!-- DATAS -->
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">De</label>
+                                            <input type="date" name="inicio" value="{{ request.GET.inicio }}"
+                                                class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Até</label>
+                                            <input type="date" name="fim" value="{{ request.GET.fim }}"
+                                                class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600">
+                                        </div>
+                                    </div>
+
+                                    <!-- BOTÕES -->
+                                    <div class="flex gap-2 pt-2">
+                                        <a href="{% url 'gestor_solicitacoes' %}"
+                                            class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg text-sm font-medium text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                            Limpar
+                                        </a>
+                                        <button type="submit"
+                                            class="flex-1 px-4 py-2 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- EXPORT BUTTON -->
+                        <a href="{% url 'exportar_excel_solicitacoes' %}?{{ request.GET.urlencode }}" 
+                           class="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold
+                                  bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white 
+                                  shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+                                  transition-all duration-200">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span class="hidden sm:inline">Exportar</span>
+                        </a>
+
+                    </div>
+                </div>
+            </form>
+
+            <!-- ACTIVE FILTERS -->
+            {% if request.GET.status or request.GET.search or request.GET.inicio %}
+            <div class="mt-4 flex items-center gap-2 flex-wrap">
+                <span class="text-sm text-gray-600 dark:text-gray-400">Filtros ativos:</span>
+                
+                {% if request.GET.status %}
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                            {% if request.GET.status == 'PENDENTE' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                            {% elif request.GET.status == 'APROVADA' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                            {% elif request.GET.status == 'EM_TRANSITO' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
+                            {% elif request.GET.status == 'FINALIZADA' %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
+                            {% elif request.GET.status == 'REPROVADA' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                            {% else %}bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300{% endif %}">
+                    {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
+                        {% if key == request.GET.status %}
+                            <i class="fa-solid fa-filter"></i>
+                            <span>Status: {{ label }}</span>
+                        {% endif %}
+                    {% endfor %}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'status' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="ml-1 hover:opacity-70">
+                        <i class="fa-solid fa-xmark"></i>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if request.GET.search %}
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                            bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Busca: "{{ request.GET.search }}"</span>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="ml-1 hover:opacity-70">
+                        <i class="fa-solid fa-xmark"></i>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if request.GET.inicio %}
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                            bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>Período: {{ request.GET.inicio }}{% if request.GET.fim %} até {{ request.GET.fim }}{% endif %}</span>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'inicio' and key != 'fim' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="ml-1 hover:opacity-70">
+                        <i class="fa-solid fa-xmark"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SOLICITAÇÕES SECTION -->
+    <div class="mb-6">
+        <!-- GRID HEADER -->
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Todas as Solicitações
+              
+            </h2>
+        </div>
+
+        <!-- SOLICITAÇÕES LIST -->
+        {% if solicitacoes %}
+        <div class="space-y-4">
+            {% for s in solicitacoes %}
+            <div class="solicitacao-card group" style="--card-index: {{ forloop.counter0 }}">
+                <!-- CARD PRINCIPAL -->
+                <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl 
+                            transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700
+                            hover:border-[#00594C]/20 dark:hover:border-[#0A7C6C]">
+                    
+                    <!-- HEADER DO CARD -->
+                    <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <!-- VEÍCULO INFO -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center">
+                                    <i class="fa-solid fa-car text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 dark:text-white text-lg">
+                                        {{ s.veiculo.marca }} {{ s.veiculo.modelo }} - {{ s.veiculo.tag_interna }}
+                                    </h3>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                                        <i class="fa-solid fa-hashtag mr-1"></i>
+                                        {{ s.veiculo.placa }}
+                                        <span class="mx-2">•</span>
+                                        <i class="fa-solid fa-user mr-1"></i>
+                                        {{ s.motorista.nome }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- STATUS BADGE -->
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+                                            {% if s.status == 'PENDENTE' %}
+                                                bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                            {% elif s.status == 'CANCELADA' %}
+                                                bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                            {% elif s.status == 'AGUARDANDO_CHECKLIST' %}
+                                                bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+                                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
+                                                bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300
+                                            {% elif s.status == 'EM_TRANSITO' %}
+                                                bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
+                                            {% elif s.status == 'AGUARDANDO_CHECKLIST_RETORNO' %}
+                                                bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300
+                                            {% elif s.status == 'FINALIZADA' %}
+                                                bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                            {% elif s.status == 'REPROVADA' %}
+                                                bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                                            {% endif %}">
+                                    {% if s.status == 'PENDENTE' %}
+                                        <i class="fa-solid fa-clock animate-pulse"></i>
+                                    {% elif s.status == 'CANCELADA' %}
+                                        <i class="fa-solid fa-times-circle text-gray-500 dark:text-gray-400"></i>
+                                    {% elif s.status == 'EM_TRANSITO' %}
+                                        <i class="fa-solid fa-car-side"></i>
+                                    {% elif s.status == 'FINALIZADA' %}
+                                        <i class="fa-solid fa-check-circle"></i>
+                                    {% elif s.status == 'REPROVADA' %}
+                                        <i class="fa-solid fa-xmark-circle"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-circle-notch"></i>
+                                    {% endif %}
+                                    {{ s.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTEÚDO PRINCIPAL -->
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- DESTINO -->
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-location-dot text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Destino</p>
+                                    <p class="text-gray-900 dark:text-white">{{ s.destino }}</p>
+                                </div>
+                            </div>
+
+                            <!-- DATAS -->
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-calendar-days text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Período</p>
+                                    <p class="text-gray-900 dark:text-white">
+                                        {{ s.data_criacao|date:"d/m H:i" }} → {{ s.previsao_retorno|date:"d/m H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- JUSTIFICATIVA -->
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-clipboard text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Justificativa</p>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        {% if s.justificativa %}
+                                            {{ s.justificativa|truncatechars:80 }}
+                                        {% else %}
+                                            <span class="italic text-gray-500">Não informada</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- APROVADOR/REPROVADOR -->
+                        {% if s.gestor_responsavel_nome or s.gestor_reprovador_nome %}
+                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                {% if s.gestor_responsavel_nome %}
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+                                    <i class="fa-solid fa-user-check"></i>
+                                    <span class="text-sm">Aprovado por: {{ s.gestor_responsavel_nome }}</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if s.gestor_reprovador_nome %}
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+                                    <i class="fa-solid fa-user-xmark"></i>
+                                    <span class="text-sm">Reprovado por: {{ s.gestor_reprovador_nome }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- FOOTER DO CARD (AÇÕES) -->
+                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <!-- DETALHES -->
+                            <a href="{% url 'detalhes_solicitacao' s.id %}"
+                               class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
+                                      text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800
+                                      transition-colors group/detail">
+                                <i class="fa-solid fa-eye text-gray-500 group-hover/detail:text-[#00594C]"></i>
+                                <span class="hidden sm:inline">Detalhes</span>
+                            </a>
+
+                            <!-- AÇÕES -->
+                            <div class="flex items-center gap-2">
+                                {% if s.status == "PENDENTE" %}
+                                    <button onclick="openAprovarModal({{ s.id }})"
+                                            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                                                bg-gradient-to-r from-green-500 to-emerald-600 text-white
+                                                hover:shadow-md hover:scale-[1.02] transition-all">
+                                        <i class="fa-solid fa-check"></i>
+                                        Aprovar
+                                    </button>                                                                   
+                                    <button onclick="openReprovarModal({{ s.id }})"
+                                            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                                                bg-gradient-to-r from-red-500 to-red-600 text-white
+                                                hover:shadow-md hover:scale-[1.02] transition-all">
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Reprovar
+                                    </button>
+                                {% elif s.status == "EM_TRANSITO" %}
+                                <a href="{% url 'registrar_retorno' s.id %}"
+                                   class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                                          bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white 
+                                          hover:shadow-md hover:scale-[1.02] active:scale-[0.98]
+                                          transition-all duration-200">
+                                    <i class="fa-solid fa-flag-checkered"></i>
+                                    <span>Registrar Retorno</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- EMPTY STATE -->
+        {% else %}
+        <div class="text-center py-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                <i class="fa-solid fa-car text-3xl text-gray-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma solicitação encontrada</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                {% if request.GET %}
+                    Não encontramos solicitações com os filtros aplicados.
+                {% else %}
+                    Não há solicitações de veículos no momento.
+                {% endif %}
+            </p>
+            {% if request.GET %}
+                <a href="{% url 'gestor_solicitacoes' %}" 
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold
+                          bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white 
+                          shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all">
+                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                    Limpar Filtros
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- MODAL APROVAR -->
+<div id="modalAprovar"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[100] p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <!-- MODAL HEADER -->
+        <div class="p-6 pb-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center">
+                        <i class="fa-solid fa-check text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Aprovar Solicitação</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Confirme os detalhes abaixo</p>
+                    </div>
+                </div>
+                <button type="button"
+                        onclick="closeModal('modalAprovar')"
+                        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-gray-500"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Ao aprovar, a solicitação será encaminhada para a saída na Portaria.
+                </p>
+            </div>
+        </div>
+
+        <!-- MODAL FORM -->
+        <form method="POST" id="formAprovar" class="p-6 pt-0 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Observações (opcional)
+                </label>
+                <textarea name="observacao_aprovacao"
+                          rows="4"
+                          placeholder="Digite observações importantes para o motorista..."
+                          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700
+                                 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white
+                                 focus:border-green-500 focus:ring-2 focus:ring-green-500/20
+                                 resize-none transition-all duration-200"></textarea>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Esta observação ficará visível para o responsável pela saída do veículo.
+                </p>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="flex gap-3 pt-4">
+                <button type="button"
+                        onclick="closeModal('modalAprovar')"
+                        class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
+                               bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
+                               hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
+                               bg-gradient-to-r from-green-500 to-emerald-600 text-white
+                               hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
+                               transition-all duration-200">
+                    <i class="fa-solid fa-check mr-2"></i>
+                    Confirmar Aprovação
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL REPROVAR -->
+<div id="modalReprovar"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[100] p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <!-- MODAL HEADER -->
+        <div class="p-6 pb-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Reprovar Solicitação</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Informe o motivo da reprovação</p>
+                    </div>
+                </div>
+                <button type="button"
+                        onclick="closeModal('modalReprovar')"
+                        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-gray-500"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900">
+                <p class="text-sm text-red-700 dark:text-red-300 font-medium">
+                    <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+                    Esta ação não pode ser desfeita. O motorista será notificado.
+                </p>
+            </div>
+        </div>
+
+        <!-- MODAL FORM -->
+        <form method="POST" id="formReprovar" class="p-6 pt-0 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Motivo da reprovação *
+                </label>
+                <textarea name="motivo_reprovacao"
+                          required
+                          rows="4"
+                          placeholder="Descreva detalhadamente o motivo da reprovação..."
+                          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700
+                                 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white
+                                 focus:border-red-500 focus:ring-2 focus:ring-red-500/20
+                                 resize-none transition-all duration-200"></textarea>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Este motivo será gravado na requisição.
+                </p>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="flex gap-3 pt-4">
+                <button type="button"
+                        onclick="closeModal('modalReprovar')"
+                        class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
+                               bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
+                               hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
+                               bg-gradient-to-r from-red-500 to-red-600 text-white
+                               hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
+                               transition-all duration-200">
+                    <i class="fa-solid fa-xmark mr-2"></i>
+                    Confirmar Reprovação
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- STYLES -->
+<style>
+    .stat-card {
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 89, 76, 0.15);
+    }
+    
+    .filter-option {
+        transition: all 0.2s ease;
+    }
+    
+    .filter-option:hover {
+        transform: translateX(4px);
+    }
+    
+    /* Card animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .solicitacao-card {
+        animation: fadeInUp 0.5s ease forwards;
+        animation-delay: calc(var(--card-index, 0) * 0.1s);
+    }
+    
+    /* Modal animations */
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    #modalAprovar > div,
+    #modalReprovar > div {
+        animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    /* Pulse animation */
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+</style>
+
+<script>
+// Definir URLs base dinamicamente
+{% url 'aprovar_solicitacao' 0 as aprovar_url %}
+{% url 'reprovar_solicitacao' 0 as reprovar_url %}
+
+// Substituir o 0 por um placeholder
+const APROVAR_BASE_URL = "{{ aprovar_url|slice:":-2" }}";
+const REPROVAR_BASE_URL = "{{ reprovar_url|slice:":-2" }}";
+
+// Funções para manipulação dos modais
+function openAprovarModal(id) {
+    const modal = document.getElementById("modalAprovar");
+    const form = document.getElementById("formAprovar");
+    
+    // Atualiza a action do formulário com a URL correta
+    form.action = `${APROVAR_BASE_URL}${id}/`;
+    
+    // Mostra o modal
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    
+    // Previne scroll no body
+    document.body.style.overflow = 'hidden';
+    
+    // Foca no textarea
+    setTimeout(() => {
+        const textarea = form.querySelector('textarea[name="observacao_aprovacao"]');
+        if (textarea) textarea.focus();
+    }, 100);
+}
+
+function openReprovarModal(id) {
+    const modal = document.getElementById("modalReprovar");
+    const form = document.getElementById("formReprovar");
+    
+    // Atualiza a action do formulário com a URL correta
+    form.action = `${REPROVAR_BASE_URL}${id}/`;
+    
+    // Mostra o modal
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    
+    // Previne scroll no body
+    document.body.style.overflow = 'hidden';
+    
+    // Foca no textarea
+    setTimeout(() => {
+        const textarea = form.querySelector('textarea[name="motivo_reprovacao"]');
+        if (textarea) textarea.focus();
+    }, 100);
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    
+    // Restaura scroll do body
+    document.body.style.overflow = '';
+    
+    // Limpa os formulários
+    const form = modal.querySelector('form');
+    if (form) {
+        form.reset();
+    }
+}
+
+// Fecha modal ao pressionar ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modals = ['modalAprovar', 'modalReprovar'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && !modal.classList.contains('hidden')) {
+                closeModal(modalId);
+            }
+        });
+    }
+});
+
+// Fecha modal ao clicar fora dele
+document.addEventListener('click', function(event) {
+    const modals = ['modalAprovar', 'modalReprovar'];
+    
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal && !modal.classList.contains('hidden') && event.target === modal) {
+            closeModal(modalId);
+        }
+    });
+});
+</script>
+
+{% endblock %}

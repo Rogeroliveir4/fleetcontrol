@@ -1,0 +1,436 @@
+{% extends "core/base.html" %}
+
+{% block title %}{% if motorista %}Editar Motorista{% else %}Novo Motorista{% endif %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .custom-green {
+    background-color: #00594C;
+  }
+
+  .custom-green-light {
+    background-color: #0a7c6c;
+  }
+
+  .custom-green-text {
+    color: #00594C;
+  }
+  
+  .form-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-left: 4px solid #00594C;
+  }
+  
+  .form-section-dark {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-left: 4px solid #0a7c6c;
+  }
+  
+  .input-label {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+  
+  .input-container {
+    transition: all 0.3s ease;
+  }
+  
+  .input-container:hover {
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-6">
+  <div class="max-w-4xl mx-auto px-4">
+
+    <!-- CABEÇALHO COM GRADIENTE -->
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-[#00594C] to-[#0a7c6c] rounded-2xl p-6 mb-4 shadow-lg">
+        <div class="flex items-center justify-center gap-3 mb-2">
+          <div class="bg-white/20 p-3 rounded-full">
+            <i class="fa-solid fa-id-card text-white text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-white text-center text-2xl font-bold dark:text-white tracking-tight">
+              {% if motorista %}✏️ Editar Motorista{% else %}👤 Novo Motorista{% endif %}
+            </h1>
+            <p class="text-sm text-green-100 text-center opacity-90 mt-1">
+              Preencha os dados do motorista abaixo
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-0 overflow-hidden">
+      <!-- HEADER DO CARD -->
+      <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-lines text-[#00594C] dark:text-[#0a7c6c]"></i>
+          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Informações do Motorista
+          </h2>
+        </div>
+      </div>
+      
+      <form method="post" class="space-y-6 p-6">
+        {% csrf_token %}
+        
+        <!-- GRID RESPONSIVO -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- NOME -->
+          <div class="input-container">
+            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <i class="fa-solid fa-user text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <span>Nome Completo *</span>
+              </label>
+              <input 
+                name="nome" 
+                required 
+                value="{{ motorista.nome|default:'' }}" 
+                placeholder="Digite o nome completo"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+              >
+            </div>
+          </div>
+
+          <!-- CPF -->
+          <div class="input-container">
+            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                  <i class="fa-solid fa-id-card text-amber-600 dark:text-amber-400"></i>
+                </div>
+                <span>CPF *</span>
+              </label>
+              <input 
+                name="cpf" 
+                required 
+                value="{{ motorista.cpf|default:'' }}" 
+                placeholder="000.000.000-00"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+              >
+            </div>
+          </div>
+
+          <!-- TELEFONE -->
+          <div class="input-container">
+            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <i class="fa-solid fa-phone text-green-600 dark:text-green-400"></i>
+                </div>
+                <span>Telefone *</span>
+              </label>
+              <input 
+                name="telefone" 
+                required 
+                value="{{ motorista.telefone|default:'' }}" 
+                placeholder="(99) 99999-9999"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+              >
+            </div>
+          </div>
+
+          <!-- CNH NÚMERO -->
+          <div class="input-container">
+            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <i class="fa-solid fa-id-badge text-purple-600 dark:text-purple-400"></i>
+                </div>
+                <span>Número da CNH *</span>
+              </label>
+              <input 
+                name="cnh_numero" 
+                required 
+                value="{{ motorista.cnh_numero|default:'' }}"
+                placeholder="Informe o número da CNH"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+              >
+            </div>
+          </div>
+
+          <!-- CNH CATEGORIA -->
+          <div class="input-container">
+            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <i class="fa-solid fa-layer-group text-blue-500 dark:text-blue-400"></i>
+                </div>
+                <span>Categoria da CNH *</span>
+              </label>
+              <div class="relative">
+                <input 
+                  name="cnh_categoria" 
+                  required 
+                  maxlength="3" 
+                  value="{{ motorista.cnh_categoria|default:'' }}"
+                  placeholder="Ex: A, B, C, D, E"
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                         rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                         focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                         transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                >
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">
+                    Max 3
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+      <!-- CNH VENCIMENTO -->
+        <div class="input-container">
+          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+              <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                <i class="fa-solid fa-calendar-xmark text-red-600 dark:text-red-400"></i>
+              </div>
+              <span>Vencimento da CNH *</span>
+            </label>
+            <input 
+              type="date" 
+              name="cnh_vencimento" 
+              required 
+              value="{{ motorista.cnh_vencimento|date:'Y-m-d' }}"
+              min="1900-01-01"
+              max="9999-12-31"
+              pattern="\d{4}-\d{2}-\d{2}"
+              oninput="validarData(this)"
+              class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                    rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                    focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                    transition-all duration-200 cursor-pointer"
+            >
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Formato: DD-MM-AAAA (ano com 4 dígitos)
+            </p>
+          </div>
+        </div>
+
+        </div> <!-- Fim do Grid -->
+
+        <!-- CONTRATO - COM COMBOBOX -->
+        <div class="input-container">
+          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+              <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                <i class="fa-solid fa-file-contract text-indigo-600 dark:text-indigo-400"></i>
+              </div>
+              <span>Contrato Associado</span>
+            </label>
+            
+            <div class="relative">
+              <select 
+                name="contrato"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       appearance-none cursor-pointer"
+              >
+                <option value="">-- Selecione um contrato --</option>
+                {% for contrato in contratos %}
+                <option value="{{ contrato.id }}" 
+                  {% if motorista and motorista.contrato and motorista.contrato.id == contrato.id %}selected{% endif %}>
+                  {{ contrato.nome }} - {{ contrato.cliente|default:"Sem cliente" }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+              </div>
+            </div>
+            
+            {% if motorista and motorista.contrato %}
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              <i class="fa-solid fa-location-dot mr-1"></i>
+              Localização atual: {{ motorista.contrato.localizacao|default:"Não informada" }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- STATUS -->
+        <div class="input-container">
+          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+              <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                <i class="fa-solid fa-toggle-on text-emerald-600 dark:text-emerald-400"></i>
+              </div>
+              <span>Situação do Motorista</span>
+            </label>
+            
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  Status Atual:
+                </span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium
+                            {% if motorista and motorista.ativo %}
+                              bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
+                            {% else %}
+                              bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                            {% endif %}">
+                  {% if motorista %}
+                    {% if motorista.ativo %}✅ Ativo{% else %}⛔ Inativo{% endif %}
+                  {% else %}
+                    ✅ Ativo
+                  {% endif %}
+                </span>
+              </div>
+              
+              <div class="relative">
+                <select name="ativo"
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                         rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                         focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                         appearance-none cursor-pointer"
+                >
+                  <option value="True" {% if motorista and motorista.ativo %}selected{% endif %}>Ativo</option>
+                  <option value="False" {% if motorista and not motorista.ativo %}selected{% endif %}>Inativo</option>
+                </select>
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <i class="fa-solid fa-chevron-down text-gray-400"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÕES -->
+        <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex flex-col sm:flex-row gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+            <button type="submit" class="group inline-flex items-center justify-center gap-2 px-6 py-3 
+                      text-sm font-semibold text-white bg-gradient-to-r from-[#00594C] to-[#0a7c6c]
+                      rounded-lg shadow hover:shadow-xl transition-all duration-200 
+                      hover:from-[#0a7c6c] hover:to-[#00594C]
+                      flex-1 min-h-[48px]">
+              <i class="fa-solid fa-check group-hover:scale-110 transition-transform"></i>
+              {% if motorista %}Atualizar Motorista{% else %}Cadastrar Motorista{% endif %}
+            </button>
+
+            <a href="{% url 'lista_motoristas' %}" class="group inline-flex items-center justify-center gap-2 px-6 py-3 
+                      text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 
+                      hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg shadow transition-all duration-200
+                      flex-1 min-h-[48px]">
+              <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+              Voltar para Lista
+            </a>
+          </div>
+          
+          <!-- NOTAS -->
+          <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-info text-blue-500 dark:text-blue-400 mt-0.5"></i>
+              <p class="text-xs text-blue-800 dark:text-blue-300">
+                <span class="font-semibold">Importante:</span> Todos os campos marcados com * são obrigatórios. 
+                Verifique se os dados estão corretos antes de salvar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Formatação automática para CPF
+  const cpfInput = document.querySelector('input[name="cpf"]');
+  if (cpfInput) {
+    cpfInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.substring(0, 11);
+      
+      if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+      
+      e.target.value = value;
+    });
+  }
+  
+  // Formatação automática para telefone
+  const telInput = document.querySelector('input[name="telefone"]');
+  if (telInput) {
+    telInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      
+      if (value.length > 11) value = value.substring(0, 11);
+      
+      if (value.length === 11) {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      } else if (value.length === 10) {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+      }
+      
+      e.target.value = value;
+    });
+  }
+  
+  // Mostrar/ocultar informações do contrato selecionado
+  const selectContrato = document.querySelector('select[name="contrato"]');
+  if (selectContrato) {
+    // Armazenar informações dos contratos em um objeto
+    const contratosInfo = {
+      {% for contrato in contratos %}
+      "{{ contrato.id }}": {
+        localizacao: "{{ contrato.localizacao|default:'Não informada'|escapejs }}"
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    };
+    
+    // Criar elemento para mostrar a localização
+    const localizacaoDiv = document.createElement('div');
+    localizacaoDiv.className = 'mt-2 text-xs text-gray-600 dark:text-gray-400 localizacao-info';
+    selectContrato.parentElement.appendChild(localizacaoDiv);
+    
+    // Função para atualizar a localização
+    function atualizarLocalizacao() {
+      const contratoId = selectContrato.value;
+      if (contratoId && contratosInfo[contratoId]) {
+        localizacaoDiv.innerHTML = `
+          <i class="fa-solid fa-location-dot mr-1"></i>
+          Localização: ${contratosInfo[contratoId].localizacao}
+        `;
+        localizacaoDiv.style.display = 'block';
+      } else {
+        localizacaoDiv.style.display = 'none';
+      }
+    }
+    
+    // Inicializar e adicionar listener
+    atualizarLocalizacao();
+    selectContrato.addEventListener('change', atualizarLocalizacao);
+  }
+});
+</script>
+
+{% endblock %}

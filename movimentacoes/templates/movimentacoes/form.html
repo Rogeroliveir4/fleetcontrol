@@ -1,0 +1,536 @@
+{% extends "core/base.html" %}
+
+{% block title %}Nova Movimentação{% endblock %}
+
+{% block content %}
+
+<style>
+    .custom-green {
+        background-color: #00594C;
+    }
+
+    .custom-green-light {
+        background-color: #0a7c6c;
+    }
+    
+    .pre-selected {
+        background-color: #f0fdf4 !important;
+        border-color: #10b981 !important;
+    }
+</style>
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-1">
+    <div class="max-w-7xl mx-auto px-2">
+        <!-- Cabeçalho -->
+        <div class="mb-4">
+            <div class="bg-[#00594C] rounded-xl p-4 mb-3 shadow-sm">
+                <h1 class="text-amber-600 text-center font-bold text-gray-900 dark:text-white">
+                    {% if solicitacao %}
+                    Registrar Saída (Solicitação #{{ solicitacao.id }})
+                    {% else %}
+                    Nova Movimentação
+                    {% endif %}
+                </h1>
+                <p class="text-sm text-green-100 text-center opacity-90">
+                    {% if solicitacao %}
+                    Confirmar saída da solicitação
+                    {% else %}
+                    Registrar saída de veículo
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Exibir erros -->
+        {% if error %}
+        <div class="mb-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+                <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="text-xs font-medium text-red-800 dark:text-red-200">
+                        Erro no formulário
+                    </p>
+                    <p class="text-xs text-red-700 dark:text-red-300">
+                        {{ error }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Informações da solicitação -->
+        {% if solicitacao %}
+        <div class="mb-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+                <i class="fa-solid fa-info-circle text-blue-500 mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="text-xs font-medium text-blue-800 dark:text-blue-200 mb-1">
+                        Dados da Solicitação
+                    </p>
+                    <div class="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                        <div><span class="font-medium">Veículo:</span> {{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }} ({{ solicitacao.veiculo.placa }})</div>
+                        <div><span class="font-medium">Motorista:</span> {{ solicitacao.motorista.nome }}</div>
+                        <div><span class="font-medium">Destino:</span> {{ solicitacao.destino }}</div>
+                        {% if solicitacao.finalidade %}
+                        <div><span class="font-medium">Finalidade:</span> {{ solicitacao.finalidade }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulário -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <form method="post" class="space-y-4 p-4" id="movimentacaoForm">
+                {% csrf_token %}
+                
+                {% if solicitacao %}
+                <input type="hidden" name="solicitacao_id" value="{{ solicitacao.id }}">
+                {% endif %}
+
+                <!-- Veículo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-car text-green-500 mr-1"></i>
+                        Veículo *
+                        {% if solicitacao %}
+                        <span class="text-green-600 dark:text-green-400 text-xs">(Pré-selecionado)</span>
+                        {% endif %}
+                    </label>
+                    
+                    {% if solicitacao %}
+                    <!-- Exibição fixa para solicitação -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 
+                                rounded-lg px-4 py-3 text-sm">
+                        <div class="font-bold text-gray-900 dark:text-white">
+                            {{ solicitacao.veiculo.placa }} - {{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }}
+                        </div>
+                        <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            {% if solicitacao.veiculo.tag_interna %}
+                            <span class="inline-block bg-[#00594C] text-white px-2 py-0.5 rounded mr-2">
+                                Tag: {{ solicitacao.veiculo.tag_interna }}
+                            </span>
+                            {% endif %}
+                            <span>KM Atual: <strong id="kmAtualVeiculo">{{ solicitacao.veiculo.km_atual|default:"0" }}</strong></span>
+                        </div>
+                    </div>
+                    <input type="hidden" name="veiculo" value="{{ solicitacao.veiculo.id }}">
+                    
+                    {% else %}
+                    <!-- Select normal para nova movimentação -->
+                    <select name="veiculo" id="selectVeiculo" required
+                            class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                                   rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white
+                                   focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none
+                                   transition-colors"
+                            onchange="atualizarKmVeiculo(this)">
+                        <option value="">Selecione um veículo...</option>
+                        {% for v in veiculos %}
+                        <option value="{{ v.id }}" data-km="{{ v.km_atual|default:0 }}">
+                            {{ v.placa }} - {{ v.marca }} {{ v.modelo }}
+                            {% if v.tag_interna %}({{ v.tag_interna }}){% endif %}
+                            - KM: {{ v.km_atual|default:"N/D" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    
+                    {% if veiculos|length == 0 %}
+                    <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                        <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+                        Nenhum veículo disponível no momento
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Motorista -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-user text-blue-500 mr-1"></i>
+                        Motorista *
+                        {% if solicitacao %}
+                        <span class="text-green-600 dark:text-green-400 text-xs">(Pré-selecionado)</span>
+                        {% endif %}
+                    </label>
+                    
+                    {% if solicitacao %}
+                    <!-- Exibição fixa para solicitação -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 
+                                rounded-lg px-4 py-3 text-sm">
+                        <div class="font-bold text-gray-900 dark:text-white">
+                            {{ solicitacao.motorista.nome }}
+                        </div>
+                        <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            CNH: <strong>{{ solicitacao.motorista.cnh_numero|default:"N/D" }}</strong>
+                            {% if solicitacao.motorista.cnh_categoria %}
+                            • Categoria: <strong>{{ solicitacao.motorista.cnh_categoria }}</strong>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="motorista" value="{{ solicitacao.motorista.id }}">
+                    
+                    {% else %}
+                    <!-- Select normal para nova movimentação -->
+                    <select name="motorista" required
+                            class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                                   rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white
+                                   focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none
+                                   transition-colors">
+                        <option value="">Selecione um motorista...</option>
+                        {% for m in motoristas %}
+                        <option value="{{ m.id }}">
+                            {{ m.nome }}
+                            {% if m.cnh_numero %}(CNH: {{ m.cnh_numero }}{% if m.cnh_categoria %}, Cat: {{ m.cnh_categoria }}{% endif %}){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    
+                    {% if motoristas|length == 0 %}
+                    <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                        <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+                        Nenhum motorista disponível no momento
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- KM Saída -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"  >
+                            <i class="fa-solid fa-gauge-high text-amber-500 mr-1"></i>
+                            KM Saída *
+                        </label>
+                    </div>
+                    
+                    <!-- Campo visível (formatado) -->
+                    <input type="text" id="km_saida_display" 
+                           placeholder="Ex: 35.750" 
+                           value="{% if solicitacao %}{{ solicitacao.veiculo.km_atual|default:'' }}{% endif %}"
+                           class="w-full bg-white dark:bg-black-400 border border-gray-300 dark:border-gray-500
+                                  rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white
+                                  focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none
+                                  font-roboto font-bold" disabled>
+                    
+                    <!-- Campo oculto para envio (apenas números) -->
+                    <input type="hidden" name="km_saida" id="km_saida_real">
+                    
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Digite o KM atual do veículo. O ponto será adicionado automaticamente.
+                    </p>
+                </div>
+
+                <!-- Destino -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-location-dot text-emerald-500 mr-1"></i>
+                        Destino *
+                    </label>
+                    
+                    <input name="destino" 
+                           value="{% if solicitacao %}{{ solicitacao.destino }}{% endif %}"
+                           placeholder="Ex: São Paulo - SP, Av. Paulista 1000" 
+                           class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                                  rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white
+                                  focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none"
+                           required>
+                </div>
+
+                <!-- Finalidade -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-flag text-purple-500 mr-1"></i>
+                        Finalidade
+                    </label>
+                    
+                    <input name="finalidade" 
+                           value="{% if solicitacao %}{{ solicitacao.finalidade|default:'' }}{% endif %}"
+                           placeholder="Ex: Entrega de documentos, Reunião, Manutenção..." 
+                           class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                                  rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white
+                                  focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none">
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fa-solid fa-note-sticky text-gray-500 mr-1"></i>
+                        Observações
+                    </label>
+                    
+                    <textarea name="observacao" rows="3" 
+                              placeholder="Informações adicionais, endereço específico, contato, etc..." 
+                              class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                                     rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white resize-y
+                                     focus:ring-2 focus:ring-[#00594C] focus:border-[#00594C] focus:outline-none"></textarea>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="submit"
+                            id="submitBtn"
+                            class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 
+                                   text-sm font-medium text-white bg-[#00594C] hover:bg-[#004238] 
+                                   rounded-lg transition-colors">
+                        <i class="fa-solid fa-car"></i>
+                        {% if solicitacao %}
+                        Registrar Saída
+                        {% else %}
+                        Criar Movimentação
+                        {% endif %}
+                    </button>
+                    
+                    <a href="{% url 'lista_movimentacoes' %}"
+                       class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 
+                              text-sm font-medium text-gray-700 dark:text-gray-300 
+                              bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 
+                              rounded-lg transition-colors text-center">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Voltar para Lista
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const kmDisplay = document.getElementById('km_saida_display');
+    const kmReal = document.getElementById('km_saida_real');
+    
+    // Formatar valor inicial se existir
+    if (kmDisplay && kmDisplay.value) {
+        formatarKmDisplay();
+    }
+    
+    // Formatar enquanto digita
+    if (kmDisplay) {
+        kmDisplay.addEventListener('input', function() {
+            formatarKmDisplay();
+        });
+        
+        // Garantir formatação ao perder o foco
+        kmDisplay.addEventListener('blur', function() {
+            formatarKmDisplay();
+        });
+    }
+    
+    function formatarKmDisplay() {
+        if (!kmDisplay || !kmReal) return;
+        
+        // Salva a posição do cursor
+        const cursorPos = kmDisplay.selectionStart;
+        
+        // Remove tudo que não é número
+        let valorLimpo = kmDisplay.value.replace(/[^\d]/g, '');
+        
+        // Atualiza campo real (apenas números)
+        kmReal.value = valorLimpo;
+        
+        // Formata para exibição (com ponto)
+        if (valorLimpo) {
+            // Formata com ponto a cada 3 dígitos a partir do final
+            let valorFormatado = '';
+            let contador = 0;
+            
+            // Percorre os dígitos de trás para frente
+            for (let i = valorLimpo.length - 1; i >= 0; i--) {
+                valorFormatado = valorLimpo[i] + valorFormatado;
+                contador++;
+                
+                // Adiciona ponto a cada 3 dígitos (exceto no último grupo)
+                if (contador === 3 && i > 0) {
+                    valorFormatado = '.' + valorFormatado;
+                    contador = 0;
+                }
+            }
+            
+            kmDisplay.value = valorFormatado;
+        } else {
+            kmDisplay.value = '';
+        }
+        
+        // Restaura posição do cursor (ajustada para a formatação)
+        kmDisplay.setSelectionRange(cursorPos, cursorPos);
+    }
+    
+    // Validar formulário
+    const form = document.getElementById('movimentacaoForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        // Garantir formatação antes de enviar
+        if (kmDisplay) {
+            formatarKmDisplay();
+        }
+        
+        // Validar KM
+        if (!kmReal.value) {
+            alert('Por favor, informe o KM de saída');
+            if (kmDisplay) kmDisplay.focus();
+            e.preventDefault();
+            return;
+        }
+        
+        // Validação básica dos outros campos
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('border-red-500');
+                
+                // Destacar apenas o primeiro campo inválido
+                if (isValid === false) {
+                    field.focus();
+                }
+                
+                const errorMsg = field.parentNode.querySelector('.error-msg');
+                if (!errorMsg) {
+                    const msg = document.createElement('p');
+                    msg.className = 'error-msg text-xs text-red-600 dark:text-red-400 mt-1';
+                    msg.textContent = 'Este campo é obrigatório';
+                    field.parentNode.appendChild(msg);
+                }
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Desabilitar botão para evitar envio duplo
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Processando...';
+        submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+    });
+    
+    // Remover mensagens de erro ao digitar
+    form.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('input', function() {
+            this.classList.remove('border-red-500');
+            const errorMsg = this.parentNode.querySelector('.error-msg');
+            if (errorMsg) {
+                errorMsg.remove();
+            }
+        });
+    });
+});
+
+// Função para atualizar KM quando selecionar veículo
+function atualizarKmVeiculo(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const kmAtual = selectedOption.getAttribute('data-km');
+    const kmDisplay = document.getElementById('km_saida_display');
+    const kmReal = document.getElementById('km_saida_real');
+    
+    if (kmAtual && kmDisplay && kmReal) {
+        // Atualiza campo real (apenas números)
+        const valorLimpo = kmAtual.toString().replace(/[^\d]/g, '');
+        kmReal.value = valorLimpo;
+        
+        // Formata para exibição
+        if (valorLimpo) {
+            // Formata com ponto a cada 3 dígitos
+            let valorFormatado = '';
+            let contador = 0;
+            
+            for (let i = valorLimpo.length - 1; i >= 0; i--) {
+                valorFormatado = valorLimpo[i] + valorFormatado;
+                contador++;
+                
+                if (contador === 3 && i > 0) {
+                    valorFormatado = '.' + valorFormatado;
+                    contador = 0;
+                }
+            }
+            
+            kmDisplay.value = valorFormatado;
+        } else {
+            kmDisplay.value = '';
+        }
+    }
+}
+
+// Função para usar KM atual do veículo selecionado
+function usarKmAtual() {
+    const veiculoSelect = document.getElementById('selectVeiculo');
+    if (!veiculoSelect || !veiculoSelect.value) {
+        alert('Por favor, selecione um veículo primeiro');
+        return;
+    }
+    
+    atualizarKmVeiculo(veiculoSelect);
+}
+
+// Animar spinner
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    /* Melhor visualização para KM */
+    #km_saida_display {
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+<style>
+    /* Reset mobile */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    /* Inputs não causam zoom em mobile */
+    select,
+    input,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    /* Estilo para selects */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    /* Ajustes desktop */
+    @media (min-width: 768px) {
+        .max-w-7xl {
+            max-width: 80rem;
+        }
+        
+        .p-4 {
+            padding: 2rem;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1.5rem;
+        }
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,412 @@
+{% extends "core/base.html" %}
+
+{% block title %}Detalhes do Motorista - {{ motorista.nome }}{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 md:p-4">
+
+    <!-- HEADER COMPACTO -->
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+            <div>
+                <a href="{% url 'lista_motoristas' %}" 
+                   class="inline-flex items-center gap-2 text-sm text-[#00594C] dark:text-[#0A7C6C] hover:text-[#0A7C6C] dark:hover:text-[#00594C] mb-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Voltar
+                </a>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                    <i class="fa-solid fa-id-card mr-2"></i>
+                    {{ motorista.nome }}
+                </h1>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                           {% if motorista.ativo %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                           {% else %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300{% endif %}">
+                    <i class="fa-solid fa-circle text-[8px] {% if motorista.ativo %}animate-pulse{% endif %}"></i>
+                    {% if motorista.ativo %}Ativo{% else %}Inativo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <!-- CPF E CATEGORIA -->
+        <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+            <div class="flex items-center gap-1">
+                <i class="fa-solid fa-id-card"></i>
+                <span>{{ motorista.cpf }}</span>
+            </div>
+            {% if motorista.cnh_categoria %}
+            <div class="flex items-center gap-1">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Categoria: {{ motorista.cnh_categoria }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <!-- COLUNA ESQUERDA -->
+            <div class="lg:col-span-2 space-y-4">
+                <!-- CARTÃO PRINCIPAL -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="p-4">
+                        <!-- AVATAR SIMPLES -->
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="relative">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-white text-lg"></i>
+                                </div>
+                                
+                                {% if motorista.cnh_vencimento and dias_para_vencimento %}
+                                    {% if dias_para_vencimento <= 0 %}
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-red-600 border-2 border-white flex items-center justify-center">
+                                        <i class="fa-solid fa-exclamation text-[8px] text-white"></i>
+                                    </div>
+                                    {% elif dias_para_vencimento <= 30 %}
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center">
+                                        <i class="fa-solid fa-exclamation text-[8px] text-white"></i>
+                                    </div>
+                                    {% elif dias_para_vencimento <= 60 %}
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
+                                        <i class="fa-solid fa-clock text-[8px] text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-medium text-gray-900 dark:text-white">Informações de Contato</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Telefone e CNH</p>
+                            </div>
+                        </div>
+                        
+                        <!-- CONTATO -->
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Telefone</p>
+                                <p class="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-phone text-[#00594C]"></i>
+                                    {{ motorista.telefone|default:"Não informado" }}
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Número da CNH</p>
+                                <p class="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-id-card text-[#0A7C6C]"></i>
+                                    {{ motorista.cnh_numero|default:"Não informado" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VALIDADE CNH -->
+                {% if motorista.cnh_vencimento and dias_para_vencimento is not None %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-days 
+                                       {% if dias_para_vencimento <= 0 %}text-red-600
+                                       {% elif dias_para_vencimento <= 30 %}text-red-500
+                                       {% elif dias_para_vencimento <= 60 %}text-amber-500
+                                       {% else %}text-emerald-500{% endif %}"></i>
+                                Validade da CNH
+                            </h3>
+                            
+                            <span class="text-xs px-2 py-1 rounded-full font-medium
+                                       {% if dias_para_vencimento <= 0 %}
+                                           bg-red-600 text-white dark:bg-red-600 dark:text-white
+                                       {% elif dias_para_vencimento <= 30 %}
+                                           bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                                       {% elif dias_para_vencimento <= 60 %}
+                                           bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300
+                                       {% else %}
+                                           bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
+                                       {% endif %}">
+                                {% if dias_para_vencimento <= 0 %}
+                                    VENCIDA
+                                {% elif dias_para_vencimento <= 30 %}
+                                    Crítico
+                                {% elif dias_para_vencimento <= 60 %}
+                                    Atenção
+                                {% else %}
+                                    OK
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="text-center p-3 rounded-lg
+                                      {% if dias_para_vencimento <= 0 %}
+                                          bg-red-600/10 dark:bg-red-600/20
+                                      {% elif dias_para_vencimento <= 30 %}
+                                          bg-red-50 dark:bg-red-900/10
+                                      {% elif dias_para_vencimento <= 60 %}
+                                          bg-amber-50 dark:bg-amber-900/10
+                                      {% else %}
+                                          bg-emerald-50 dark:bg-emerald-900/10
+                                      {% endif %}">
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Vencimento</p>
+                                <p class="text-lg font-bold
+                                          {% if dias_para_vencimento <= 0 %}
+                                              text-red-600 dark:text-red-500
+                                          {% elif dias_para_vencimento <= 30 %}
+                                              text-red-600 dark:text-red-400
+                                          {% elif dias_para_vencimento <= 60 %}
+                                              text-amber-600 dark:text-amber-400
+                                          {% else %}
+                                              text-emerald-600 dark:text-emerald-400
+                                          {% endif %}">
+                                    {{ motorista.cnh_vencimento|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                            
+                            <div class="text-center p-3 rounded-lg
+                                      {% if dias_para_vencimento <= 0 %}
+                                          bg-red-600/10 dark:bg-red-600/20
+                                      {% elif dias_para_vencimento <= 30 %}
+                                          bg-red-50 dark:bg-red-900/10
+                                      {% elif dias_para_vencimento <= 60 %}
+                                          bg-amber-50 dark:bg-amber-900/10
+                                      {% else %}
+                                          bg-emerald-50 dark:bg-emerald-900/10
+                                      {% endif %}">
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    {% if dias_para_vencimento <= 0 %}Vencida há{% else %}Dias Restantes{% endif %}
+                                </p>
+                                <p class="text-lg font-bold
+                                          {% if dias_para_vencimento <= 0 %}
+                                              text-red-600 dark:text-red-500
+                                          {% elif dias_para_vencimento <= 30 %}
+                                              text-red-600 dark:text-red-400
+                                          {% elif dias_para_vencimento <= 60 %}
+                                              text-amber-600 dark:text-amber-400
+                                          {% else %}
+                                              text-emerald-600 dark:text-emerald-400
+                                          {% endif %}">
+                                    {% if dias_para_vencimento <= 0 %}
+                                        {% with dias_absoluto=dias_para_vencimento|stringformat:"d"|slice:"1:" %}
+                                            {{ dias_absoluto }} dias
+                                        {% endwith %}
+                                    {% else %}
+                                        {{ dias_para_vencimento }} dias
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- BARRA DE PROGRESSO -->
+                        {% if dias_para_vencimento > 0 %}
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                <span>Tempo até o vencimento</span>
+                                <span>{{ dias_para_vencimento }} dias</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full
+                                          {% if dias_para_vencimento <= 30 %}
+                                              bg-red-500
+                                          {% elif dias_para_vencimento <= 60 %}
+                                              bg-amber-500
+                                          {% else %}
+                                              bg-emerald-500
+                                          {% endif %}"
+                                     style="width: {% if dias_para_vencimento > 365 %}100%{% else %}{% widthratio dias_para_vencimento 365 100 %}%{% endif %}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- CONTRATO -->
+                {% if motorista.contrato %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-file-contract text-indigo-500"></i>
+                                Contrato Associado
+                            </h3>
+                            
+                            <span class="text-xs px-2 py-1 rounded-full font-medium
+                                       {% if motorista.contrato.ativo %}
+                                           bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                       {% else %}
+                                           bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                                       {% endif %}">
+                                {% if motorista.contrato.ativo %}Ativo{% else %}Inativo{% endif %}
+                            </span>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white mb-1">{{ motorista.contrato.nome }}</h4>
+                            
+                            {% if motorista.contrato.cliente %}
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-building text-xs"></i>
+                                {{ motorista.contrato.cliente }}
+                            </p>
+                            {% endif %}
+                            
+                            {% if motorista.contrato.localizacao %}
+                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot text-xs"></i>
+                                {{ motorista.contrato.localizacao }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- COLUNA DIREITA -->
+            <div class="space-y-4">
+                <!-- STATUS -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <h3 class="font-medium text-gray-900 dark:text-white mb-3">
+                        <i class="fa-solid fa-info-circle mr-2"></i>
+                        Status
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-md 
+                                          {% if motorista.ativo %}
+                                              bg-green-100 dark:bg-green-900/30
+                                          {% else %}
+                                              bg-red-100 dark:bg-red-900/30
+                                          {% endif %} 
+                                          flex items-center justify-center">
+                                    <i class="fa-solid 
+                                             {% if motorista.ativo %}
+                                                 fa-toggle-on text-green-600 dark:text-green-400 text-sm
+                                             {% else %}
+                                                 fa-toggle-off text-red-600 dark:text-red-400 text-sm
+                                             {% endif %}"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Situação</p>
+                                    <p class="text-sm font-medium
+                                             {% if motorista.ativo %}
+                                                 text-green-700 dark:text-green-400
+                                             {% else %}
+                                                 text-red-700 dark:text-red-400
+                                             {% endif %}">
+                                        {% if motorista.ativo %}Ativo{% else %}Inativo{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/10">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                    <i class="fa-solid fa-clock text-blue-600 dark:text-blue-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">ID</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ motorista.id }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AÇÕES -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <h3 class="font-medium text-gray-900 dark:text-white mb-3">
+                        <i class="fa-solid fa-bolt mr-2"></i>
+                        Ações
+                    </h3>
+                    
+                    <div class="space-y-2">
+                        <!-- EDITAR -->
+                        <a href="{% url 'editar_motorista' motorista.id %}"
+                           class="group flex items-center gap-2 p-2 rounded-lg text-sm text-gray-700 dark:text-gray-300
+                                  hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:text-blue-600 dark:hover:text-blue-400
+                                  transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                <i class="fa-solid fa-pen-to-square text-blue-600 dark:text-blue-400 text-sm"></i>
+                            </div>
+                            <span class="flex-1">Editar</span>
+                            <i class="fa-solid fa-chevron-right text-xs text-blue-400 opacity-0 group-hover:opacity-100"></i>
+                        </a>
+                        
+                        <!-- ATIVAR/DESATIVAR -->
+                        {% if motorista.ativo %}
+                        <a href="{% url 'toggle_motorista' motorista.id %}"
+                           class="group flex items-center gap-2 p-2 rounded-lg text-sm text-gray-700 dark:text-gray-300
+                                  hover:bg-amber-50 dark:hover:bg-amber-900/10 hover:text-amber-600 dark:hover:text-amber-400
+                                  transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                                <i class="fa-solid fa-toggle-on text-amber-600 dark:text-amber-400 text-sm"></i>
+                            </div>
+                            <span class="flex-1">Inativar</span>
+                            <i class="fa-solid fa-chevron-right text-xs text-amber-400 opacity-0 group-hover:opacity-100"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'toggle_motorista' motorista.id %}"
+                           class="group flex items-center gap-2 p-2 rounded-lg text-sm text-gray-700 dark:text-gray-300
+                                  hover:bg-green-50 dark:hover:bg-green-900/10 hover:text-green-600 dark:hover:text-green-400
+                                  transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                <i class="fa-solid fa-toggle-off text-green-600 dark:text-green-400 text-sm"></i>
+                            </div>
+                            <span class="flex-1">Ativar</span>
+                            <i class="fa-solid fa-chevron-right text-xs text-green-400 opacity-0 group-hover:opacity-100"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <!-- LISTA -->
+                        <a href="{% url 'lista_motoristas' %}"
+                            class="group flex items-center gap-2 p-2 rounded-lg text-sm text-gray-700 dark:text-gray-300
+                                hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-300
+                                transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                                <i class="fa-solid fa-list text-gray-600 dark:text-gray-400 text-sm"></i>
+                            </div>
+                            <span class="flex-1">Ver Todos</span>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-400 opacity-0 group-hover:opacity-100"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- METADADOS -->
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4">
+                    <h4 class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Informações</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Motorista ID</span>
+                            <span class="font-medium">{{ motorista.id }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Atualizado em</span>
+                            <span>{% now "d/m H:i" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DEBUG - Para verificar se os dados estão chegando -->
+<div style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 20px; background: #f9f9f9;">
+    <h4>DEBUG Info:</h4>
+    <p>CNH Vencimento: {{ motorista.cnh_vencimento|date:"d/m/Y" }}</p>
+    <p>dias_para_vencimento (view): {{ dias_para_vencimento }}</p>
+    <p>Hoje: {% now "Y-m-d" %}</p>
+</div>
+
+{% endblock %}

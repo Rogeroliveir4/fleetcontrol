@@ -1,0 +1,305 @@
+<!-- SIDEBAR MOBILE -->
+<aside id="sidebarMobile"
+    class="lg:hidden sidebar-bg text-white w-56 fixed top-0 left-0 h-screen
+           z-[9999] -translate-x-full transition-transform duration-300 shadow-lg">
+
+    <!-- Topo -->
+    <div class="flex items-center justify-between p-3 border-b border-black/20">
+        <h1 class="text-lg font-bold truncate">FleetControl</h1>
+
+        <button onclick="closeMobileSidebar()"
+            class="w-7 h-7 rounded flex items-center justify-center hover:bg-black/20 transition flex-shrink-0"
+            aria-label="Fechar menu">
+            <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+    </div>
+
+    <!-- Menu -->
+   <nav class="flex-1 p-3 space-y-1 overflow-y-auto overflow-visible">
+
+        {% include "core/sidebar-menu.html" %}
+    </nav>
+
+    <!-- Área usuário -->
+    <div class="p-3 border-t border-black/20">
+        {% include "core/sidebar-user.html" %}
+    </div>
+</aside>
+
+<!-- Botão mobile -->
+<button onclick="toggleMobileSidebar()" class="lg:hidden fixed top-3 left-3 z-[10000]
+               bg-black/40 backdrop-blur px-2.5 py-1.5 rounded-lg text-white shadow">
+    <i class="fa-solid fa-bars text-lg"></i>
+</button>
+
+<style>
+
+  #sidebarMobile {
+    width: 240px; /* Largura reduzida para telas menores */
+  }
+  
+  /* Ajustes para o menu dentro do sidebar mobile */
+  #sidebarMobile .menu-item {
+    padding: 10px 12px;
+    gap: 10px;
+    min-height: 40px;
+  }
+  
+  #sidebarMobile .menuText {
+    font-size: 14px;
+  }
+  
+  #sidebarMobile i.fa-solid {
+    font-size: 16px;
+    width: 16px;
+  }
+  
+  #sidebarMobile #submenu {
+    margin-left: 10px;
+  }
+  
+  #sidebarMobile #submenu a {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  /* Bloco do usuário no mobile */
+  #sidebarMobile .flex.items-center.gap-2 {
+    gap: 12px;
+  }
+  
+  #sidebarMobile .w-8.h-8 {
+    width: 36px;
+    height: 36px;
+  }
+  
+  #sidebarMobile .fa-user {
+    font-size: 18px;
+  }
+  
+  #sidebarMobile .text-sm {
+    font-size: 14px;
+  }
+  
+  #sidebarMobile .text-xs {
+    font-size: 12px;
+  }
+  
+  #sidebarMobile a, 
+  #sidebarMobile button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  /* Responsividade para telas muito pequenas */
+  @media (max-width: 480px) {
+    #sidebarMobile {
+      width: 220px;
+    }
+    
+    #sidebarMobile .flex.items-center.justify-between {
+      padding: 12px;
+    }
+    
+    #sidebarMobile h1 {
+      font-size: 16px;
+    }
+    
+    #sidebarMobile .w-7.h-7 {
+      width: 24px;
+      height: 24px;
+    }
+    
+    #sidebarMobile .fa-xmark {
+      font-size: 14px;
+    }
+    
+    /* Menu */
+    #sidebarMobile nav {
+      padding: 12px;
+    }
+    
+    #sidebarMobile .menu-item {
+      padding: 8px 10px;
+      gap: 8px;
+      min-height: 36px;
+    }
+    
+    #sidebarMobile .menuText {
+      font-size: 13px;
+    }
+    
+    #sidebarMobile i.fa-solid {
+      font-size: 15px;
+      width: 15px;
+    }
+    
+    #sidebarMobile #submenu {
+      margin-left: 8px;
+    }
+    
+    #sidebarMobile #submenu a {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+    
+    /* Área do usuário */
+    #sidebarMobile .p-3 {
+      padding: 12px;
+    }
+    
+    #sidebarMobile .flex.items-center.gap-2 {
+      gap: 10px;
+    }
+    
+    #sidebarMobile .w-8.h-8 {
+      width: 32px;
+      height: 32px;
+    }
+    
+    #sidebarMobile .fa-user {
+      font-size: 16px;
+    }
+    
+    #sidebarMobile .text-sm {
+      font-size: 13px;
+    }
+    
+    #sidebarMobile .text-xs {
+      font-size: 11px;
+    }
+    
+    #sidebarMobile a, 
+    #sidebarMobile button {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    
+    /* Botão mobile */
+    .lg\\:hidden.fixed {
+      top: 12px;
+      left: 12px;
+      padding: 8px 10px;
+    }
+    
+    .lg\\:hidden.fixed .fa-bars {
+      font-size: 16px;
+    }
+  }
+  
+  @media (max-width: 360px) {
+    #sidebarMobile {
+      width: 200px;
+    }
+    
+    #sidebarMobile .flex.items-center.justify-between {
+      padding: 10px;
+    }
+    
+    #sidebarMobile h1 {
+      font-size: 15px;
+    }
+    
+    #sidebarMobile nav {
+      padding: 10px;
+    }
+    
+    #sidebarMobile .menu-item {
+      padding: 6px 8px;
+      gap: 6px;
+      min-height: 32px;
+    }
+    
+    #sidebarMobile .menuText {
+      font-size: 12px;
+    }
+    
+    #sidebarMobile i.fa-solid {
+      font-size: 14px;
+      width: 14px;
+    }
+    
+    #sidebarMobile .p-3 {
+      padding: 10px;
+    }
+    
+    #sidebarMobile a, 
+    #sidebarMobile button {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+  }
+  
+  /* Melhorias de acessibilidade e usabilidade */
+  #sidebarMobile {
+    -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+  }
+  
+  #sidebarMobile nav {
+    max-height: calc(100vh - 140px); /* Altura máxima para o menu */
+  }
+  
+  /* Overlay para fechar o sidebar */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+  }
+  
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+  // Funções para controle do sidebar mobile
+  function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebarMobile');
+    const overlay = document.querySelector('.sidebar-overlay') || createOverlay();
+    
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('active');
+    
+    // Prevenir scroll do body quando sidebar aberto
+    document.body.style.overflow = sidebar.classList.contains('-translate-x-full') ? 'auto' : 'hidden';
+  }
+  
+  function closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebarMobile');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    sidebar.classList.add('-translate-x-full');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+  
+  function createOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    overlay.addEventListener('click', closeMobileSidebar);
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+  
+  // Fechar sidebar ao pressionar ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeMobileSidebar();
+    }
+  });
+  
+  // Fechar sidebar ao redimensionar para desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 1024) { // lg breakpoint
+      closeMobileSidebar();
+    }
+  });
+</script>

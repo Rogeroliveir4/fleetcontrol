@@ -1,0 +1,84 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Solicitações Pendentes{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto">
+
+    <!-- Banner -->
+    <div class="w-full bg-[#00594C] text-white rounded-2xl p-5 mb-6 shadow text-center">
+        <h2 class="text-2xl font-bold">Solicitações Pendentes — Contrato {{ contrato }}</h2>
+        <p class="text-sm opacity-80">Aprovar ou Reprovar solicitações de uso de veículos</p>
+    </div>
+
+    <!-- Grid de Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {% for s in pendentes %}
+        <div class="bg-white rounded-2xl shadow p-6 flex flex-col justify-between">
+
+            <!-- Cabeçalho -->
+            <div class="mb-4">
+                <h3 class="text-xl font-bold text-gray-800">
+                    {{ s.veiculo.tag_interna|default:s.veiculo }}
+                </h3>
+                <p class="text-sm text-gray-600">
+                    <strong>Motorista:</strong> {{ s.motorista.nome }}
+                </p>
+            </div>
+
+            <!-- Detalhes -->
+            <div class="space-y-2 text-gray-700 text-sm">
+
+                <p><strong>Destino:</strong> {{ s.destino }}</p>
+
+                <p>
+                    <strong>Previsão retorno:</strong>
+                    {{ s.previsao_retorno|date:"d/m/Y H:i" }}
+                </p>
+
+                {% if s.justificativa %}
+                <p>
+                    <strong>Justificativa:</strong><br>
+                    {{ s.justificativa }}
+                </p>
+                {% endif %}
+
+                <p class="text-xs text-gray-500">
+                    Solicitado em: {{ s.data_criacao|date:"d/m/Y H:i" }}
+                </p>
+
+            </div>
+
+            <!-- Botões -->
+            <div class="flex gap-3 mt-6">
+
+                <!-- Aprovar -->
+                <a href="{% url 'aprovar_solicitacao' s.id %}"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-xl shadow">
+                    Aprovar
+                </a>
+
+                <!-- Reprovar -->
+                <a href="{% url 'reprovar_solicitacao' s.id %}"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white text-center py-2 rounded-xl shadow">
+                    Reprovar
+                </a>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+        {% if pendentes|length == 0 %}
+        <p class="text-center text-gray-600 col-span-2 py-10 text-lg font-medium">
+            Nenhuma solicitação pendente.
+        </p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

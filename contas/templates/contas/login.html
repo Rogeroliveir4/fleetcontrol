@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FleetControl</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#00594C',
+                            600: '#00473d',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'drive': 'drive 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        drive: {
+                            '0%, 100%': { 
+                                transform: 'translateX(0)',
+                                filter: 'drop-shadow(0 0 2px rgba(0, 89, 76, 0.3))'
+                            },
+                            '50%': { 
+                                transform: 'translateX(8px)',
+                                filter: 'drop-shadow(2px 0 4px rgba(0, 89, 76, 0.4))'
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Estilos essenciais */
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn-primary {
+            background-color: #00594C;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #00473d;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .input-field {
+            transition: border-color 0.2s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #00594C;
+            box-shadow: 0 0 0 2px rgba(0, 89, 76, 0.1);
+        }
+        
+        /* Animação para o ícone do carro */
+        .car-icon {
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Efeito de estrada */
+        .road-effect::before {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #00594C 20%, 
+                #00594C 80%, 
+                transparent 100%);
+            border-radius: 2px;
+            animation: roadLine 1.5s linear infinite;
+        }
+        
+        @keyframes roadLine {
+            0% {
+                background-position: -40px 0;
+            }
+            100% {
+                background-position: 40px 0;
+            }
+        }
+        
+        /* Safe areas para iOS */
+        .safe-top {
+            padding-top: env(safe-area-inset-top);
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen safe-top safe-bottom">
+
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        
+        <!-- Logo com ícone animado -->
+        <div class="mb-8 text-center">
+            <div class="relative mb-4">
+                <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto car-icon road-effect">
+                    <i class="fas fa-car text-white text-3xl"></i>
+                </div>
+                <!-- Efeito de movimento -->
+                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                    <div class="flex space-x-1">
+                        <div class="w-1 h-1 bg-primary-400 rounded-full animate-pulse" style="animation-delay: 0s"></div>
+                        <div class="w-1 h-1 bg-primary-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                        <div class="w-1 h-1 bg-primary-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">FleetControl</h1>
+            <p class="text-gray-600 mt-1">Entrada e Saída de Veículos</p>
+        </div>
+
+        <!-- Card de Login -->
+        <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 animate-fade-in" style="animation: fadeIn 0.5s ease-out">
+            <h2 class="text-lg font-semibold text-gray-800 mb-6">Faça seu login</h2>
+            
+            <form method="POST" id="loginForm">
+                {% csrf_token %}
+                
+                <!-- Campo Usuário -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Usuário
+                    </label>
+                    <div class="relative">
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="username"
+                            required
+                            autocomplete="username"
+                            placeholder="Digite seu usuário"
+                            class="w-full pl-10 pr-4 py-3 input-field border border-gray-300 rounded-lg focus:outline-none"
+                        >
+                    </div>
+                </div>
+
+                <!-- Campo Senha -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Senha
+                        </label>
+                        <button type="button"
+                                onclick="togglePassword()"
+                                class="text-sm text-primary-500 hover:text-primary-600 transition-transform hover:scale-110 active:scale-95">
+                            <i class="fas fa-eye" id="passIcon"></i>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input 
+                            type="password" 
+                            name="password"
+                            id="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="Digite sua senha"
+                            class="w-full pl-10 pr-4 py-3 input-field border border-gray-300 rounded-lg focus:outline-none"
+                        >
+                    </div>
+                </div>
+
+                <!-- Lembrar-me -->
+                <div class="mb-6">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" 
+                                   id="remember" 
+                                   class="sr-only"
+                                   checked>
+                            <div class="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs check-icon hidden"></i>
+                            </div>
+                        </div>
+                        <span class="ml-2 text-sm text-gray-700">Manter conectado</span>
+                    </label>
+                </div>
+
+                <!-- Mensagens de erro -->
+                {% if messages %}
+                <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 animate-shake">
+                    {% for message in messages %}
+                        <div class="flex items-center text-red-700 text-sm">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Botão de Login -->
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="w-full btn-primary text-white font-medium py-3 rounded-lg flex items-center justify-center transition-all hover:shadow-lg active:scale-[0.98]"
+                >
+                    <span id="loginText">Entrar</span>
+                    <i class="fas fa-spinner fa-spin ml-2 hidden" id="loadingIcon"></i>
+                </button>
+
+                <!-- Link para recuperar senha -->
+                <div class="mt-6 pt-6 border-t border-gray-100 text-center">
+                    <a href="{% url 'password_reset' %}" 
+                       class="text-sm text-primary-500 hover:text-primary-600 hover:underline transition-colors">
+                        <i class="fas fa-key mr-1"></i>
+                        Esqueci minha senha
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>© 2026 FleetControl • v1.0</p>
+
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const passwordInput = document.getElementById('password');
+        const passIcon = document.getElementById('passIcon');
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const loginText = document.getElementById('loginText');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const rememberCheckbox = document.getElementById('remember');
+        const checkIcon = document.querySelector('.check-icon');
+
+        // Configurar checkbox customizado
+        function setupCheckbox() {
+            if (rememberCheckbox.checked) {
+                rememberCheckbox.parentElement.style.backgroundColor = '#00594C';
+                rememberCheckbox.parentElement.style.borderColor = '#00594C';
+                checkIcon.classList.remove('hidden');
+            }
+            
+            rememberCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.parentElement.style.backgroundColor = '#00594C';
+                    this.parentElement.style.borderColor = '#00594C';
+                    checkIcon.classList.remove('hidden');
+                } else {
+                    this.parentElement.style.backgroundColor = '';
+                    this.parentElement.style.borderColor = '';
+                    checkIcon.classList.add('hidden');
+                }
+            });
+        }
+
+        // Alternar visibilidade da senha
+        function togglePassword() {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            passIcon.classList.toggle('fa-eye', !isPassword);
+            passIcon.classList.toggle('fa-eye-slash', isPassword);
+            
+            // Efeito visual no botão
+            const btn = event.currentTarget;
+            btn.classList.add('active:scale-95');
+            setTimeout(() => {
+                btn.classList.remove('active:scale-95');
+            }, 200);
+        }
+
+        // Submissão do formulário
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validação simples
+            const username = this.querySelector('input[name="username"]');
+            const password = this.querySelector('input[name="password"]');
+            
+            if (!username.value.trim() || !password.value.trim()) {
+                // Adicionar indicadores visuais de erro
+                if (!username.value.trim()) {
+                    username.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => username.classList.remove('animate-shake'), 500);
+                }
+                if (!password.value.trim()) {
+                    password.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => password.classList.remove('animate-shake'), 500);
+                }
+                return;
+            }
+            
+            // Estado de loading
+            loginButton.disabled = true;
+            loginText.textContent = 'Entrando...';
+            loadingIcon.classList.remove('hidden');
+            
+            // Efeito de sucesso no ícone do carro
+            const carContainer = document.querySelector('.car-icon');
+            carContainer.classList.add('animate-drive');
+            
+            // Enviar formulário após breve delay para feedback visual
+            setTimeout(() => {
+                this.submit();
+            }, 800);
+        });
+
+        // Remover indicador de erro ao digitar
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('border-red-500');
+            });
+        });
+
+        // Foco automático no primeiro campo
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCheckbox();
+            document.querySelector('input[name="username"]')?.focus();
+        });
+
+        // Submit com Enter
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                const form = document.getElementById('loginForm');
+                const inputs = Array.from(form.querySelectorAll('input'));
+                const currentIndex = inputs.indexOf(e.target);
+                
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                } else {
+                    form.querySelector('button[type="submit"]').click();
+                }
+            }
+        });
+
+        // Animação CSS para fadeIn
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                20%, 40%, 60%, 80% { transform: translateX(2px); }
+            }
+            .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+            .animate-shake { animation: shake 0.5s ease-in-out; }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

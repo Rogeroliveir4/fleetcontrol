@@ -1,0 +1,26 @@
+<!-- SIDEBAR DESKTOP (fixo, sem recolher) -->
+<aside id="sidebarDesktop"
+       class="hidden lg:flex sidebar-bg text-white h-screen w-64 flex-col fixed left-0 top-0 z-50">
+
+    <!-- LOGO -->
+    <div class="p-4 border-b border-black/20">
+        <h1 class="text-2xl font-bold">FleetControl</h1>
+        <span class="text-sm text-white/70">Gestão de Pátio</span>
+    </div>
+
+    <!-- MENU -->
+    <nav class="flex-1 p-4 space-y-2">
+        {% include "core/sidebar-menu.html" %}
+    </nav>
+
+    <!-- USER -->
+    <div class="p-4 border-t border-black/20 mt-auto">
+        {% include "core/sidebar-user.html" %}
+    </div>
+</aside>
+
+<style>
+    .sidebar-bg {
+        background-color: #00594C;
+    }
+</style>

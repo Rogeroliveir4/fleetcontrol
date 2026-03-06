@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full {% if dark %}dark{% endif %}">
+
+<head>
+    <meta charset="UTF-8" />
+    <!-- VIEWPORT OTIMIZADO PARA MOBILE -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="theme-color" content="#00594C">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+
+
+    <!-- PRELOAD FONTE PRINCIPAL -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="fontawesome-free/css/brands.min.css">
+    <link rel="stylesheet" href="fontawesome-free/css/regular.min.css">
+    
+
+    <!-- SCRIPT ALPINE OTIMIZADO -->
+    <script src="https://unpkg.com/alpinejs@3.13.1/dist/cdn.min.js" defer></script>
+
+    <!-- ÍCONES COM FONT DISPLAY SWAP -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- TAILWIND CSS OTIMIZADO -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                screens: {
+                    'xs': '475px',
+                    'sm': '640px',
+                    'md': '768px',
+                    'lg': '1024px',
+                    'xl': '1280px',
+                    '2xl': '1536px',
+                },
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"]
+                    },
+                    colors: {
+                        primary: {
+                            DEFAULT: '#00664e',
+                            light: '#00664e',
+                            dark: '#00664e',
+                        },
+                        dark: {
+                            bg: "#111827",
+                            card: "#1f2937",
+                            border: "#374151",
+                            sidebar: "#00664e",
+                        }
+                    },
+                    fontSize: {
+                        'xxs': '0.625rem',
+                    },
+                    spacing: {
+                        'safe-top': 'env(safe-area-inset-top)',
+                        'safe-bottom': 'env(safe-area-inset-bottom)',
+                        'safe-left': 'env(safe-area-inset-left)',
+                        'safe-right': 'env(safe-area-inset-right)',
+                    }
+                }
+            },
+            corePlugins: {
+                container: false,
+            }
+        }
+    
+        function toggleSubmenu() {
+            const submenu = document.getElementById("submenuAdm");
+        const arrow = document.getElementById("submenuArrow");
+
+            if (submenu.classList.contains("hidden")) {
+                submenu.classList.remove("hidden");
+                arrow.classList.add("rotate-180");
+            } else {
+                submenu.classList.add("hidden");
+                arrow.classList.remove("rotate-180");
+            }
+        }
+ 
+        function toggleTheme() {
+            const html = document.documentElement;
+
+            // Alternar classe
+            html.classList.toggle("dark");
+
+            // Gravar preferência
+            if (html.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        // Aplicar tema salvo ao carregar a página
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedTheme = localStorage.getItem("theme");
+
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        });
+
+
+</script>
+
+    <style>
+        /* Botões do topo padrão */
+        .fc-nav-btn {
+            @apply p-3 rounded-xl bg-gray-800 text-gray-200 shadow-md transition;
+        }
+
+        /* Dark Mode: vira verde */
+        .dark .fc-nav-btn {
+            background: #00664e !important;
+            /* verde institucional */
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(3, 95, 65, 0.25) !important;
+            /* leve brilho */
+
+        .dark .fc-nav-btn:hover {
+            background: #007a63 !important;
+            /* verde claro no hover */
+        }
+    </style>
+
+
+    <!-- CRITICAL CSS INLINE -->
+    <style>
+        /* ESTILOS CRÍTICOS PARA MOBILE */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html,
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: "Inter", system-ui, -apple-system, sans-serif;
+            overscroll-behavior-y: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* MELHOR CONTRASTE PARA MOBILE */
+        @media (max-width: 640px) {
+            html:not(.dark) body {
+                background-color: #f8fafc !important;
+            }
+        }
+
+        /* TOUCH-FRIENDLY ELEMENTS */
+        button,
+        a.btn,
+        .clickable,
+        input[type="submit"],
+        .menu-item {
+            min-height: 44px !important;
+            min-width: 44px !important;
+        }
+
+        /* PREVENT TEXT SIZE ADJUSTMENT ON MOBILE */
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        /* OPTIMIZE IMAGES FOR MOBILE */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+
+    <title>{% block title %}FleetControl{% endblock %}</title>
+
+    <!-- DEFERED STYLES -->
+    <style>
+    /* Mobile First */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+    .menu {
+        flex-direction: column;
+    }
+}
+
+/* Para telas muito pequenas (celulares antigos) */
+@media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .btn { width: 100%; }
+}
+        @media (min-width: 1024px) {
+            .table-wrapper {
+                max-height: 600px !important;
+                min-height: 600px !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        html.dark body {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        /* Sidebar dark */
+        html.dark .sidebar-bg {
+            background-color: #0f3c2c !important;
+        }
+
+        /* Melhorar a paginação mobile */
+        #paginacao-mobile .pagination {
+            @apply flex flex-wrap justify-center items-center gap-1 xs:gap-2;
+        }
+
+        #paginacao-mobile .page-link {
+            @apply px-2 xs:px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 min-w-[36px] xs:min-w-[44px] min-h-[36px] xs:min-h-[44px] flex items-center justify-center text-sm xs:text-base;
+        }
+
+        #paginacao-mobile .page-link:hover {
+            @apply bg-gray-50 dark:bg-gray-700;
+        }
+
+        #paginacao-mobile .page-item.active .page-link {
+            @apply bg-primary border-primary text-white;
+        }
+
+        /* Scroll personalizado */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 3px;
+            width: 3px;
+        }
+
+        @media (hover: hover) {
+            .custom-scrollbar::-webkit-scrollbar {
+                height: 6px;
+                width: 6px;
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            @apply bg-gray-100 dark:bg-gray-800 rounded-full;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+        }
+
+        /* Sidebar + tooltip + collapse */
+        .sidebar-bg {
+            background-color: #00664e;
+        }
+
+        .tooltip {
+            position: absolute;
+            left: calc(5rem + 0.5rem);
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transform: translateY(-50%);
+            top: 50%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s ease;
+            z-index: 60;
+        }
+
+        body.sidebar-collapsed .menu-item:hover .tooltip {
+            opacity: 1;
+        }
+
+        #sidebarDesktop,
+        #sidebarMobile {
+            will-change: width, transform;
+        }
+
+        @media (min-width: 1024px) {
+            body:not(.sidebar-collapsed) #sidebarDesktop {
+                width: 16rem;
+            }
+
+            body:not(.sidebar-collapsed) main {
+                margin-left: 16rem;
+            }
+
+            body.sidebar-collapsed #sidebarDesktop {
+                width: 5rem;
+            }
+
+            body.sidebar-collapsed main {
+                margin-left: 5rem;
+            }
+        }
+
+        .menuText {
+            transition: opacity .15s ease, transform .15s ease;
+        }
+
+        /* Melhor comportamento ao alternar tema */
+        * {
+            transition: background-color 0.20s ease, color 0.20s ease, border-color 0.20s ease;
+        }
+
+        body.sidebar-collapsed .menuText {
+            opacity: 0;
+            transform: translateX(-6px);
+            pointer-events: none;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .2s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        /* MOBILE OVERLAY IMPROVEMENTS */
+        @media (max-width: 1023px) {
+            .overlay {
+                background: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        body.mobile-open .overlay {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* MOBILE SPECIFIC STYLES */
+        @media (max-width: 640px) {
+            main {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+            }
+
+            /* TOUCH-FRIENDLY INPUTS */
+            input:not([type="checkbox"]):not([type="radio"]),
+            select,
+            textarea {
+                font-size: 16px !important;
+                /* Prevents iOS zoom */
+                min-height: 48px !important;
+                padding: 12px !important;
+            }
+
+            /* IMPROVE TABLES ON MOBILE */
+            .mobile-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -0.5rem;
+                padding: 0 0.5rem;
+            }
+
+            /* BETTER CARDS ON MOBILE */
+            .mobile-card {
+                border-radius: 0.75rem !important;
+                padding: 1rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+        }
+
+        /* TABLET OPTIMIZATIONS */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            main {
+                padding: 1rem !important;
+            }
+
+            .tablet-optimized {
+                max-width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+        /* SAFE AREA SUPPORT */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* HAMBURGER MENU ANIMATION */
+        .hamburger-line {
+            transition: all 0.3s ease;
+        }
+
+        .mobile-open .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .mobile-open .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-open .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* LOADING STATE FOR MOBILE */
+        .loading-skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* BOTTOM SHEET EFFECT FOR MOBILE SIDEBAR */
+        @media (max-width: 1023px) {
+            #sidebarMobile {
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* IMPROVE READABILITY ON SMALL SCREENS */
+        @media (max-width: 380px) {
+            .text-xxs-responsive {
+                font-size: 0.625rem !important;
+            }
+
+            .text-xs-responsive {
+                font-size: 0.75rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden relative">
+    <!-- TOP SAFE AREA -->
+    <div class="h-safe-top bg-transparent"></div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <!-- DESKTOP SIDEBAR (hidden on mobile) -->
+        <div class="hidden lg:block">
+            {% include "core/sidebar-desktop.html" %}
+        </div>
+
+        <!-- MOBILE HEADER -->
+        <header
+            class="lg:hidden sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 pt-safe">
+            <div class="flex items-center justify-between px-4 py-3">
+                <!-- MOBILE MENU BUTTON -->
+                <button onclick="toggleMobileSidebar()"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    aria-label="Abrir menu">
+                    <div class="w-6 h-6 flex flex-col justify-center gap-1.5">
+                        <div class="hamburger-line h-0.5 w-6 bg-current"></div>
+                        <div class="hamburger-line h-0.5 w-6 bg-current"></div>
+                        <div class="hamburger-line h-0.5 w-6 bg-current"></div>
+                    </div>
+                </button>
+
+                <!-- APP TITLE -->
+                <h1 class="text-lg font-bold text-gray-800 dark:text-white truncate">
+                    {% block mobile_title %}FleetControl{% endblock %}
+                </h1>
+
+                <!-- THEME TOGGLE FOR MOBILE -->
+                <button onclick="toggleTheme()"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    aria-label="Alternar tema">
+                    <i class="fas fa-moon dark:fa-sun text-base"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MOBILE SIDEBAR -->
+        <div class="lg:hidden ">
+            {% include "core/sidebar-mobile.html" %}
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 px-3 sm:px-4 py-3 lg:py-4 transition-margin duration-200 pb-safe">
+            {% block content %}{% endblock %}
+
+            <!-- MOBILE FLOATING ACTION BUTTON (OPTIONAL) -->
+            {% block mobile_fab %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- OVERLAY FOR MOBILE SIDEBAR -->
+    <div class="overlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
+    <!-- BOTTOM SAFE AREA -->
+    <div class="h-safe-bottom bg-transparent"></div>
+
+</body>
+
+<!-- OPTIMIZED JAVASCRIPT FOR MOBILE -->
+<script>
+        // CRITICAL JS LOADED FIRST
+        (function () {
+            'use strict';
+
+            /* PREVENT MULTIPLE TAPS */
+            let lastTap = 0;
+            document.addEventListener('touchend', function (event) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 500 && tapLength > 0) {
+                    event.preventDefault();
+                }
+                lastTap = currentTime;
+            });
+
+            /* FIX FOR IOS 100VH ISSUE */
+            function setAppHeight() {
+                const doc = document.documentElement;
+                doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+            }
+            window.addEventListener('resize', setAppHeight);
+            window.addEventListener('orientationchange', setAppHeight);
+            setAppHeight();
+
+            /* IMPROVE TOUCH FEEDBACK */
+            document.addEventListener('touchstart', function () { }, { passive: true });
+
+            /* PREVENT ZOOM ON INPUT FOCUS (iOS) */
+            let viewport = document.querySelector("meta[name=viewport]");
+            document.addEventListener('focusin', function (e) {
+                if (e.target.matches('input, select, textarea')) {
+                    viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1';
+                }
+            });
+
+            document.addEventListener('focusout', function () {
+                viewport.content = 'width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
+            });
+        })();
+</script>
+
+<!-- DEFERRED JAVASCRIPT -->
+<script>
+    /* TEMA (DARK MODE) */
+    if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.classList.add("dark");
+    }
+
+    function toggleTheme() {
+        document.documentElement.classList.toggle("dark");
+        localStorage.setItem(
+            "theme",
+            document.documentElement.classList.contains("dark")
+                ? "dark"
+                : "light"
+        );
+        // Update icon
+        const icon = document.querySelector('[aria-label="Alternar tema"] i');
+        if (icon) {
+            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun');
+        }
+    }
+
+    /* SIDEBAR DESKTOP */
+    (() => {
+        const KEY = 'fc_sidebar_collapsed_v1';
+        const saved = localStorage.getItem(KEY);
+        if (saved === '1') document.body.classList.add('sidebar-collapsed');
+
+        window.toggleDesktopCollapse = () => {
+            document.body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem(KEY,
+                document.body.classList.contains('sidebar-collapsed') ? '1' : '0'
+            );
+        };
+    })();
+
+    /* SIDEBAR MOBILE */
+    (() => {
+        const lockScroll = lock => {
+            document.documentElement.style.overflow = lock ? 'hidden' : '';
+            document.body.style.overflow = lock ? 'hidden' : '';
+        };
+
+        window.openMobileSidebar = () => {
+            document.body.classList.add('mobile-open');
+            document.getElementById('sidebarMobile').classList.remove('-translate-x-full');
+            lockScroll(true);
+        };
+
+        window.closeMobileSidebar = () => {
+            document.body.classList.remove('mobile-open');
+            document.getElementById('sidebarMobile').classList.add('-translate-x-full');
+            lockScroll(false);
+        };
+
+        window.toggleMobileSidebar = () =>
+            document.body.classList.contains('mobile-open')
+                ? closeMobileSidebar()
+                : openMobileSidebar();
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            }
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (document.body.classList.contains('mobile-open') &&
+                !e.target.closest('#sidebarMobile') &&
+                !e.target.closest('[onclick*="toggleMobileSidebar"]')) {
+                closeMobileSidebar();
+            }
+        });
+    })();
+
+    /* FORMAT KM VALUES */
+    document.addEventListener('DOMContentLoaded', function () {
+        // Aguardar um pouco para garantir que o conteúdo foi carregado
+        setTimeout(function () {
+            const elementosKm = document.querySelectorAll('.km-value');
+            elementosKm.forEach(elemento => {
+                const valor = elemento.textContent.trim();
+                if (valor && valor !== '-') {
+                    // Remover formatação existente e aplicar nova
+                    const num = parseInt(valor.replace(/\./g, '').replace(',', '.'));
+                    if (!isNaN(num)) {
+                        elemento.textContent = num.toLocaleString('pt-BR');
+                    }
+                }
+            });
+
+            // LAZY LOAD IMAGES IF ANY
+            if ('IntersectionObserver' in window) {
+                const lazyImages = document.querySelectorAll('img[data-src]');
+                const imageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            imageObserver.unobserve(img);
+                        }
+                    });
+                });
+                lazyImages.forEach((img) => imageObserver.observe(img));
+            }
+        }, 100);
+    });
+
+    /* OFFLINE DETECTION */
+    window.addEventListener('online', () => {
+        document.body.classList.remove('offline');
+        // Optional: Show reconnect message
+    });
+
+    window.addEventListener('offline', () => {
+        document.body.classList.add('offline');
+        // Optional: Show offline message
+    });
+</script>
+
+</html>

@@ -1,0 +1,954 @@
+{% extends "core/base.html" %}
+
+{% block title %}Novo Veículo{% endblock %}
+
+{% block content %}
+
+<style>
+  .custom-green {
+    background-color: #00594C;
+  }
+
+  .custom-green-light {
+    background-color: #0a7c6c;
+  }
+
+  .custom-green-text {
+    color: #00594C;
+  }
+
+  .shake {
+    animation: shake 0.3s ease-in-out;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+</style>
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-4">
+  <div class="max-w-6xl mx-auto px-4">
+
+    <!-- CABEÇALHO -->
+    <div class="mb-6">
+      <div class="bg-[#00594C] rounded-xl p-5 mb-4 shadow-sm">
+        <h1 class="text-white text-center text-2xl font-bold dark:text-white">
+          Novo Veículo
+        </h1>
+        <p class="text-sm text-green-100 text-center opacity-90 mt-1">
+          Cadastro completo conforme modelo FleetControl
+        </p>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <form method="post" id="veiculoForm" class="space-y-4 p-4 md:p-6">
+        {% csrf_token %}
+
+        <!-- LINHA 1: DADOS PRINCIPAIS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- PLACA -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 relative">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-hashtag text-blue-500 text-xs"></i>
+              Placa *
+            </p>
+            <input name="placa" id="placaField" required placeholder="ABC-1D23" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none uppercase" 
+                  maxlength="10">
+            <div id="placaFeedback" class="hidden mt-1 text-xs">
+              <i class="fa-solid fa-check text-green-500"></i>
+              <span class="text-green-600 dark:text-green-400">Placa disponível</span>
+            </div>
+            <div id="placaError" class="hidden mt-1 text-xs">
+              <i class="fa-solid fa-times text-red-500"></i>
+              <span class="text-red-600 dark:text-red-400"></span>
+            </div>
+          </div>
+
+          <!-- TAG CLIENTE -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-hashtag text-blue-500 text-xs"></i>
+              Tag Cliente
+            </p>
+            <input type="text" name="tag_cliente" placeholder="Ex: JI-051" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
+          </div>
+
+          <!-- TAG TRATERRA -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 relative">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-hashtag text-blue-500 text-xs"></i>
+              Tag Traterra *
+            </p>
+            <input type="text" name="tag_interna" id="tagInternaField" required placeholder="Ex: VA-451" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
+            <div id="tagInternaFeedback" class="hidden mt-1 text-xs">
+              <i class="fa-solid fa-check text-green-500"></i>
+              <span class="text-green-600 dark:text-green-400">Tag disponível</span>
+            </div>
+            <div id="tagInternaError" class="hidden mt-1 text-xs">
+              <i class="fa-solid fa-times text-red-500"></i>
+              <span class="text-red-600 dark:text-red-400"></span>
+            </div>
+          </div>
+
+          <!-- CONTRATO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <div class="flex items-center gap-2 mb-1">
+              <i class="fa-solid fa-file-contract text-purple-500 text-xs"></i>
+              <p class="block text-gray-700 dark:text-gray-200 font-medium">Contrato *</p>
+            </div>
+            
+            <select 
+              name="id_contrato" 
+              id="id_contrato"
+              class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                    rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                    focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none"
+              required>
+              
+              <option value="">Selecione um contrato...</option>
+
+              {% for c in contratos %}
+                <option value="{{ c.id }}"
+                  {% if veiculo.contrato and veiculo.contrato.id == c.id %}
+                    selected
+                  {% endif %}
+                >
+                  {{ c.id }} - {{ c.nome }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- LINHA 2: DOCUMENTOS BÁSICOS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- RENAVAM -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-id-card text-amber-500 text-xs"></i>
+              Renavam
+            </p>
+            <input name="renavam" placeholder="12345678900" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="20">
+          </div>
+
+          <!-- MARCA -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-tag text-purple-500 text-xs"></i>
+              Marca *
+            </p>
+            <input name="marca" required placeholder="Toyota" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="100">
+          </div>
+
+          <!-- MODELO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-car-side text-indigo-500 text-xs"></i>
+              Modelo *
+            </p>
+            <input name="modelo" required placeholder="Corolla" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="100">
+          </div>
+
+          <!-- ANO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-calendar text-emerald-500 text-xs"></i>
+              Ano *
+            </p>
+            <input type="number" name="ano" required placeholder="2025" min="1900" max="{% now 'Y' %}" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+          </div>
+        </div>
+
+        <!-- LINHA 3: ESPECIFICAÇÕES -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- COR -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-fill-drip text-pink-500 text-xs"></i>
+              Cor
+            </p>
+            <input name="cor" placeholder="Prata" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
+          </div>
+
+          <!-- TIPO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-car text-blue-500 text-xs"></i>
+              Tipo *
+            </p>
+            <select name="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="">Selecione</option>
+              <option value="Carro">Carro</option>
+              <option value="Moto">Moto</option>
+              <option value="Utilitario">Utilitário</option>
+              <option value="Caminhao">Caminhão</option>
+            </select>
+          </div>
+
+          <!-- CATEGORIA -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
+              Categoria *
+            </p>
+            <select name="categoria" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="">Selecione</option>
+              <option value="Leve">Leve</option>
+              <option value="Pesado">Pesado</option>
+              <option value="Passageiro">Passageiro</option>
+              <option value="Carga">Carga</option>
+              <option value="Onibus">Ônibus</option>
+            </select>
+          </div>
+
+          <!-- COMBUSTÍVEL -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-gas-pump text-red-500 text-xs"></i>
+              Combustível *
+            </p>
+            <select name="combustivel" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="">Selecione</option>
+              <option value="Gasolina">Gasolina</option>
+              <option value="Etanol">Etanol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Flex">Flex</option>
+              <option value="GNV">GNV</option>
+              <option value="Elétrico">Elétrico</option>
+              <option value="Híbrido">Híbrido</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LINHA 4: STATUS E PROPRIEDADE -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- STATUS -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-green-500 text-xs"></i>
+              Status *
+            </p>
+            <select name="status" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="Disponivel" selected>Disponível</option>
+              <option value="EmTransito">Em Trânsito</option>
+              <option value="Manutencao">Manutenção</option>
+              <option value="Reservado">Reservado</option>
+            </select>
+          </div>
+
+          <!-- KM ATUAL -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-gauge-high text-yellow-500 text-xs"></i>
+                    KM Atual *
+                </p>
+                <input type="text" 
+                      name="km_atual" 
+                      id="km_atual"
+                      required 
+                      placeholder="0" 
+                      value="0"
+                      class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                              focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+            </div>
+
+          <!-- TIPO PROPRIEDADE -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-house text-teal-500 text-xs"></i>
+              Propriedade *
+            </p>
+            <select name="tipo_propriedade" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="Proprio" selected>Próprio</option>
+              <option value="Locado">Locado</option>
+            </select>
+          </div>
+
+          <!-- POSSUI SEGURO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-red-500 text-xs"></i>
+              Possui Seguro?
+            </p>
+            <select name="seguro" id="seguroSelect" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+              <option value="False" selected>Não</option>
+              <option value="True">Sim</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LINHA 5: DOCUMENTOS VENCIMENTOS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- LICENCIAMENTO VENCIMENTO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-file-shield text-blue-500 text-xs"></i>
+              Venc. Licenciamento
+            </p>
+            <input type="date" name="licenciamento_vencimento" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+          </div>
+
+          <!-- VALIDADE SEGURO -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-calendar-check text-green-500 text-xs"></i>
+              Validade Seguro
+            </p>
+            <input type="date" name="seguro_validade" id="seguroValidade" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none" disabled>
+          </div>
+
+          <!-- Nº APÓLICE -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-file-contract text-indigo-500 text-xs"></i>
+              Nº da Apólice
+            </p>
+            <input name="apolice_numero" id="apoliceNumero" placeholder="Nº da apólice" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none" disabled maxlength="50">
+          </div>
+        </div>
+
+        <!-- LINHA 6: CAMPO CONTRATO OUTRO E ESPAÇOS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- CAMPO CONTRATO OUTRO (OCULTO) -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 hidden" id="contrato_outro_container">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-file-contract text-purple-500 text-xs"></i>
+              Especificar Contrato
+            </p>
+            <input type="text" name="contrato_outro" id="contrato_outro" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none"
+                  placeholder="Digite o nome do contrato" maxlength="100">
+          </div>
+
+          <!-- ESPAÇOS VAZIOS -->
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+          <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-note-sticky text-gray-500 text-xs"></i>
+            Observações
+          </p>
+          <textarea name="observacoes" rows="3"
+            placeholder="Informações adicionais, histórico de manutenções, particularidades do veículo..." 
+            class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                  rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                  focus:ring-2 focus:ring-[#00594C] focus:outline-none resize-none"></textarea>
+        </div>
+        
+        <!-- CADASTRO ATIVO -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+          <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-power-off text-red-500 text-xs"></i>
+            Cadastro Ativo?
+          </p>
+          <select name="ativo" 
+                class="w-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                      rounded-md px-3 py-1 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+            <option value="True" selected>Ativo</option>
+            <option value="False">Inativo</option>
+          </select>
+        </div>
+
+        <!-- BOTÕES -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button type="submit" id="submitBtn" class="inline-flex justify-center items-center gap-2 px-4 py-3 
+                    text-sm font-medium text-white custom-green hover:custom-green-light 
+                    rounded-lg transition-colors min-h-[44px] flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-check"></i>
+            <span id="submitText">Salvar Veículo</span>
+            <span id="loadingSpinner" class="hidden">
+              <i class="fa-solid fa-spinner fa-spin"></i> Processando...
+            </span>
+          </button>
+
+          <a href="{% url 'lista_veiculos' %}" class="inline-flex justify-center items-center gap-2 px-4 py-3 text-sm 
+                    font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 
+                    hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg transition-colors 
+                    min-h-[44px] flex-1 sm:flex-none">
+            <i class="fa-solid fa-arrow-left"></i>
+            Voltar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE SUCESSO/ERRO -->
+<div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 max-w-md w-full">
+    <div class="flex items-center gap-4 mb-6">
+      <div id="modalIcon" class="w-12 h-12 rounded-full flex items-center justify-center">
+        <!-- Ícone será inserido via JS -->
+      </div>
+      <div>
+        <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-white"></h3>
+        <p id="modalMessage" class="text-gray-600 dark:text-gray-300"></p>
+      </div>
+    </div>
+    
+    <div class="flex gap-3">
+      <button id="modalConfirmBtn" 
+              class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 
+                     bg-[#00594C] hover:bg-[#0a7c6c] text-white font-medium rounded-lg 
+                     transition-colors">
+        <i class="fa-solid fa-check"></i>
+        OK
+      </button>
+      <button id="modalRetryBtn" 
+              class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 
+                     bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 
+                     text-gray-700 dark:text-gray-300 font-medium rounded-lg 
+                     transition-colors hidden">
+        <i class="fa-solid fa-redo"></i>
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// MÁSCARA PARA CAMPO KM - VERSÃO SIMPLES E FUNCIONAL
+document.addEventListener('DOMContentLoaded', function() {
+    const kmField = document.getElementById('km_atual');
+    
+    if (!kmField) {
+        console.error('Campo km_atual não encontrado!');
+        return;
+    }
+    
+    // Formata o valor inicial
+    formatarKMField(kmField);
+    
+    // Aplica máscara durante a digitação
+    kmField.addEventListener('input', function(e) {
+        formatarKMField(e.target);
+    });
+    
+    // Limpa zeros à esquerda ao focar
+    kmField.addEventListener('focus', function() {
+        if (this.value === '0' || this.value === '') {
+            this.value = '';
+        }
+    });
+    
+    // Garante formatação ao perder o foco
+    kmField.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            this.value = '0';
+        }
+        formatarKMField(this);
+    });
+    
+    // Função para formatar o campo KM
+    function formatarKMField(field) {
+        // Guarda posição do cursor
+        let cursorPos = field.selectionStart;
+        let originalValue = field.value;
+        
+        // Remove tudo que não é número
+        let valorNumerico = originalValue.replace(/\D/g, '');
+        
+        // Se estiver vazio, define como 0
+        if (!valorNumerico) {
+            field.value = '0';
+            return;
+        }
+        
+        // Remove zeros à esquerda, exceto se for o único dígito
+        valorNumerico = valorNumerico.replace(/^0+/, '') || '0';
+        
+        // Formata com pontos a cada 3 dígitos (da direita para esquerda)
+        let valorFormatado = '';
+        for (let i = valorNumerico.length - 1, contador = 0; i >= 0; i--, contador++) {
+            if (contador > 0 && contador % 3 === 0) {
+                valorFormatado = '.' + valorFormatado;
+            }
+            valorFormatado = valorNumerico[i] + valorFormatado;
+        }
+        
+        // Atualiza o campo
+        field.value = valorFormatado;
+        
+        // Ajusta posição do cursor considerando os pontos adicionados
+        if (cursorPos > 0) {
+            let pontosAntesDoCursor = contarPontosAntesDaPosicao(originalValue, cursorPos);
+            let pontosDepoisDaFormatacao = contarPontosAntesDaPosicao(valorFormatado, cursorPos);
+            let diferencaPontos = pontosDepoisDaFormatacao - pontosAntesDoCursor;
+            
+            cursorPos = Math.max(0, cursorPos + diferencaPontos);
+            field.setSelectionRange(cursorPos, cursorPos);
+        }
+    }
+    
+    // Função auxiliar para contar pontos antes de uma posição
+    function contarPontosAntesDaPosicao(texto, posicao) {
+        let contador = 0;
+        for (let i = 0; i < Math.min(posicao, texto.length); i++) {
+            if (texto[i] === '.') {
+                contador++;
+            }
+        }
+        return contador;
+    }
+    
+    // Remove formatação antes de enviar (para enviar apenas números)
+    const form = document.getElementById('veiculoForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (kmField) {
+                // Remove os pontos e converte para número
+                const valorNumerico = kmField.value.replace(/\./g, '');
+                kmField.value = valorNumerico;
+            }
+        });
+    }
+});
+
+// Remove scripts duplicados de KM que possam estar conflitando
+</script>
+
+<script>
+// Estado de validação
+let isPlacaValid = false;
+let isTagInternaValid = false;
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Inicializar campos
+  const placaField = document.getElementById('placaField');
+  const tagInternaField = document.getElementById('tagInternaField');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitText = document.getElementById('submitText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const veiculoForm = document.getElementById('veiculoForm');
+
+  // Função para verificar se placa já existe
+  async function checkPlacaExists(placa) {
+    if (!placa || placa.length < 4) return false;
+    
+    try {
+      const response = await fetch(`/veiculos/api/check-placa/?placa=${encodeURIComponent(placa)}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.exists;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao verificar placa:', error);
+      return false;
+    }
+  }
+
+  // Função para verificar se tag interna já existe
+  async function checkTagInternaExists(tag) {
+    if (!tag || tag.length < 2) return false;
+    
+    try {
+      const response = await fetch(`/veiculos/api/check-tag-interna/?tag_interna=${encodeURIComponent(tag)}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.exists;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao verificar tag interna:', error);
+      return false;
+    }
+  }
+
+  // Validação de placa em tempo real
+  placaField.addEventListener('input', debounce(async function(e) {
+    const placa = e.target.value.trim().toUpperCase();
+    const feedback = document.getElementById('placaFeedback');
+    const error = document.getElementById('placaError');
+    
+    // Reset
+    feedback.classList.add('hidden');
+    error.classList.add('hidden');
+    placaField.classList.remove('border-red-500', 'border-green-500', 'shake');
+    
+    // Validação básica
+    if (!placa) {
+      isPlacaValid = false;
+      updateSubmitButton();
+      return;
+    }
+    // Verificar no servidor
+    const exists = await checkPlacaExists(placa);
+    
+    if (exists) {
+      showFieldError(placaField, error, 'Esta placa já está cadastrada');
+      isPlacaValid = false;
+    } else {
+      showFieldSuccess(placaField, feedback);
+      isPlacaValid = true;
+    }
+    
+    updateSubmitButton();
+  }, 500));
+
+  // Validação de tag interna em tempo real
+  tagInternaField.addEventListener('input', debounce(async function(e) {
+    const tag = e.target.value.trim();
+    const feedback = document.getElementById('tagInternaFeedback');
+    const error = document.getElementById('tagInternaError');
+    
+    // Reset
+    feedback.classList.add('hidden');
+    error.classList.add('hidden');
+    tagInternaField.classList.remove('border-red-500', 'border-green-500', 'shake');
+    
+    if (!tag) {
+      isTagInternaValid = false;
+      updateSubmitButton();
+      return;
+    }
+
+    if (tag.length < 2) {
+      showFieldError(tagInternaField, error, 'Tag muito curta (mín. 2 caracteres)');
+      isTagInternaValid = false;
+      updateSubmitButton();
+      return;
+    }
+
+    // Verificar no servidor
+    const exists = await checkTagInternaExists(tag);
+    
+    if (exists) {
+      showFieldError(tagInternaField, error, 'Esta tag já está em uso');
+      isTagInternaValid = false;
+    } else {
+      showFieldSuccess(tagInternaField, feedback);
+      isTagInternaValid = true;
+    }
+    
+    updateSubmitButton();
+  }, 500));
+
+  // Atualizar estado do botão
+  function updateSubmitButton() {
+    const isFormValid = isPlacaValid && isTagInternaValid;
+    submitBtn.disabled = !isFormValid;
+  }
+
+  // Funções auxiliares
+  function showFieldError(field, errorElement, message) {
+    field.classList.add('border-red-500', 'shake');
+    errorElement.querySelector('span').textContent = message;
+    errorElement.classList.remove('hidden');
+    
+    // Remover animação após execução
+    setTimeout(() => {
+      field.classList.remove('shake');
+    }, 300);
+  }
+
+  function showFieldSuccess(field, feedbackElement) {
+    field.classList.add('border-green-500');
+    feedbackElement.classList.remove('hidden');
+  }
+
+  // Debounce para evitar muitas requisições
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Submissão do formulário com AJAX
+  veiculoForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Verificar se já está processando
+    if (submitBtn.disabled && loadingSpinner.classList.contains('hidden')) {
+      console.log('Formulário já está sendo processado');
+      return;
+    }
+    
+    // Desabilitar botão e mostrar loading
+    submitBtn.disabled = true;
+    submitText.classList.add('hidden');
+    loadingSpinner.classList.remove('hidden');
+    
+    try {
+      // Remove formatação do KM antes de enviar
+      const kmField = document.getElementById('km_atual');
+      if (kmField) {
+        kmField.value = kmField.value.replace(/\./g, '');
+      }
+      
+      const formData = new FormData(this);
+      
+      const response = await fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      
+      console.log('Status da resposta:', response.status);
+      console.log('Content-Type:', response.headers.get('content-type'));
+      
+      // Tenta parsear como JSON primeiro
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        console.log('Resposta JSON:', result);
+        
+        if (response.ok && result.success !== false) {
+          // Sucesso
+          showFeedbackModal('success', 'Sucesso!', 
+            result.message || 'Veículo cadastrado com sucesso!', true);
+          
+          // Redirecionar após 2 segundos
+          setTimeout(() => {
+            window.location.href = result.redirect_url || "{% url 'lista_veiculos' %}";
+          }, 2000);
+          
+        } else {
+          // Erro do servidor
+          let errorMessage = 'Erro ao cadastrar veículo';
+          if (result.errors) {
+            errorMessage = Object.values(result.errors).flat().join('<br>');
+          } else if (result.message) {
+            errorMessage = result.message;
+          }
+          
+          showFeedbackModal('error', 'Erro no cadastro', errorMessage, false);
+          resetSubmitButton();
+        }
+      } else {
+        // Se não for JSON, provavelmente é HTML (redirect ou página com erro)
+        console.log('Resposta não é JSON, verificando status...');
+        
+        if (response.ok) {
+          // Provavelmente um redirect bem-sucedido
+          showFeedbackModal('success', 'Sucesso!', 'Veículo cadastrado com sucesso!', true);
+          
+          setTimeout(() => {
+            // Tenta seguir o redirect
+            window.location.href = response.url || "{% url 'lista_veiculos' %}";
+          }, 2000);
+          
+        } else {
+          // Erro HTTP
+          showFeedbackModal('error', 'Erro', `Erro ${response.status}: ${response.statusText}`, false);
+          resetSubmitButton();
+        }
+      }
+      
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      
+      // Mostra erro específico
+      let errorMsg = 'Erro de conexão';
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMsg = 'Não foi possível conectar ao servidor. Verifique sua conexão.';
+      } else {
+        errorMsg = `Erro: ${error.message}`;
+      }
+      
+      showFeedbackModal('error', 'Erro de conexão', errorMsg, false);
+      resetSubmitButton();
+      
+      // Fallback: tenta enviar tradicionalmente após 3 segundos se o usuário quiser
+      setTimeout(() => {
+        const modal = document.getElementById('feedbackModal');
+        if (modal && !modal.classList.contains('hidden')) {
+          // Atualiza o botão "Tentar Novamente" para fazer submit tradicional
+          const retryBtn = document.getElementById('modalRetryBtn');
+          if (retryBtn) {
+            retryBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> Enviar Tradicional';
+            retryBtn.onclick = function() {
+              // Remove o event listener AJAX
+              veiculoForm.removeEventListener('submit', arguments.callee);
+              // Faz submit normal
+              veiculoForm.submit();
+            };
+          }
+        }
+      }, 1000);
+    }
+  });
+
+  // Função para resetar o botão de submit
+  function resetSubmitButton() {
+    submitBtn.disabled = !(isPlacaValid && isTagInternaValid);
+    submitText.classList.remove('hidden');
+    loadingSpinner.classList.add('hidden');
+  }
+
+  // Configuração inicial dos selects
+  const selects = document.querySelectorAll('select');
+  selects.forEach(select => {
+    select.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")";
+    select.style.backgroundRepeat = "no-repeat";
+    select.style.backgroundPosition = "right 0.75rem center";
+    select.style.backgroundSize = "1.25em";
+  });
+
+  // Controle do campo de seguro
+  const seguroSelect = document.getElementById('seguroSelect');
+  const seguroValidade = document.getElementById('seguroValidade');
+  const apoliceNumero = document.getElementById('apoliceNumero');
+
+  function toggleSeguroFields() {
+    const temSeguro = seguroSelect.value === 'True';
+    seguroValidade.disabled = !temSeguro;
+    apoliceNumero.disabled = !temSeguro;
+
+    if (!temSeguro) {
+      seguroValidade.value = '';
+      apoliceNumero.value = '';
+    }
+  }
+
+  seguroSelect.addEventListener('change', toggleSeguroFields);
+  toggleSeguroFields();
+
+  // Placeholder dinâmico para ano
+  const anoField = document.querySelector('input[name="ano"]');
+  if (anoField) {
+    anoField.placeholder = new Date().getFullYear();
+  }
+
+  // Foco automático
+  placaField.focus();
+});
+
+// Funções do modal - CORRIGIDAS
+function showFeedbackModal(type, title, message, isSuccess) {
+  console.log('Mostrando modal:', type, title, message);
+  
+  const modal = document.getElementById('feedbackModal');
+  const icon = document.getElementById('modalIcon');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMessage = document.getElementById('modalMessage');
+  const confirmBtn = document.getElementById('modalConfirmBtn');
+  const retryBtn = document.getElementById('modalRetryBtn');
+  
+  if (!modal) {
+    console.error('Modal não encontrado!');
+    return;
+  }
+  
+  // Configurar baseado no tipo
+  if (type === 'success') {
+    // Sucesso
+    icon.className = 'w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center';
+    icon.innerHTML = '<i class="fa-solid fa-check text-xl text-green-600 dark:text-green-400"></i>';
+    modalTitle.textContent = title;
+    modalMessage.innerHTML = message;
+    retryBtn.classList.add('hidden');
+    
+    confirmBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> OK';
+    confirmBtn.onclick = function() {
+      console.log('Fechando modal de sucesso');
+      closeModal();
+    };
+    
+  } else {
+    // Erro
+    icon.className = 'w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center';
+    icon.innerHTML = '<i class="fa-solid fa-times text-xl text-red-600 dark:text-red-400"></i>';
+    modalTitle.textContent = title;
+    modalMessage.innerHTML = message;
+    retryBtn.classList.remove('hidden');
+    
+    confirmBtn.innerHTML = '<i class="fa-solid fa-times mr-1"></i> Fechar';
+    confirmBtn.onclick = function() {
+      console.log('Fechando modal de erro');
+      closeModal();
+    };
+    
+    retryBtn.innerHTML = '<i class="fa-solid fa-redo mr-1"></i> Tentar Novamente';
+    retryBtn.onclick = function() {
+      console.log('Tentando novamente...');
+      closeModal();
+      // Simula clique no botão submit
+      document.getElementById('submitBtn').click();
+    };
+  }
+  
+  // Mostra o modal
+  modal.classList.remove('hidden');
+  console.log('Modal exibido');
+}
+
+function closeModal() {
+  const modal = document.getElementById('feedbackModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    console.log('Modal fechado');
+  }
+}
+
+// Função global para retry (mantida para compatibilidade)
+function retrySubmission() {
+  closeModal();
+  document.getElementById('submitBtn').click();
+}
+</script>
+
+
+{% endblock %}

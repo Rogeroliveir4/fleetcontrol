@@ -1,0 +1,561 @@
+{% extends "core/base.html" %}
+{% block title %}Detalhes — Veículo de Terceiro{% endblock %}
+{% block mobile_title %}Detalhes{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl xl:max-w-4xl mx-auto px-2 py-3 animate-fade-in">
+
+    <!-- HEADER COMPACTO -->
+    <div class="mb-3">
+        <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+            <a href="{% url 'terceiros_historico' %}" class="hover:text-[#00594C] transition-colors">
+                Histórico
+            </a>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+            <span class="text-gray-700 dark:text-gray-300">Detalhes</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+                <h1 class="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-0.5">
+                    Detalhes da Movimentação
+                </h1>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Registro completo de entrada e saída
+                </p>
+            </div>
+
+            <div class="flex items-center gap-1.5 mt-2 sm:mt-0">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded 
+                        {% if mov.status == 'ENTRADA' %}
+                            bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
+                        {% else %}
+                            bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+                        {% endif %} 
+                            text-[11px] font-semibold">
+                    {% if mov.status == 'ENTRADA' %}
+                        <i class="fa-solid fa-circle text-[5px] animate-pulse"></i>
+                        NO PÁTIO
+                    {% else %}
+                        <i class="fa-solid fa-check-circle text-[9px]"></i>
+                        FINALIZADO
+                    {% endif %}
+                </span>
+                <a href="{% url 'terceiros_portaria_lista' %}"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md 
+                        bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900
+                        border border-gray-300 dark:border-gray-700
+                        text-gray-800 dark:text-gray-200 
+                        hover:from-[#00594C]/5 hover:to-white dark:hover:from-[#00C2A2]/10 dark:hover:to-gray-900
+                        hover:border-[#00594C]/30 dark:hover:border-[#00C2A2]/30
+                        hover:shadow-sm transition-all duration-200 
+                        group text-sm font-medium">
+                    <i class="fa-solid fa-arrow-left text-xs text-[#00594C] dark:text-[#00C2A2] 
+                        group-hover:-translate-x-1 transition-transform duration-200"></i>
+                    Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARTÃO PRINCIPAL COMPACTO -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+
+        <!-- COLUNA ESQUERDA - INFORMAÇÕES DO VEÍCULO -->
+        <div class="lg:col-span-2 space-y-3">
+            <!-- CARTÃO DE IDENTIFICAÇÃO COMPACTO -->
+            <div class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 
+                        rounded-lg p-3 shadow border border-gray-200 dark:border-gray-700 
+                        hover:shadow transition-shadow duration-300">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-1.5">
+                        <div class="p-1.5 rounded bg-gradient-to-r from-[#00594C] to-emerald-600 shadow-emerald-500/20">
+                            <i class="fa-solid fa-car text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-gray-900 dark:text-white">
+                                Veículo de Terceiro
+                            </h2>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400">Informações cadastrais</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right mt-1 sm:mt-0">
+                        <span class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Placa</span>
+                        <div class="text-base font-black text-gray-900 dark:text-white tracking-wider">
+                            {{ mov.placa }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRID DE INFORMAÇÕES COMPACTO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                    <div class="space-y-1.5">
+                        <div>
+                            <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Empresa</label>
+                            <p class="text-xs text-gray-900 dark:text-white font-medium mt-0.5 flex items-center gap-1">
+                                <i class="fa-solid fa-building text-[#00594C] text-[11px]"></i>
+                                {{ mov.empresa }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Tipo</label>
+                            <p class="text-xs text-gray-900 dark:text-white font-medium mt-0.5 flex items-center gap-1">
+                                <i class="fa-solid fa-truck text-[#00594C] text-[11px]"></i>
+                                {{ mov.tipo_veiculo }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <div>
+                            <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Motorista</label>
+                            <p class="text-xs text-gray-900 dark:text-white font-medium mt-0.5 flex items-center gap-1">
+                                <i class="fa-solid fa-id-card text-[#00594C] text-[11px]"></i>
+                                {{ mov.motorista_nome }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Documento</label>
+                            <p class="text-xs text-gray-900 dark:text-white font-medium mt-0.5 flex items-center gap-1">
+                                <i class="fa-solid fa-file text-[#00594C] text-[11px]"></i>
+                                {{ mov.documento|default:"-" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔹 MOTIVO DA ENTRADA -->
+                <div class="mb-2">
+                    <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Motivo da Entrada</label>
+                    <div class="mt-1 p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.motivo_entrada }}</p>
+                    </div>
+                </div>
+
+                <!-- 🔹 OBSERVAÇÕES DA ENTRADA -->
+                {% if mov.observacoes_entrada %}
+                <div class="mb-2">
+                    <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">
+                        Observações da Entrada
+                    </label>
+                    <div class="mt-1 p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded border border-emerald-200 dark:border-emerald-800/30">
+                        <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.observacoes_entrada }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if mov.descricao_veiculo %}
+                <div class="mb-2">
+                    <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Descrição</label>
+                    <div class="mt-1 p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.descricao_veiculo }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if mov.tags %}
+                <div class="flex flex-wrap gap-1">
+                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full 
+                                bg-gradient-to-r from-[#00594C]/10 to-emerald-500/10 
+                                text-[#00594C] dark:text-emerald-400 
+                                border border-[#00594C]/20 dark:border-emerald-500/20
+                                text-[11px] font-semibold">
+                        <i class="fa-solid fa-tag text-[9px]"></i>
+                        {{ mov.tags }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- GALERIA DE FOTOS COMPACTA -->
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
+                        hover:shadow transition-shadow duration-300">
+                <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-1.5">
+                        <div class="p-1 rounded bg-gradient-to-r from-emerald-500 to-teal-400">
+                            <i class="fa-solid fa-camera text-white text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+                            Registro Fotográfico
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {% if mov.foto_placa %}
+                        <div class="group relative overflow-hidden rounded cursor-pointer"
+                             onclick="openLightbox('{{ mov.foto_placa.url }}')">
+                            <img src="{{ mov.foto_placa.url }}" 
+                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto da Placa">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-car-battery text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Placa</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if mov.foto_veiculo %}
+                        <div class="group relative overflow-hidden rounded cursor-pointer"
+                             onclick="openLightbox('{{ mov.foto_veiculo.url }}')">
+                            <img src="{{ mov.foto_veiculo.url }}" 
+                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto do Veículo">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-truck text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Veículo</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if mov.foto_motorista %}
+                        <div class="group relative overflow-hidden rounded cursor-pointer"
+                             onclick="openLightbox('{{ mov.foto_motorista.url }}')">
+                            <img src="{{ mov.foto_motorista.url }}" 
+                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto do Motorista">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-user text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Motorista</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if not mov.foto_placa and not mov.foto_veiculo and not mov.foto_motorista %}
+                    <div class="text-center py-4">
+                        <div class="mx-auto w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1.5">
+                            <i class="fa-solid fa-camera text-gray-400 text-xs"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma foto</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA - TIMELINE COMPACTA -->
+        <div class="space-y-3">
+            <!-- TIMELINE COMPACTA -->
+            <div class="relative">
+                <!-- LINHA VERTICAL -->
+                <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 to-blue-500"></div>
+
+                <!-- ENTRADA COMPACTA -->
+                <div class="relative bg-gradient-to-br from-white to-emerald-50 dark:from-gray-900 dark:to-emerald-900/10 
+                            rounded-lg p-3 shadow border border-emerald-200 dark:border-emerald-800/30 
+                            hover:shadow transition-shadow duration-300 ml-5 mb-3">
+                    <div class="absolute -left-4 top-2.5">
+                        <div class="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 
+                                    flex items-center justify-center shadow-emerald-500/30">
+                            <i class="fa-solid fa-inbox text-white text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-1.5">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Entrada</h3>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-calendar text-[9px]"></i>
+                            {{ mov.data_entrada|date:"d/m H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 p-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded">
+                        <div class="p-1 rounded bg-white dark:bg-gray-800">
+                            <i class="fa-solid fa-user-shield text-emerald-600 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-gray-500 dark:text-gray-400">Porteiro</p>
+                            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ mov.porteiro_entrada_nome }}</p>
+                        </div>
+                    </div>
+
+                    <!-- 🔹 MOTIVO NA TIMELINE -->
+                    <div class="mt-2">
+                        <label class="text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+                            Motivo
+                        </label>
+                        <div class="p-1.5 bg-emerald-50/50 dark:bg-emerald-900/10 rounded border border-emerald-100 dark:border-emerald-800/20">
+                            <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.motivo_entrada|truncatechars:80 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAÍDA COMPACTA -->
+                <div class="relative bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-blue-900/10 
+                            rounded-lg p-3 shadow border border-blue-200 dark:border-blue-800/30 
+                            hover:shadow transition-shadow duration-300 ml-5">
+                    <div class="absolute -left-4 top-2.5">
+                        <div class="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 
+                                    flex items-center justify-center shadow-blue-500/30">
+                            <i class="fa-solid fa-outbox text-white text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-1.5">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Saída</h3>
+                        
+                        {% if mov.data_saida %}
+                            <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <i class="fa-solid fa-calendar-check text-[9px]"></i>
+                                {{ mov.data_saida|date:"d/m H:i" }}
+                            </div>
+                        {% else %}
+                            <div class="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs">
+                                <i class="fa-solid fa-clock text-[9px]"></i>
+                                <span>Aguardando</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if mov.data_saida %}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center gap-1.5 p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <div class="p-1 rounded bg-white dark:bg-gray-800">
+                                <i class="fa-solid fa-user-check text-blue-600 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-500 dark:text-gray-400">Porteiro</p>
+                                <p class="text-xs font-medium text-gray-900 dark:text-white">{{ mov.porteiro_saida_nome }}</p>
+                            </div>
+                        </div>
+
+                        <!-- 🔹 OBSERVAÇÕES DA SAÍDA -->
+                        {% if mov.observacoes_saida %}
+                        <div class="mt-1.5">
+                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                                Observações da Saída
+                            </label>
+                            <div class="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800/30">
+                                <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.observacoes_saida }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- STATUS INFO COMPACTO -->
+            <div class="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 
+                        rounded-lg p-3 shadow border border-gray-200 dark:border-gray-700">
+                <h4 class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Sistema
+                </h4>
+                
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-600 dark:text-gray-400">Status</span>
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-medium
+                                   {% if mov.status == 'ENTRADA' %}
+                                       bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300
+                                   {% else %}
+                                       bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                                   {% endif %}">
+                            {{ mov.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-600 dark:text-gray-400">ID</span>
+                        <code class="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-mono">
+                            {{ mov.id|stringformat:"06d" }}
+                        </code>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-600 dark:text-gray-400">Tempo</span>
+                        {% if mov.data_saida %}
+                            <span class="text-xs">
+                                {{ mov.data_entrada|timesince:mov.data_saida }}
+                            </span>
+                        {% else %}
+                            <span class="text-xs">
+                                {{ mov.data_entrada|timesince }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 BLOCO DE OBSERVAÇÕES COMPLETO -->
+    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- OBSERVAÇÕES DA ENTRADA -->
+        <div class="bg-gradient-to-br from-white to-emerald-50 dark:from-gray-900 dark:to-emerald-900/10 
+                    rounded-lg p-3 shadow border border-emerald-200 dark:border-emerald-800/30">
+            <div class="flex items-center gap-1.5 mb-2">
+                <div class="p-1 rounded bg-gradient-to-r from-emerald-500 to-teal-400">
+                    <i class="fa-solid fa-sign-in-alt text-white text-xs"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+                    Detalhes da Entrada
+                </h3>
+            </div>
+            
+            <div class="space-y-2">
+                <div>
+                    <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Motivo</label>
+                    <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ mov.motivo_entrada }}</p>
+                </div>
+                
+                {% if mov.observacoes_entrada %}
+                <div>
+                    <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Observações do Porteiro</label>
+                    <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ mov.observacoes_entrada }}</p>
+                </div>
+                {% else %}
+                <div class="text-center py-2">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma observação registrada</p>
+                </div>
+                {% endif %}
+                
+                <div class="pt-2 border-t border-emerald-100 dark:border-emerald-800/30">
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <i class="fa-solid fa-user-shield text-[8px]"></i>
+                        Porteiro: <span class="font-medium">{{ mov.porteiro_entrada_nome }}</span>
+                    </div>
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+                        <i class="fa-solid fa-clock text-[8px]"></i>
+                        {{ mov.data_entrada|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OBSERVAÇÕES DA SAÍDA -->
+        <div class="bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-blue-900/10 
+                    rounded-lg p-3 shadow border border-blue-200 dark:border-blue-800/30">
+            <div class="flex items-center gap-1.5 mb-2">
+                <div class="p-1 rounded bg-gradient-to-r from-blue-500 to-cyan-400">
+                    <i class="fa-solid fa-sign-out-alt text-white text-xs"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+                    Detalhes da Saída
+                </h3>
+            </div>
+            
+            <div class="space-y-2">
+                {% if mov.data_saida %}
+                    {% if mov.observacoes_saida %}
+                    <div>
+                        <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Observações do Porteiro</label>
+                        <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ mov.observacoes_saida }}</p>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-2">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma observação registrada</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="pt-2 border-t border-blue-100 dark:border-blue-800/30">
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-user-check text-[8px]"></i>
+                            Porteiro: <span class="font-medium">{{ mov.porteiro_saida_nome }}</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+                            <i class="fa-solid fa-clock text-[8px]"></i>
+                            {{ mov.data_saida|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <div class="mx-auto w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1.5">
+                            <i class="fa-solid fa-clock text-amber-500 text-xs"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Aguardando saída</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER COMPACTO -->
+    <div class="mt-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="text-[9px] text-gray-400 dark:text-gray-500 flex items-center gap-2">
+            <span>Registro somente leitura</span>
+            <span>•</span>
+            <span>{{ now|date:"d/m H:i" }}</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL LIGHTBOX COMPACTO -->
+<div id="lightbox-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 bg-black/90 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg max-h-[80vh]">
+        <!-- Botão fechar -->
+        <button onclick="closeLightbox()" 
+                class="absolute -top-6 right-0 z-10 p-1 text-white hover:text-gray-300 transition-colors">
+            <i class="fa-solid fa-times text-base"></i>
+        </button>
+        
+        <!-- Imagem -->
+        <div class="relative rounded overflow-hidden bg-black">
+            <img id="lightbox-image" 
+                 class="w-full h-auto max-h-[50vh] object-contain"
+                 alt="Imagem ampliada">
+            
+            <!-- Título -->
+            <div id="lightbox-title" 
+                 class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent 
+                        text-white text-xs font-semibold">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+</style>
+
+<script>
+// Função simplificada para abrir o lightbox
+function openLightbox(imageUrl) {
+    document.getElementById('lightbox-image').src = imageUrl;
+    document.getElementById('lightbox-modal').classList.remove('hidden');
+    document.getElementById('lightbox-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+// Função para fechar o lightbox
+function closeLightbox() {
+    document.getElementById('lightbox-modal').classList.add('hidden');
+    document.getElementById('lightbox-modal').classList.remove('flex');
+    document.body.style.overflow = 'auto';
+}
+
+// Event listeners para teclado
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
+
+// Fechar modal ao clicar no fundo
+document.getElementById('lightbox-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'lightbox-modal') {
+        closeLightbox();
+    }
+});
+</script>
+{% endblock %}

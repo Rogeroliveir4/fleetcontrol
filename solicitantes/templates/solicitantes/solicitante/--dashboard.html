@@ -1,0 +1,24 @@
+
+<!-- 
+{% extends "core/base.html" %}
+{% block title %}Solicitante — Veículos{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto p-4">
+  <h1 class="text-xl font-bold mb-4">Veículos do seu contrato</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for v in veiculos %}
+    <div class="p-4 bg-white rounded shadow">
+      <p class="font-semibold">{{ v.marca }} {{ v.modelo }}</p>
+      <p class="text-sm">Placa: {{ v.placa }}</p>
+      <p class="text-sm">Tag: {{ v.tag_interna }}</p>
+      <div class="mt-3">
+        <a href="{% url 'solicitante_solicitar' v.id %}" class="px-3 py-2 bg-[#00594C] text-white rounded">Solicitar</a>
+      </div>
+    </div>
+    {% empty %}
+      <p>Nenhum veículo disponível.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+-->
