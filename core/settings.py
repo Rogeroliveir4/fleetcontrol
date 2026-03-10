@@ -1,10 +1,15 @@
 from pathlib import Path
 import os
+from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-q9&c9n(-(we1cibb(9ah0z#47k@s6lb_g75vk2ysdojs=e7lb*'
-DEBUG = False
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG') == 'True'
 ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '192.168.*']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
@@ -14,9 +19,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'fleetcontrol.app@gmail.com'
-EMAIL_HOST_PASSWORD = 'nlyv vvjt qepe jvij'
+    
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = 'FleetControl <fleetcontrol.app@gmail.com>'
 
@@ -92,8 +97,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
     }
 }
 
@@ -112,7 +121,14 @@ THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','  #
 # Define como os números são agrupados (padrão 3 em 3)
 NUMBER_GROUPING = (3, 0)
-STATIC_URL = 'static/'
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -1,0 +1,18 @@
+# ambiente
+.env
+.venv/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# banco local
+db.sqlite3
+
+# static files gerados
+staticfiles/
+
+# sistema
+.DS_Store
+Thumbs.db
