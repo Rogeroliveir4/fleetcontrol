@@ -3,12 +3,9 @@ from contas.models import PerfilUsuario
 from veiculos.models import Veiculo
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-
 from django.shortcuts import render, redirect
 from solicitacoes.models import SolicitacaoVeiculo
 from movimentacoes.models import Movimentacao
-
-
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -20,6 +17,7 @@ from django.db.models.query_utils import Q
 from django.contrib.auth.models import User
 import logging
 
+# Configuração de logging (opcional, mas recomendado para produção)
 def login_view(request):
 
     if request.method == "POST":
@@ -60,17 +58,15 @@ def login_view(request):
 
 
 
-
+# View para logout
 def logout_view(request):
     logout(request)
     return redirect("login")
 
 
-
+# View personalizada para solicitação de recuperação de senha
 def password_reset_request(request):
-    """
-    View personalizada para solicitação de recuperação de senha
-    """
+
     if request.method == "POST":
         password_reset_form = PasswordResetForm(request.POST)
         

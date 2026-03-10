@@ -4,19 +4,21 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-q9&c9n(-(we1cibb(9ah0z#47k@s6lb_g75vk2ysdojs=e7lb*'
-DEBUG = True
-ALLOWED_HOSTS = ['192.168.0.2', 'localhost', '127.0.0.1', '192.168.*']
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '192.168.*']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES SENDGRID
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
+
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'  # ← ESTA PALAVRA EXATA 'apikey' (minúsculas)
-EMAIL_HOST_PASSWORD = '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'  # ← Cole a API Key que você copiou
-DEFAULT_FROM_EMAIL = 'FleetControl App <fleetcontrol.app@gmail.com>'  # ← Email que você autenti
+
+EMAIL_HOST_USER = 'fleetcontrol.app@gmail.com'
+EMAIL_HOST_PASSWORD = 'nlyv vvjt qepe jvij'
+
+DEFAULT_FROM_EMAIL = 'FleetControl <fleetcontrol.app@gmail.com>'
 
 # Outras configurações importantes
 EMAIL_TIMEOUT = 30
