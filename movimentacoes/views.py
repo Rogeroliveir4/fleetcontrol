@@ -822,9 +822,7 @@ def checklist_retorno_motorista(request, pk):
 
 
 
-
 #REGISTRA A ENTRADA NA PORTARIA
-
 # movimentacoes/views.py - Atualize a view terceiro_entrada
 @login_required
 def terceiro_entrada(request):
@@ -1009,11 +1007,11 @@ def terceiro_saida(request, pk):
         pk=pk,
         status="ENTRADA"
     )
-
     
     # POST → somente PORTARIA pode registrar a saída
     if request.method == "POST":
-        if perfil.nivel != "portaria":
+        #if perfil.nivel != "portaria": # SOMENTE PORTARIA REGISTRA SAÍDA, MAS GESTOR/ADM PODEM VISUALIZAR DETALHES
+        if perfil.nivel not in ["portaria", "adm", "gestor"]: # PERMITIR GESTOR/ADM REGISTRAREM SAÍDA (CASO PORTARIA NÃO ESTEJA DISPONÍVEL)
             messages.error(request, "Apenas a portaria pode registrar a saída do veículo.")
             return redirect("terceiros_portaria_lista")
         
