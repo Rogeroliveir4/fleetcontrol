@@ -7,7 +7,6 @@ from solicitacoes import views as solicitacoes_views
 
 
 
-
 urlpatterns = [
 
     # Painel administrativo
@@ -45,6 +44,7 @@ urlpatterns = [
 
 ]
 
-# Browser Reload (apenas em DEBUG)
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

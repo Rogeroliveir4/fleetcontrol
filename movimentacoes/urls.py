@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     # LISTAGEM & DETALHE
     path("", views.lista_movimentacoes, name="lista_movimentacoes"),
@@ -25,7 +26,6 @@ urlpatterns = [
     # ===============================
     path("solicitacao/<int:solicitacao_id>/checklist-saida/",views.checklist_saida_motorista, name="checklist_saida_motorista", ),
 
-
     path("portaria/saida/<int:movimentacao_id>/", views.portaria_registrar_saida, name="portaria_registrar_saida"),
 
     # ===============================
@@ -35,3 +35,5 @@ urlpatterns = [
 
     
 ]
+
+
