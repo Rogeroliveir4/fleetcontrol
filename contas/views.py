@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.db.models.query_utils import Q
 from django.contrib.auth.models import User
 import logging
+from django.core.mail import EmailMultiAlternatives
 
 # Configuração de logging (opcional, mas recomendado para produção)
 def login_view(request):
@@ -69,101 +70,98 @@ def password_reset_request(request):
 
     if request.method == "POST":
         password_reset_form = PasswordResetForm(request.POST)
-        
+
         if password_reset_form.is_valid():
-            data = password_reset_form.cleaned_data['email']
-            
-            # Busca usuários pelo email
-            associated_users = User.objects.filter(Q(email=data))
-            
-            if associated_users.exists():
-                for user in associated_users:
-                    try:
-                        # Configurar email
-                        subject = "Redefinição de senha - FleetControl"
-                        
-                        # Gerar token e uid
-                        token = default_token_generator.make_token(user)
-                        uid = urlsafe_base64_encode(force_bytes(user.pk))
-                        
-                        # Construir URL completa
-                        protocol = 'https' if request.is_secure() else 'http'
-                        domain = request.get_host()
-                        reset_url = f"{protocol}://{domain}/password-reset-confirm/{uid}/{token}/"
-                        
-                        # Contexto para o template
-                        context = {
-                            'user': user,
-                            'reset_url': reset_url,
-                            'protocol': protocol,
-                            'domain': domain,
-                            'uid': uid,
-                            'token': token,
-                        }
-                        
-                        # Renderizar templates
-                        html_message = render_to_string(
-                            'contas/password_reset_email.html', 
-                            context
-                        )
-                        
-                        # Texto simples (IMPORTANTE para evitar spam)
-                        plain_message = f"""
-                        Olá {user.get_full_name() or user.username},
-                        
-                        Recebemos uma solicitação para redefinir a senha da sua conta no FleetControl.
-                        
-                        Para redefinir sua senha, clique no link abaixo:
-                        {reset_url}
-                        
-                        Este link é válido por 24 horas.
-                        
-                        Se você não solicitou esta redefinição, ignore este email.
-                        
-                        Atenciosamente,
-                        Equipe FleetControl
-                        """
-                        
-                        # Enviar email
-                        send_mail(
-                            subject=subject,
-                            message=plain_message,
-                            from_email=None,  # Usa DEFAULT_FROM_EMAIL do settings.py
-                            recipient_list=[user.email],
-                            html_message=html_message,
-                            fail_silently=False,
-                        )
-                        
-                        # Log simples (opcional)
-                        print(f"[INFO] Email de recuperação enviado para {user.email}")
-                        
-                    except Exception as e:
-                        print(f"[ERRO] Erro ao enviar email para {user.email}: {e}")
-                        messages.error(
-                            request, 
-                            "Ocorreu um erro ao enviar o email. Tente novamente."
-                        )
-                        return render(request, "contas/password_reset.html", 
-                                {"form": password_reset_form})
-                
-                # Sucesso - redireciona para página de confirmação
-                messages.success(
-                    request,
-                    "Se o email estiver cadastrado, você receberá instruções em alguns minutos."
-                )
-                return redirect("password_reset_done")
-            
-            else:
-                # Email não encontrado - mensagem genérica por segurança
-                messages.info(
-                    request,
-                    "Se o email estiver cadastrado, você receberá instruções para redefinir sua senha em alguns minutos."
-                )
-                return redirect("password_reset_done")
-    
+            data = password_reset_form.cleaned_data['email'].strip()
+
+            # Busca usuário pelo email (case insensitive)
+            user = User.objects.filter(email__iexact=data).first()
+
+            if user:
+                try:
+                    subject = "FleetControl - Redefinição de senha da sua conta"
+
+                    # Gerar token e uid
+                    token = default_token_generator.make_token(user)
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                    # Construir URL completa
+                    protocol = 'https' if request.is_secure() else 'http'
+                    domain = request.get_host()
+                    reset_url = f"{protocol}://{domain}/password-reset-confirm/{uid}/{token}/"
+
+                    context = {
+                        'user': user,
+                        'reset_url': reset_url,
+                        'protocol': protocol,
+                        'domain': domain,
+                        'uid': uid,
+                        'token': token,
+                    }
+
+                    # Renderizar HTML
+                    html_message = render_to_string(
+                        'contas/password_reset_email.html',
+                        context
+                    )
+
+                    # Texto simples (importante para Outlook)
+                    plain_message = f"""
+Olá {user.get_full_name() or user.username},
+
+Recebemos uma solicitação para redefinir a senha da sua conta no FleetControl.
+
+Acesse o link abaixo para criar uma nova senha:
+
+{reset_url}
+
+Este link é válido por 24 horas.
+
+Se você não solicitou essa redefinição, ignore este email.
+
+Equipe FleetControl
+fleetcontrol.app@gmail.com
+"""
+
+                    # Enviar email
+                    email = EmailMultiAlternatives(
+                        subject=subject,
+                        body=plain_message,
+                        from_email="FleetControl <fleetcontrol.app@gmail.com>",
+                        to=[user.email],
+                        headers={"Reply-To": "fleetcontrol.app@gmail.com"},
+                    )
+
+                    email.attach_alternative(html_message, "text/html")
+                    email.send(fail_silently=False)
+
+                    print(f"[INFO] Email de recuperação enviado para {user.email}")
+
+                except Exception as e:
+                    print(f"[ERRO] Erro ao enviar email para {user.email}: {e}")
+                    messages.error(
+                        request,
+                        "Ocorreu um erro ao enviar o email. Tente novamente."
+                    )
+                    return render(
+                        request,
+                        "contas/password_reset.html",
+                        {"form": password_reset_form}
+                    )
+
+            # Mensagem genérica (segurança)
+            messages.success(
+                request,
+                "Se o email estiver cadastrado, você receberá instruções em alguns minutos."
+            )
+
+            return redirect("password_reset_done")
+
     else:
-        # GET request - mostrar formulário vazio
         password_reset_form = PasswordResetForm()
-    
-    return render(request, "contas/password_reset.html", 
-                {"form": password_reset_form})
+
+    return render(
+        request,
+        "contas/password_reset.html",
+        {"form": password_reset_form}
+    )
