@@ -34,13 +34,13 @@ urlpatterns = [
         # path("gestor/solicitacoes/reprovar/<int:id>/", views.reprovar_solicitacao, name="reprovar_solicitacao"),"""
         
     path("contratos/", include("contratos.urls")),
-    path("__reload__/", include("django_browser_reload.urls")),
+    # path("__reload__/", include("django_browser_reload.urls")),
     path("solicitacoes/minhas/", solicitacoes_views.minhas_solicitacoes, name="minhas_solicitacoes"),
 
 
     path("solicitante/", include("solicitantes.urls")),
 
-    
+
 
 ]
 

@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'core',
     'tailwind',
     'theme',
-    'django_browser_reload',
+    #'django_browser_reload',
     'motoristas.apps.MotoristasConfig',
     'movimentacoes',
     'veiculos',
@@ -70,7 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    #"django_browser_reload.middleware.BrowserReloadMiddleware",
 
 ]
 
