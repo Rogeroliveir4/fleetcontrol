@@ -17,9 +17,18 @@ from django.db.models.query_utils import Q
 from django.contrib.auth.models import User
 import logging
 from django.core.mail import EmailMultiAlternatives
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.messages import get_messages
 
 # Configuração de logging (opcional, mas recomendado para produção)
 def login_view(request):
+
+    # Limpa mensagens antigas apenas quando abrir a tela de login
+    if request.method == "GET":
+        storage = get_messages(request)
+        for _ in storage:
+            pass
 
     if request.method == "POST":
         usuario = request.POST.get("username")
@@ -30,26 +39,20 @@ def login_view(request):
         if user is not None:
             login(request, user)
 
-            # Obtém o perfil do usuário autenticado
             perfil = user.perfilusuario
 
-            #  1) ADMINISTRADOR – visão completa
             if perfil.nivel == "adm":
                 return redirect("dashboard")
 
-            #  2) GESTOR – visão de gestão
             elif perfil.nivel == "gestor":
                 return redirect("dashboard_gestor")
 
-            #  3) PORTARIA – visão operacional (SAÍDA)
             elif perfil.nivel == "portaria":
-                return redirect("listar_saidas_portaria")   
+                return redirect("listar_saidas_portaria")
 
-            #  4) MOTORISTA/SOLICITANTE – visão limitada
             elif perfil.nivel == "basico":
                 return redirect("dashboard_motorista")
 
-            # fallback de segurança
             return redirect("dashboard")
 
         else:
@@ -69,6 +72,18 @@ def logout_view(request):
 def password_reset_request(request):
 
     if request.method == "POST":
+
+        # --- Proteção contra múltiplos pedidos ---
+        last_request = request.session.get("last_reset_request")
+
+        if last_request:
+            last_request_time = timezone.datetime.fromisoformat(last_request)
+
+            if timezone.now() - last_request_time < timedelta(minutes=5):
+                # Apenas redireciona silenciosamente (sem mensagem)
+                return redirect("password_reset")
+        # ----------------------------------------
+
         password_reset_form = PasswordResetForm(request.POST)
 
         if password_reset_form.is_valid():
@@ -81,13 +96,12 @@ def password_reset_request(request):
                 try:
                     subject = "FleetControl - Redefinição de senha da sua conta"
 
-                    # Gerar token e uid
                     token = default_token_generator.make_token(user)
                     uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                    # Construir URL completa
                     protocol = 'https' if request.is_secure() else 'http'
                     domain = request.get_host()
+
                     reset_url = f"{protocol}://{domain}/password-reset-confirm/{uid}/{token}/"
 
                     context = {
@@ -99,13 +113,11 @@ def password_reset_request(request):
                         'token': token,
                     }
 
-                    # Renderizar HTML
                     html_message = render_to_string(
                         'contas/password_reset_email.html',
                         context
                     )
 
-                    # Texto simples (importante para Outlook)
                     plain_message = f"""
 Olá {user.get_full_name() or user.username},
 
@@ -123,7 +135,6 @@ Equipe FleetControl
 fleetcontrol.app@gmail.com
 """
 
-                    # Enviar email
                     email = EmailMultiAlternatives(
                         subject=subject,
                         body=plain_message,
@@ -137,12 +148,17 @@ fleetcontrol.app@gmail.com
 
                     print(f"[INFO] Email de recuperação enviado para {user.email}")
 
+                    # Registrar horário da solicitação
+                    request.session["last_reset_request"] = timezone.now().isoformat()
+
                 except Exception as e:
                     print(f"[ERRO] Erro ao enviar email para {user.email}: {e}")
+
                     messages.error(
                         request,
                         "Ocorreu um erro ao enviar o email. Tente novamente."
                     )
+
                     return render(
                         request,
                         "contas/password_reset.html",
