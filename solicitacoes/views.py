@@ -22,7 +22,54 @@ from contas.models import PerfilUsuario
 from openpyxl import Workbook
 from django.db.models import Q, Case, When, Value, IntegerField
 from datetime import datetime, timedelta
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 
+
+
+#FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
+def notificar_gestores_nova_solicitacao(request, solicitacao):
+
+    gestores = User.objects.filter(
+        perfilusuario__nivel="gestor",
+        perfilusuario__contrato=solicitacao.contrato
+    ).exclude(email="")
+
+    protocol = "https" if request.is_secure() else "http"
+    domain = request.get_host()
+
+    url = f"{protocol}://{domain}/solicitacoes/{solicitacao.id}/"
+
+    for gestor in gestores:
+
+        subject = "FleetControl - Nova solicitação aguardando aprovação"
+
+        plain_message = f"""
+Olá {gestor.first_name or gestor.username},
+
+Uma nova solicitação de veículo foi criada.
+
+Solicitante: {solicitacao.solicitante_nome}
+Veículo: {solicitacao.veiculo}
+Destino: {solicitacao.destino}
+
+Acesse o sistema para aprovar ou reprovar:
+
+{url}
+FleetControl
+Sistema de Gestão de pátio
+Este é um email automático, por favor não responda.
+"""
+
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=plain_message,
+            from_email="FleetControl <fleetcontrol.app@gmail.com>",
+            to=[gestor.email],
+        )
+
+        email.send(fail_silently=True)
 
 
 # SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
@@ -71,7 +118,7 @@ def solicitar_veiculo(request, veiculo_id):
         )
 
         #  CRIAR SOLICITAÇÃO (ORIGEM = SISTEMA)
-        SolicitacaoVeiculo.objects.create(
+        solicitacao = SolicitacaoVeiculo.objects.create(
             origem="SISTEMA",
 
             veiculo=veiculo,
@@ -93,6 +140,8 @@ def solicitar_veiculo(request, veiculo_id):
             data_criacao=timezone.now()
         )
 
+        # Enviar email para gestores
+        notificar_gestores_nova_solicitacao(request, solicitacao)
 
         # STATUS DO VEÍCULO (RESERVA LÓGICA)
         veiculo.status = "Reservado"
@@ -105,6 +154,8 @@ def solicitar_veiculo(request, veiculo_id):
         "veiculo": veiculo,
         "motoristas": motoristas,
     })
+
+
 
 
 # Cancelar solicitação (somente pelo solicitante)
