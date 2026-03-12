@@ -10,10 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '192.168.*']
+ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '54.242.113.40']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
-# CONFIGURAÇÕES SENDGRID
+# CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
@@ -24,6 +24,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = 'FleetControl <fleetcontrol.app@gmail.com>'
+SERVER_EMAIL = EMAIL_HOST_USER
 
 # Outras configurações importantes
 EMAIL_TIMEOUT = 30
@@ -136,3 +137,6 @@ TAILWIND_APP_NAME = 'theme'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SESSION_COOKIE_AGE = 1200  # 20 minutos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
