@@ -39,7 +39,8 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
     protocol = "https" if request.is_secure() else "http"
     domain = request.get_host()
 
-    url = f"{protocol}://{domain}/solicitacoes/{solicitacao.id}/"
+# url = f"{protocol}://{domain}/solicitacoes/{solicitacao.id}/"
+    url = f"http://54.242.113.40/login/"
 
     for gestor in gestores:
 
