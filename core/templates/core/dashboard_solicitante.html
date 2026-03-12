@@ -357,9 +357,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Inicializa e atualiza a cada minuto
+    // Inicializa e atualiza a cada hora
     updateTime();
-    setInterval(updateTime, 60000);
+    setInterval(updateTime, 3600000); // Atualiza a cada hora
 });
 </script>
 {% endblock %}
