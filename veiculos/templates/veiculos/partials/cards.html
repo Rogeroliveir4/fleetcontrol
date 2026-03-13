@@ -122,18 +122,19 @@
         <div class="grid grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-4">
         
             <!-- Ano -->
-            <div class="text-center">
-                <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Ano</p>
-                <p class="text-sm sm:text-base font-semibold text-gray-800 dark:text-white">{{ veiculo.ano }}</p>
+                   <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Ano</p>
+                <p class="text-base font-semibold text-gray-800 dark:text-white">
+                    {{ veiculo.ano|stringformat:"d" }}
+                </p>
             </div>
 
             <!-- KM -->
-            <div class="text-center">
-                <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">KM</p>
-                <p class="text-sm sm:text-base font-semibold text-gray-800 dark:text-white">{{ veiculo.km_atual }}</p>
-                <!-- Barra de progresso -->
-                <div class="h-1 sm:h-1.5 bg-gray-300 dark:bg-gray-800 rounded-full mt-1 sm:mt-1.5">
-                    <div class="h-full rounded-full 
+                 <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">KM</p>
+                <p class="text-base font-semibold text-gray-800 dark:text-white">{{ veiculo.km_atual|intcomma }}</p>
+                <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300
                         {% if veiculo.km_atual < 30000 %}bg-green-500
                         {% elif veiculo.km_atual < 70000 %}bg-yellow-500
                         {% elif veiculo.km_atual < 120000 %}bg-orange-500
@@ -148,10 +149,10 @@
             </div>
 
             <!-- Cor -->
-            <div class="text-center">
-                <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Cor</p>
-                <p class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white truncate">
-                    {{ veiculo.cor|default:"—"|truncatechars:6 }}
+           <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Cor</p>
+                <p class="text-sm font-medium text-gray-800 dark:text-white truncate">
+                    {{ veiculo.cor|default:"—"|truncatechars:8 }}
                 </p>
             </div>
 
@@ -192,7 +193,9 @@
             {% endif %}
 
             <!-- Solicitar -->
+            <!-- Verifica se o usuário tem um nível de perfil definido-->
             {% if perfilusuario.nivel %}
+            <!-- Verifica se há uma solicitação ativa para o veículo, verifica se o veículo está disponível e ativo  -->
                 {% if not solicitacao_ativa and veiculo.status == "Disponivel" and veiculo.ativo %}
                 <a href="{% url 'solicitar_veiculo' veiculo.id %}"
                    class="flex-1 py-1.5 sm:py-2 lg:py-1.5 xl:py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600
