@@ -189,6 +189,8 @@ def cancelar_solicitacao(request, pk):
 
         solicitacao.save()
 
+        veiculo.status = "Disponível"
+
         messages.success(
             request,
             "Solicitação cancelada com sucesso."
