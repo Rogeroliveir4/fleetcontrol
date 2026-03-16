@@ -189,6 +189,7 @@ def cancelar_solicitacao(request, pk):
 
         solicitacao.save()
 
+        # Liberar o veículo (se estava reservado)
         veiculo.status = "Disponível"
 
         messages.success(
