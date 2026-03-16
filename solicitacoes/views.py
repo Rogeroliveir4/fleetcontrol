@@ -162,13 +162,14 @@ def solicitar_veiculo(request, veiculo_id):
 # Cancelar solicitação (somente pelo solicitante)
 @login_required
 def cancelar_solicitacao(request, pk):
+
     solicitacao = get_object_or_404(
         SolicitacaoVeiculo,
         pk=pk,
-        solicitante=request.user  # 🔒 garante que é dele
+        solicitante=request.user
     )
 
-    #  Regra 
+    # Regra
     if solicitacao.status != "PENDENTE":
         messages.error(
             request,
@@ -177,6 +178,7 @@ def cancelar_solicitacao(request, pk):
         return redirect("minhas_solicitacoes")
 
     if request.method == "POST":
+
         motivo = request.POST.get("motivo_cancelamento", "").strip()
 
         if not motivo:
@@ -186,16 +188,18 @@ def cancelar_solicitacao(request, pk):
         solicitacao.status = "CANCELADA"
         solicitacao.motivo_cancelamento = motivo
         solicitacao.data_cancelamento = timezone.now()
-
         solicitacao.save()
 
-        # Liberar o veículo (se estava reservado)
-        veiculo.status = "Disponível"
+        # Liberar o veículo
+        veiculo = solicitacao.veiculo
+        veiculo.status = "Disponivel"
+        veiculo.save()
 
         messages.success(
             request,
             "Solicitação cancelada com sucesso."
         )
+
         return redirect("minhas_solicitacoes")
 
     return redirect("minhas_solicitacoes")
