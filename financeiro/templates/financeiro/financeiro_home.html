@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Financeiro</h2>
+
+<div class="row">
+
+    <div class="card">
+        <h3>IPVA</h3>
+        <p>{{ total_ipva }} registros</p>
+        <a href="/financeiro/ipva/">Ver IPVA</a>
+    </div>
+
+    <div class="card">
+        <h3>Licenciamento</h3>
+        <p>{{ total_licenciamento }} registros</p>
+        <a href="/financeiro/licenciamento/">Ver Licenciamento</a>
+    </div>
+
+    <div class="card">
+        <h3>Multas</h3>
+        <p>{{ total_multas }} registros</p>
+        <a href="/financeiro/multas/">Ver Multas</a>
+    </div>
+
+    <div class="card">
+        <h3>Manutenções</h3>
+        <p>{{ total_manutencoes }} registros</p>
+        <a href="/financeiro/manutencoes/">Ver Manutenções</a>
+    </div>
+
+</div>
+
+{% endblock %}
