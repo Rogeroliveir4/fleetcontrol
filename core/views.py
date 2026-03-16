@@ -14,7 +14,7 @@ from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 import openpyxl
 
-
+# DASHBOARD GERAL PARA USUÁRIOS COM PERFIL DE GESTOR E ADMINISTRADOR
 @login_required
 def dashboard(request):
     perfil = request.user.perfilusuario
@@ -28,7 +28,7 @@ def dashboard(request):
         # Nível desconhecido - redireciona para login ou página inicial
         return redirect("login")
 
-
+#
 @login_required
 def dashboard_gestor(request):
     perfil = request.user.perfilusuario
@@ -109,7 +109,7 @@ def dashboard_gestor(request):
 def dashboard_motorista(request):
     hoje = timezone.now().date()
 
-    # 🔐 QUERY BASE — ESSA É A CHAVE
+    #  QUERY BASE — ESSA É A CHAVE
     qs = SolicitacaoVeiculo.objects.filter(
         solicitante=request.user
     )
@@ -134,7 +134,7 @@ def dashboard_motorista(request):
             status="FINALIZADA"
         ).count(),
 
-        # ⚠️ REPROVADA NÃO É STATUS
+        #  REPROVADA NÃO É STATUS
         "reprovadas": qs.filter(
             data_reprovacao__isnull=False
         ).count(),
@@ -162,31 +162,35 @@ def dashboard_motorista(request):
 
 
 
-
-
+# VIEWS DE GESTOR PARA APROVAR/REPROVAR SOLICITAÇÕES
 def gestor_solicitacoes(request):
 
+    # Verificar se o usuário tem perfil de gestor
     if not request.user.is_authenticated:
         return redirect("login")
 
+    # Verificar se o perfil do usuário é de gestor
     perfil = request.user.perfilusuario
     if perfil.nivel != "gestor":
         return redirect("dashboard")
 
+    # Obter o contrato do gestor
     contrato = perfil.contrato
 
+    # Obter as solicitações pendentes do contrato
     pendentes = SolicitacaoVeiculo.objects.filter(
         contrato=contrato,
         status="PENDENTE"
     ).select_related("motorista", "veiculo")
 
+    # Renderizar a página com as solicitações pendentes
     return render(request, "gestor/solicitacoes_pendentes.html", {
         "pendentes": pendentes,
         "contrato": contrato,
     })
 
 
-
+# VIEWS DE GESTOR PARA APROVAR SOLICITAÇÕES
 def aprovar_solicitacao(request, id):
     sol = SolicitacaoVeiculo.objects.get(id=id)
 
@@ -202,6 +206,7 @@ def aprovar_solicitacao(request, id):
     return redirect("gestor_solicitacoes")
 
 
+# VIEWS DE GESTOR PARA REPROVAR SOLICITAÇÕES
 def reprovar_solicitacao(request, id):
     sol = SolicitacaoVeiculo.objects.get(id=id)
 
