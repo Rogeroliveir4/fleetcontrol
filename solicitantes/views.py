@@ -3,15 +3,13 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-
-
 from veiculos.models import Veiculo
 from motoristas.models import Motorista
-from solicitacoes.models import SolicitacaoVeiculo  # ajuste se seu model estiver em outro app
+from solicitacoes.models import SolicitacaoVeiculo  
 from contas.models import PerfilUsuario
 from datetime import timedelta
 
-
+# View para o dashboard do solicitante
 @login_required
 def dashboard_solicitante(request):
     hoje = timezone.now().date()
@@ -68,7 +66,7 @@ def dashboard_solicitante(request):
 
 
 
-
+# View para solicitar um veículo
 @login_required
 def solicitar_veiculo(request, veiculo_id):
     perfil = getattr(request.user, "perfilusuario", None)
