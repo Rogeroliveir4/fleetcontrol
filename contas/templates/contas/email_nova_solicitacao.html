@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Solicitação - FleetControl</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2b654d 0%, #49b48b 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #2b654d;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: #2b654d;
+            color: white;
+            padding: 14px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="email-container">
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td align="center" bgcolor="#2b654d" style="padding: 30px; color: #ffffff;">
+                    <h2 style="margin: 0; font-family: Arial, sans-serif;">
+                        FleetControl
+                    </h2>
+                    <p style="margin: 5px 0 0 0; font-family: Arial, sans-serif;">
+                        Nova solicitação aguardando aprovação
+                    </p>
+                </td>
+            </tr>
+    </table>
+
+    <div class="content">
+
+        <p>Olá {{ gestor_nome }},</p>
+
+        <p>Uma nova solicitação de veículo foi registrada no sistema.</p>
+
+        <div class="info-box">
+            <p><strong>Solicitante:</strong> {{ solicitacao.solicitante_nome }}</p>
+            <p><strong>Veículo:</strong> {{ solicitacao.veiculo }}</p>
+            <p><strong>TAG:</strong> {{ solicitacao.veiculo.tag_interna }}</p>
+            <p><strong>Destino:</strong> {{ solicitacao.destino }}</p>
+        </div>
+
+        <p style="text-align:center;">
+            <a href="{{ url }}" class="button">
+                Acessar sistema
+            </a>
+        </p>
+
+        <p style="font-size:14px;">
+            Se o botão não funcionar, copie o link abaixo:
+        </p>
+
+        <p style="word-break: break-all;">
+            <a href="{{ url }}">{{ url }}</a>
+        </p>
+
+    </div>
+
+    <div class="footer">
+        <p>FleetControl - Sistema de Gestão de Pátio</p>
+        <p>Este é um email automático, não responda.</p>
+        <p>© {{ ano |stringformat:"d" }} FleetControl</p>
+    </div>
+
+</div>
+
+</body>
+</html>
