@@ -41,6 +41,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
 
+            if request.POST.get("remember_me"):
+                request.session.set_expiry(60 * 60 * 24 * 7)  # 7 dias
+            else:
+                request.session.set_expiry(60 * 60)  # 1 hora
+
             perfil = getattr(user, "perfilusuario", None)
 
             if not perfil:
