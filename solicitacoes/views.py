@@ -28,6 +28,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 
 
+
 #FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
 def notificar_gestores_nova_solicitacao(request, solicitacao):
 
@@ -39,13 +40,14 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
     protocol = "https" if request.is_secure() else "http"
     domain = request.get_host()
 
-# url = f"{protocol}://{domain}/solicitacoes/{solicitacao.id}/"
-    url = f"http://54.242.113.40/login/"
+    # 🔹 URL dinâmica (melhor prática)
+    url = f"{protocol}://{domain}/login/"
 
     for gestor in gestores:
 
         subject = "FleetControl - Nova solicitação aguardando aprovação"
 
+        # 🔹 TEXTO (fallback - mantém compatibilidade)
         plain_message = f"""
 Olá {gestor.first_name or gestor.username},
 
@@ -55,13 +57,23 @@ Solicitante: {solicitacao.solicitante_nome}
 Veículo: {solicitacao.veiculo}
 Destino: {solicitacao.destino}
 
-Acesse o sistema para aprovar ou reprovar:
-
+Acesse o sistema:
 {url}
+
 FleetControl
 Sistema de Gestão de pátio
-Este é um email automático, por favor não responda.
 """
+
+        # 🔹 HTML (usa seu template)
+        html_message = render_to_string(
+            "contas/email_nova_solicitacao.html",
+            {
+                "gestor_nome": gestor.first_name or gestor.username,
+                "solicitacao": solicitacao,
+                "url": url,
+                "ano": timezone.now().year,
+            }
+        )
 
         email = EmailMultiAlternatives(
             subject=subject,
@@ -70,7 +82,11 @@ Este é um email automático, por favor não responda.
             to=[gestor.email],
         )
 
+        # 🔥 Aqui ativa o HTML
+        email.attach_alternative(html_message, "text/html")
+
         email.send(fail_silently=True)
+
 
 
 # SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
@@ -128,7 +144,19 @@ def solicitar_veiculo(request, veiculo_id):
             motorista_id = request.POST.get("motorista")
             destino = request.POST.get("destino")
             justificativa = request.POST.get("justificativa", "")
-            previsao_retorno = request.POST.get("previsao_retorno")
+
+            previsao_retorno_str = request.POST.get("previsao_retorno")
+            previsao_retorno = None
+
+            if previsao_retorno_str:
+                try:
+                    previsao_retorno = datetime.strptime(
+                        previsao_retorno_str,
+                        "%Y-%m-%dT%H:%M"
+                    )
+                    previsao_retorno = timezone.make_aware(previsao_retorno)
+                except ValueError:
+                    previsao_retorno = None
 
             if not motorista_id:
                 messages.error(request, "Selecione um motorista.")
@@ -1195,7 +1223,20 @@ def editar_solicitacao(request, pk):
         motorista_id = request.POST.get("motorista")
         destino = request.POST.get("destino")
         justificativa = request.POST.get("justificativa", "")
-        previsao_retorno = request.POST.get("previsao_retorno")
+
+        # AJustar previsão de retorno (que agora é um campo datetime, não date)
+        previsao_retorno_str = request.POST.get("previsao_retorno")
+        previsao_retorno = None
+
+        if previsao_retorno_str:
+            try:
+                previsao_retorno = datetime.strptime(
+                    previsao_retorno_str,
+                    "%Y-%m-%dT%H:%M"
+                )
+                previsao_retorno = timezone.make_aware(previsao_retorno)
+            except ValueError:
+                previsao_retorno = None
 
         if not motorista_id:
             messages.error(request, "Selecione um motorista.")

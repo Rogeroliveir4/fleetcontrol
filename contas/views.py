@@ -20,6 +20,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.messages import get_messages
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 # Configuração de logging (opcional, mas recomendado para produção)
 def login_view(request):
@@ -39,7 +41,12 @@ def login_view(request):
         if user is not None:
             login(request, user)
 
-            perfil = user.perfilusuario
+            perfil = getattr(user, "perfilusuario", None)
+
+            if not perfil:
+                messages.error(request, "Perfil de usuário não encontrado.")
+                logout(request)
+                return redirect("login")
 
             if perfil.nivel == "adm":
                 return redirect("dashboard")
@@ -102,7 +109,12 @@ def password_reset_request(request):
                     protocol = 'https' if request.is_secure() else 'http'
                     domain = request.get_host()
 
-                    reset_url = f"{protocol}://{domain}/password-reset-confirm/{uid}/{token}/"
+                    reset_path = reverse(
+                        "password_reset_confirm",
+                        kwargs={"uidb64": uid, "token": token}
+                    )
+
+                    reset_url = f"{protocol}://{domain}{reset_path}"
 
                     context = {
                         'user': user,
