@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
-
+from django.db import transaction
 
 
 #FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
@@ -74,83 +74,96 @@ Este é um email automático, por favor não responda.
 
 
 # SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
+from django.db import transaction
+
 @login_required
 def solicitar_veiculo(request, veiculo_id):
-    veiculo = get_object_or_404(Veiculo, id=veiculo_id)
-    perfil = request.user.perfilusuario
 
+    with transaction.atomic():
 
-    #  DEFINIR NOME DO SOLICITANTE (PADRÃO ÚNICO DO SISTEMA)
-    if perfil.nome_exibicao:
-        nome_solicitante = perfil.nome_exibicao
-    elif perfil.nome:
-        nome_solicitante = perfil.nome
-    else:
-        nome_solicitante = (
-            request.user.get_full_name()
-            or request.user.username.split("@")[0].replace(".", " ").title()
-        )
+        #  LOCK no veículo para gravação da solicitação
+        veiculo = Veiculo.objects.select_for_update().get(id=veiculo_id)
 
-    # CONTRATO CORRETO (PERFIL > VEÍCULO)
-    contrato = perfil.contrato or veiculo.contrato
+        perfil = request.user.perfilusuario
 
-    # SEGURANÇA: CONTRATO
-    if perfil.nivel != "adm" and veiculo.contrato != perfil.contrato:
-        messages.error(request, "Você não pode solicitar veículos de outro contrato.")
-        return redirect("dashboard_solicitante")
-
-    # MOTORISTAS DO CONTRATO
-    motoristas = Motorista.objects.filter(contrato=contrato)
-
-    if request.method == "POST":
-        motorista_id = request.POST.get("motorista")
-        destino = request.POST.get("destino")
-        justificativa = request.POST.get("justificativa", "")
-        previsao_retorno = request.POST.get("previsao_retorno")
-
-        if not motorista_id:
-            messages.error(request, "Selecione um motorista.")
-            return redirect("solicitar_veiculo", veiculo_id=veiculo.id)
-
-        motorista = get_object_or_404(
-            Motorista,
-            id=motorista_id,
-            contrato=contrato
-        )
-
-        #  CRIAR SOLICITAÇÃO (ORIGEM = SISTEMA)
-        solicitacao = SolicitacaoVeiculo.objects.create(
-            origem="SISTEMA",
-
+        #  VERIFICA SE existe alguma solicitação ativa para esse veículo"
+        existe_ativa = SolicitacaoVeiculo.objects.filter(
             veiculo=veiculo,
-            motorista=motorista,
+            status__in=[
+                "PENDENTE",
+                "AGUARDANDO_SAIDA_PORTARIA",
+                "EM_TRANSITO"
+            ]
+        ).exists()
 
-            contrato=contrato,
-            id_contrato=contrato.id if contrato else None,
+        if existe_ativa:
+            messages.error(
+                request,
+                "Este veículo já possui uma solicitação em andamento."
+            )
+            return redirect("lista_veiculos")
 
-            destino=destino,
-            justificativa=justificativa,
-            previsao_retorno=previsao_retorno,
+        # ---------------- RESTO DO SEU CÓDIGO ---------------- #
 
-            status="PENDENTE",
+        # DEFINIR NOME
+        if perfil.nome_exibicao:
+            nome_solicitante = perfil.nome_exibicao
+        elif perfil.nome:
+            nome_solicitante = perfil.nome
+        else:
+            nome_solicitante = (
+                request.user.get_full_name()
+                or request.user.username.split("@")[0].replace(".", " ").title()
+            )
 
-            #  SOLICITANTE
-            solicitante=request.user,
-            solicitante_nome=nome_solicitante,
+        contrato = perfil.contrato or veiculo.contrato
 
-            data_criacao=timezone.now()
-        )
+        if perfil.nivel != "adm" and veiculo.contrato != perfil.contrato:
+            messages.error(request, "Você não pode solicitar veículos de outro contrato.")
+            return redirect("dashboard_solicitante")
 
-        # Enviar email para gestores
-        notificar_gestores_nova_solicitacao(request, solicitacao)
+        motoristas = Motorista.objects.filter(contrato=contrato)
 
-        # STATUS DO VEÍCULO (RESERVA LÓGICA)
-        veiculo.status = "Reservado"
-        veiculo.save(update_fields=["status"])
-        
-        messages.success(request, "Solicitação enviada ao gestor.")
-        return redirect("lista_veiculos")
+        if request.method == "POST":
+            motorista_id = request.POST.get("motorista")
+            destino = request.POST.get("destino")
+            justificativa = request.POST.get("justificativa", "")
+            previsao_retorno = request.POST.get("previsao_retorno")
 
+            if not motorista_id:
+                messages.error(request, "Selecione um motorista.")
+                return redirect("solicitar_veiculo", veiculo_id=veiculo.id)
+
+            motorista = get_object_or_404(
+                Motorista,
+                id=motorista_id,
+                contrato=contrato
+            )
+
+            solicitacao = SolicitacaoVeiculo.objects.create(
+                origem="SISTEMA",
+                veiculo=veiculo,
+                motorista=motorista,
+                contrato=contrato,
+                id_contrato=contrato.id if contrato else None,
+                destino=destino,
+                justificativa=justificativa,
+                previsao_retorno=previsao_retorno,
+                status="PENDENTE",
+                solicitante=request.user,
+                solicitante_nome=nome_solicitante,
+                data_criacao=timezone.now()
+            )
+
+            notificar_gestores_nova_solicitacao(request, solicitacao)
+
+            veiculo.status = "Reservado"
+            veiculo.save(update_fields=["status"])
+
+            messages.success(request, "Solicitação enviada ao gestor.")
+            return redirect("lista_veiculos")
+
+    # fora da transação (GET)
     return render(request, "solicitantes/solicitar.html", {
         "veiculo": veiculo,
         "motoristas": motoristas,
@@ -159,7 +172,7 @@ def solicitar_veiculo(request, veiculo_id):
 
 
 
-# Cancelar solicitação (somente pelo solicitante)
+# CANCELAR SOLICITAÇÃO (SOLICITANTE)
 @login_required
 def cancelar_solicitacao(request, pk):
 
@@ -169,7 +182,6 @@ def cancelar_solicitacao(request, pk):
         solicitante=request.user
     )
 
-    # Regra
     if solicitacao.status != "PENDENTE":
         messages.error(
             request,
@@ -185,15 +197,48 @@ def cancelar_solicitacao(request, pk):
             messages.error(request, "Informe o motivo do cancelamento.")
             return redirect("minhas_solicitacoes")
 
+        #  CANCELAMENTO
         solicitacao.status = "CANCELADA"
         solicitacao.motivo_cancelamento = motivo
         solicitacao.data_cancelamento = timezone.now()
+
+        #  AUDITORIA (QUEM CANCELOU)
+        solicitacao.cancelado_por = request.user
+
+        perfil = getattr(request.user, "perfilusuario", None)
+
+        if perfil:
+            if perfil.nome_exibicao:
+                solicitacao.cancelado_por_nome = perfil.nome_exibicao
+            elif perfil.nome:
+                solicitacao.cancelado_por_nome = perfil.nome
+            else:
+                username = request.user.username.split("@")[0]
+                solicitacao.cancelado_por_nome = username.replace(".", " ").title()
+        else:
+            solicitacao.cancelado_por_nome = (
+                request.user.get_full_name()
+                or request.user.username
+            )
+
         solicitacao.save()
 
-        # Liberar o veículo
-        veiculo = solicitacao.veiculo
-        veiculo.status = "Disponivel"
-        veiculo.save()
+        #  LIBERAÇÃO SEGURA DO VEÍCULO
+        if solicitacao.veiculo_id:
+
+            existe_outra = SolicitacaoVeiculo.objects.filter(
+                veiculo_id=solicitacao.veiculo_id,
+                status__in=[
+                    "PENDENTE",
+                    "AGUARDANDO_SAIDA_PORTARIA",
+                    "EM_TRANSITO"
+                ]
+            ).exclude(id=solicitacao.id).exists()
+
+            if not existe_outra:
+                Veiculo.objects.filter(
+                    id=solicitacao.veiculo_id
+                ).update(status="Disponivel")
 
         messages.success(
             request,
@@ -344,7 +389,7 @@ def gestor_solicitacoes(request):
 
 
 
-# Adicione no views.py, antes das views
+# FUNÇÃO PARA CALCULAR ESTATÍSTICAS COMPLETAS DO DASHBOARD
 def get_dashboard_stats(solicitacoes):
     """    Retorna estatísticas completas para o dashboard """
     from datetime import datetime, timedelta
@@ -444,7 +489,7 @@ def aprovar_solicitacao(request, id):
 
 
 
-# REPROVAR SOLICITAÇÃO
+# REPROVAR SOLICITAÇÃO (REPROVAÇÃO DO GESTOR/ADM)
 def reprovar_solicitacao(request, id):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=id)
     veiculo = solicitacao.veiculo
@@ -1180,79 +1225,3 @@ def editar_solicitacao(request, pk):
 
 
 
-@login_required
-def cancelar_solicitacao(request, pk):
-    """
-    Cancela uma solicitação de veículo.
-
-    Regras:
-    - Somente o solicitante pode cancelar
-    - Somente se status = PENDENTE
-    - Motivo obrigatório
-    - Registra auditoria completa (usuário + nome congelado)
-    """
-
-    solicitacao = get_object_or_404(
-        SolicitacaoVeiculo,
-        pk=pk,
-        solicitante=request.user  # 🔒 garante que é do próprio usuário
-    )
-
-    # 🔒 Só pode cancelar se ainda estiver pendente
-    if solicitacao.status != "PENDENTE":
-        messages.error(
-            request,
-            "Esta solicitação não pode mais ser cancelada."
-        )
-        return redirect("minhas_solicitacoes")
-
-    # 🔒 Apenas POST é permitido
-    if request.method != "POST":
-        messages.error(request, "Ação inválida.")
-        return redirect("minhas_solicitacoes")
-
-    motivo = request.POST.get("motivo_cancelamento", "").strip()
-
-    # 🔒 Motivo obrigatório
-    if not motivo:
-        messages.error(request, "Informe o motivo do cancelamento.")
-        return redirect("minhas_solicitacoes")
-
-    # ✅ Registrar cancelamento
-    solicitacao.status = "CANCELADA"
-    solicitacao.motivo_cancelamento = motivo
-    solicitacao.data_cancelamento = timezone.now()
-
-    # 🔎 Auditoria
-    solicitacao.cancelado_por = request.user
-
-    # Nome congelado (snapshot)
-    perfil = getattr(request.user, "perfilusuario", None)
-    if perfil:
-        if perfil.nome_exibicao:
-            solicitacao.cancelado_por_nome = perfil.nome_exibicao
-        elif perfil.nome:
-            solicitacao.cancelado_por_nome = perfil.nome
-        else:
-            username = request.user.username.split("@")[0]
-            solicitacao.cancelado_por_nome = username.replace(".", " ").title()
-    else:
-        solicitacao.cancelado_por_nome = (
-            request.user.get_full_name()
-            or request.user.username
-        )
-
-    solicitacao.save(update_fields=[
-        "status",
-        "motivo_cancelamento",
-        "data_cancelamento",
-        "cancelado_por",
-        "cancelado_por_nome"
-    ])
-
-    messages.success(
-        request,
-        "Solicitação cancelada com sucesso."
-    )
-
-    return redirect("minhas_solicitacoes")
