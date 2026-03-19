@@ -182,7 +182,8 @@
                                         {% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
                                         <i class="fa-solid 
                                             {% if solicitacao.status == 'APROVADA' %}fa-check text-green-600 dark:text-green-400
-                                            {% elif solicitacao.status == 'REPROVADA' %}fa-xmark text-red-600 dark:text-red-400
+                                            {% elif solicitacao.status == 'REPROVADA' %}fa-xmark text-red-600
+                                            {% elif solicitacao.status == 'CANCELADA' %}fa-ban text-red-600
                                             {% elif solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' %}fa-check text-green-600 dark:text-green-400
                                             {% else %}fa-clock text-gray-400{% endif %} text-lg"></i>
                                     </div>
@@ -194,6 +195,7 @@
                                             {% elif solicitacao.status == 'EM_TRANSITO' %}Solicitação Aprovada
                                             {% elif solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' %}Solicitação Aprovada
                                             {% elif solicitacao.status == 'REPROVADA' %}Solicitação Reprovada
+                                            {% elif solicitacao.status == 'CANCELADA' %}Solicitação Cancelada
                                             {% else %}Aguardando Aprovação{% endif %}
                                         </h3>
                                         {% if solicitacao.data_aprovacao or solicitacao.data_reprovacao %}
@@ -202,6 +204,20 @@
                                         </span>
                                         {% endif %}
                                     </div>
+                                        {% if solicitacao.status == 'CANCELADA' and solicitacao.motivo_cancelamento %}
+                                        <div class="mt-4 p-4 bg-red-50 dark:bg-amber-900/20 rounded-lg">
+                                            <p class="text-sm text-amber-800 dark:text-amber-500">
+                                            {{ solicitacao.motivo_cancelamento.upper }}
+                                            </p>
+
+                                            {% if solicitacao.cancelado_por_nome %}
+                                            <p class="text-sm mt-2 text-gray-500">
+                                                Cancelado por: {{ solicitacao.cancelado_por_nome }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+
                                     {% if solicitacao.gestor_responsavel_nome %}
                                     <p class="text-gray-600 dark:text-gray-400 text-sm">Por {{ solicitacao.gestor_responsavel_nome }}</p>
                                     {% elif solicitacao.gestor_reprovador_nome %}

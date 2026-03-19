@@ -104,6 +104,7 @@ def dashboard_gestor(request):
         'perfil_usuario': perfil,
     })
 
+
 # MESMA VISÃO DO DASHBOARD DO SOLICITANTE
 @login_required
 def dashboard_motorista(request):
@@ -134,9 +135,14 @@ def dashboard_motorista(request):
             status="FINALIZADA"
         ).count(),
 
-        #  REPROVADA NÃO É STATUS
+        #  REPROVADA NÃO É STATUS (usa data_reprovacao)
         "reprovadas": qs.filter(
             data_reprovacao__isnull=False
+        ).count(),
+
+        #  🆕 CANCELADAS (usa data_cancelamento)
+        "canceladas": qs.filter(
+            data_cancelamento__isnull=False
         ).count(),
 
         "hoje": qs.filter(
@@ -156,8 +162,6 @@ def dashboard_motorista(request):
     }
 
     return render(request, "core/dashboard_solicitante.html", context)
-
-
 
 
 

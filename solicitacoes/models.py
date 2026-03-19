@@ -56,6 +56,14 @@ class SolicitacaoVeiculo(models.Model):
 
     id_contrato = models.IntegerField(null=True, blank=True)
 
+    tag_interna = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        db_index=True,  # Índice para busca rápida
+        help_text="Código identificador interno da solicitação (ex: VA-950, TAG-123)"
+    )
+
     destino = models.CharField(max_length=255)
     justificativa = models.TextField(blank=True, null=True)
     previsao_retorno = models.DateTimeField()
@@ -165,7 +173,7 @@ class SolicitacaoVeiculo(models.Model):
 
 
 
-
+    # Propriedade para obter a movimentação ativa (aguardando checklist de retorno)
     @property
     def movimentacao_ativa(self):
         return self.movimentacoes.filter(

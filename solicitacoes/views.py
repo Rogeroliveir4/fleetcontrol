@@ -29,7 +29,7 @@ from django.db import transaction
 
 
 
-#FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
+# FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
 def notificar_gestores_nova_solicitacao(request, solicitacao):
 
     gestores = User.objects.filter(
@@ -47,22 +47,22 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
         subject = "FleetControl - Nova solicitação aguardando aprovação"
 
-        # 🔹 TEXTO (fallback - mantém compatibilidade)
+        #  TEXTO (fallback - mantém compatibilidade)
         plain_message = f"""
-Olá {gestor.first_name or gestor.username},
+        Olá {gestor.first_name or gestor.username},
 
-Uma nova solicitação de veículo foi criada.
+        Uma nova solicitação de veículo foi criada.
 
-Solicitante: {solicitacao.solicitante_nome}
-Veículo: {solicitacao.veiculo}
-Destino: {solicitacao.destino}
+        Solicitante: {solicitacao.solicitante_nome}
+        Veículo: {solicitacao.veiculo}
+        Destino: {solicitacao.destino}
 
-Acesse o sistema:
-{url}
+        Acesse o sistema:
+        {url}
 
-FleetControl
-Sistema de Gestão de pátio
-"""
+        FleetControl
+        Sistema de Gestão de pátio
+        """
 
         # 🔹 HTML (usa seu template)
         html_message = render_to_string(
@@ -279,7 +279,7 @@ def cancelar_solicitacao(request, pk):
 
 
 
-# DASHBOARD GESTOR - LISTA COM FILTROS COMPLETOS
+# DASHBOARD GESTOR - LISTAGEM COM FILTROS COMPLETOS
 def gestor_solicitacoes(request):
     perfil = request.user.perfilusuario
     
@@ -552,46 +552,119 @@ def reprovar_solicitacao(request, id):
 
 
 
+
 # SOLICITAÇÕES DO USUÁRIO LOGADO
 @login_required
 def minhas_solicitacoes(request):
     perfil = request.user.perfilusuario
 
-    # 🔐 Apenas solicitante / gestor / adm
+    #  Apenas solicitante / gestor / adm
     if perfil.nivel not in ["basico", "gestor", "adm"]:
         messages.error(request, "Acesso não autorizado.")
         return redirect("dashboard_solicitante")
 
-    # 🔹 SOLICITANTE → SEMPRE pelo campo solicitante
+    #  SOLICITANTE → SEMPRE pelo campo solicitante
     if perfil.nivel == "basico":
         solicitacoes = SolicitacaoVeiculo.objects.filter(
             solicitante=request.user
-        ).order_by("-data_criacao")
+        )
 
-    # 🔹 GESTOR → por contrato
+    #  GESTOR → por contrato (todos os solicitantes do contrato)
     elif perfil.nivel == "gestor":
         solicitacoes = SolicitacaoVeiculo.objects.filter(
             contrato=perfil.contrato
-        ).order_by("-data_criacao")
+        )
 
-    # 🔹 ADM → tudo
+    #  ADM → tudo
     else:
-        solicitacoes = SolicitacaoVeiculo.objects.all().order_by("-data_criacao")
+        solicitacoes = SolicitacaoVeiculo.objects.all()
 
-    return render(request, "solicitacoes/minhas.html", {
-        "solicitacoes": solicitacoes
-    })
+    # ===== FILTROS =====
+    # Pegar parâmetros da URL
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'recentes')
+    
+    # Aplicar filtro por status
+    if status_filter and status_filter != 'todos':
+        solicitacoes = solicitacoes.filter(status=status_filter)
+    
+    # APLICAR BUSCA (AGORA COM TAG_INTERNA)
+    if search_query:
+        from django.db.models import Q
+        
+        query = Q()
+        
+        #  BUSCA PRIORITÁRIA POR TAG INTERNA
+        query |= Q(tag_interna__icontains=search_query)
+        
+        # Busca por ID (se for número)
+        if search_query.isdigit():
+            query |= Q(id=int(search_query))
+        
+        # Busca por outros campos de texto
+        query |= Q(destino__icontains=search_query)
+        query |= Q(justificativa__icontains=search_query)
+        query |= Q(observacao_aprovacao__icontains=search_query)
+        query |= Q(motivo_cancelamento__icontains=search_query)
+        query |= Q(motivo_reprovacao__icontains=search_query)
+        
+        # Busca por id_contrato (se for número)
+        if search_query.isdigit():
+            query |= Q(id_contrato=int(search_query))
+        
+        # Busca por veículo
+        query |= Q(veiculo__marca__icontains=search_query)
+        query |= Q(veiculo__modelo__icontains=search_query)
+        query |= Q(veiculo__placa__icontains=search_query)
+        
+        # Busca por motorista
+        query |= Q(motorista__nome__icontains=search_query)
+        query |= Q(motorista__cpf__icontains=search_query)
+        
+        # Busca por solicitante
+        query |= Q(solicitante__username__icontains=search_query)
+        query |= Q(solicitante__first_name__icontains=search_query)
+        query |= Q(solicitante__last_name__icontains=search_query)
+        query |= Q(solicitante_nome__icontains=search_query)
+        
+        # Busca por gestores
+        query |= Q(gestor_responsavel_nome__icontains=search_query)
+        query |= Q(gestor_reprovador_nome__icontains=search_query)
+        query |= Q(cancelado_por_nome__icontains=search_query)
+        
+        solicitacoes = solicitacoes.filter(query).distinct()
+    
+    # Aplicar ordenação
+    if sort_by == 'antigas':
+        solicitacoes = solicitacoes.order_by('data_criacao')
+    else:  # recentes (padrão)
+        solicitacoes = solicitacoes.order_by('-data_criacao')
+    
+    # ===== PAGINAÇÃO =====
+    from django.core.paginator import Paginator
+    paginator = Paginator(solicitacoes, 10)
+    page = request.GET.get('page')
+    solicitacoes_page = paginator.get_page(page)
+    
+    context = {
+        "solicitacoes": solicitacoes_page,
+        "status_atual": status_filter,
+        "search_atual": search_query,
+        "sort_atual": sort_by,
+    }
+    
+    return render(request, "solicitacoes/minhas.html", context)
 
 
 
 
-
-
+# LISTAR SAÍDAS DA PORTARIA (PORTARIA)
 @login_required
 def listar_saidas_portaria(request):
     perfil = getattr(request.user, "perfilusuario", None)
     
-    # 🔐 Segurança explícita
+    #  Segurança explícita
     if not perfil or perfil.nivel != "portaria":
         messages.error(request, "Acesso não autorizado.")
         return redirect("lista_movimentacoes")
@@ -631,10 +704,7 @@ def listar_saidas_portaria(request):
 
 # FILTRAR AS SAÍDAS DA PORTARIA
 def filtrar_saidas_portaria(request):
-    """
-    Função compartilhada para filtrar saídas da portaria.
-    Retorna um queryset filtrado com base nos parâmetros GET.
-    """
+
     perfil = getattr(request.user, "perfilusuario", None)
 
     # Base query
@@ -733,14 +803,14 @@ def filtrar_saidas_portaria(request):
 
     return qs
 
-
+# FUNÇÃO AUXILIAR PARA NORMALIZAR VALORES DE FILTRO (TRATAR CASOS DE "None", "", etc)
 def normalizar(valor):
     if valor in [None, "", "None", "null", "undefined"]:
         return None
     return valor
 
 
-
+# VISUALIZAR DETALHES DA SOLICITAÇÃO (QUALQUER USUÁRIO COM ACESSO)
 @login_required
 def visualizar_solicitacao(request, pk):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=pk)
@@ -750,7 +820,7 @@ def visualizar_solicitacao(request, pk):
         {"solicitacao": solicitacao}
     )
 
-
+# DETALHES DA SOLICITAÇÃO (COM INFORMAÇÕES COMPLETAS PARA GESTORES/ADM)
 @login_required
 def solicitacao_detalhe(request, pk):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=pk)

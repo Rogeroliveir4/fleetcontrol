@@ -32,57 +32,98 @@
         </div>
     </div>
 
-    <!-- RESUMO GERAL COM ÍCONES -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                    hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center justify-between mb-2">
-                <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg">
-                    <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400"></i>
-                </div>
-                <span class="text-xs text-gray-500 font-medium">Total</span>
+<!-- RESUMO GERAL COM ÍCONES - GRID RESPONSIVO -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <!-- Total -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center justify-between mb-1 sm:mb-2">
+            <div class="p-1.5 sm:p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg">
+                <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400 text-sm sm:text-base"></i>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ total }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Solicitações</p>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Total</span>
         </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                    hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center justify-between mb-2">
-                <div class="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-                    <i class="fa-solid fa-clock text-yellow-600 dark:text-yellow-400"></i>
-                </div>
-                <span class="text-xs text-gray-500 font-medium">Pendentes</span>
-            </div>
-            <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ pendentes }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Aguardando</p>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                    hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center justify-between mb-2">
-                <div class="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                    <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400"></i>
-                </div>
-                <span class="text-xs text-gray-500 font-medium">Ativas</span>
-            </div>
-            <p class="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">{{ aprovadas }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Em andamento</p>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                    hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center justify-between mb-2">
-                <div class="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                    <i class="fa-solid fa-times-circle text-red-600 dark:text-red-400"></i>
-                </div>
-                <span class="text-xs text-gray-500 font-medium">Reprovadas</span>
-            </div>
-            <p class="text-2xl sm:text-3xl font-bold text-red-600 dark:text-red-400">{{ reprovadas }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Não aprovadas</p>
-        </div>
+        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{{ total }}</p>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Solicitações</p>
     </div>
 
+    <!-- Pendentes -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center justify-between mb-1 sm:mb-2">
+            <div class="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+                <i class="fa-solid fa-clock text-yellow-600 dark:text-yellow-400 text-sm sm:text-base"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Pendentes</span>
+        </div>
+        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ pendentes }}</p>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Aguardando</p>
+    </div>
+
+    <!-- Ativas -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center justify-between mb-1 sm:mb-2">
+            <div class="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400 text-sm sm:text-base"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Ativas</span>
+        </div>
+        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400">{{ aprovadas }}</p>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Em andamento</p>
+    </div>
+
+    <!-- Reprovadas -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center justify-between mb-1 sm:mb-2">
+            <div class="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                <i class="fa-solid fa-times-circle text-red-600 dark:text-red-400 text-sm sm:text-base"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Reprovadas</span>
+        </div>
+        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-red-600 dark:text-red-400">{{ reprovadas }}</p>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Não aprovadas</p>
+    </div>
+
+    <!-- Canceladas -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                hover:shadow-md transition-shadow duration-200 col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between mb-1 sm:mb-2">
+            <div class="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-900/20 rounded-lg">
+                <i class="fa-solid fa-ban text-gray-600 dark:text-gray-400 text-sm sm:text-base"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Canceladas</span>
+        </div>
+        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600 dark:text-gray-400">{{ canceladas }}</p>
+        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Canceladas</p>
+    </div>
+</div>
+
+<!-- CSS para esconder scrollbar -->
+<style>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>
+
+<!-- JavaScript para navegação -->
+<script>
+function scrollCards(direction) {
+    const container = document.getElementById('cardsContainer');
+    const scrollAmount = 280; // Largura aproximada de um card
+    
+    if (direction === 'left') {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+</script>
     <!-- ESTATÍSTICAS TEMPORAIS 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-5">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">

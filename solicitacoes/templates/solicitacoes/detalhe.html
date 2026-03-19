@@ -172,111 +172,167 @@
                 </div>
             </div>
             
-            <!-- CARD: TIMELINE -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-6">
-                        <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
-                            <i class="fa-solid fa-timeline text-[#00594C] dark:text-green-400"></i>
-                        </div>
-                        Timeline da Solicitação
-                    </h2>
-                    
-                    <div class="relative pl-8">
-                        <!-- Linha vertical -->
-                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                        
-                        <!-- Item 1: Criação -->
-                        <div class="relative mb-8">
-                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                                <i class="fa-solid fa-plus text-white text-sm"></i>
-                            </div>
-                            <div class="ml-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">Solicitação Criada</h3>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ solicitacao.data_criacao|date:"d/m/Y H:i" }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Por: {{ solicitacao.solicitante_nome|default:solicitacao.solicitante.get_full_name }}
-                                </p>
-                            </div>
-                        </div>
-
-                        {% if solicitacao.data_cancelamento %}
-                        <div class="relative mb-8">
-                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                                <i class="fa-solid fa-ban text-white text-sm"></i>
-                            </div>
-                            <div class="ml-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">
-                                        Solicitação Cancelada
-                                    </h3>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ solicitacao.data_cancelamento|date:"d/m/Y H:i" }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Cancelado por: 
-                                    <strong>
-                                        {{ solicitacao.nome_cancelador }}
-                                    </strong>
-                                </p>
-                                {% if solicitacao.motivo_cancelamento %}
-                                <div class="mt-2 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-sm text-red-700 dark:text-red-300">
-                                    <strong>Motivo:</strong> {{ solicitacao.motivo_cancelamento }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-
-                        <!-- Item 2: Aprovação -->
-                        {% if solicitacao.data_aprovacao %}
-                        <div class="relative mb-8">
-                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                                <i class="fa-solid fa-check text-white text-sm"></i>
-                            </div>
-                            <div class="ml-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">Aprovação</h3>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ solicitacao.data_aprovacao|date:"d/m/Y H:i" }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Por: {{ solicitacao.gestor_responsavel_nome|default:"Gestor" }}
-                                </p>
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Item 3: Saída -->
-                        {% if solicitacao.data_saida %}
-                        <div class="relative mb-8">
-                            <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
-                                <i class="fa-solid fa-door-open text-white text-sm"></i>
-                            </div>
-                            <div class="ml-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">Saída Registrada</h3>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ solicitacao.data_saida|date:"d/m/Y H:i" }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Portaria: {{ solicitacao.portaria_registro_saida.get_full_name }}
-                                </p>
-                            </div>
-                        </div>
-                        {% endif %}
-                        
+                <!-- CARD: TIMELINE -->
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="p-4 sm:p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-6">
+            <div class="p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg mr-3">
+                <i class="fa-solid fa-timeline text-[#00594C] dark:text-green-400"></i>
+            </div>
+            Timeline da Solicitação
+        </h2>
+        
+        <div class="relative pl-8">
+            <!-- Linha vertical -->
+            <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+            
+            <!-- Item 1: Criação (sempre visível) -->
+            <div class="relative mb-8">
+                <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <i class="fa-solid fa-plus text-white text-sm"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Solicitação Criada</h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ solicitacao.data_criacao|date:"d/m/Y H:i" }}
+                        </span>
                     </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Por: {{ solicitacao.solicitante_nome|default:solicitacao.solicitante.get_full_name }}
+                    </p>
                 </div>
             </div>
+
+            <!--  CANCELAMENTO (se houver) -->
+            {% if solicitacao.data_cancelamento %}
+            <div class="relative mb-8">
+                <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center">
+                    <i class="fa-solid fa-ban text-white text-sm"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>Solicitação Cancelada</span>
+                        </h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ solicitacao.data_cancelamento|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Cancelado por: 
+                        <strong class="text-red-600 dark:text-red-400">
+                            {{ solicitacao.nome_cancelador|default:"Solicitante" }}
+                        </strong>
+                    </p>
+                    {% if solicitacao.motivo_cancelamento %}
+                    <div class="mt-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 rounded-r-lg">
+                        <p class="text-xs text-red-700 dark:text-red-300 mb-1 font-semibold">
+                            <i class="fa-solid fa-pen mr-1"></i> Motivo do cancelamento:
+                        </p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ solicitacao.motivo_cancelamento|linebreaksbr }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!--  REPROVAÇÃO (se houver) -->
+            {% if solicitacao.data_reprovacao %}
+            <div class="relative mb-8">
+                <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                    <i class="fa-solid fa-times text-white text-sm"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>Solicitação Reprovada</span>
+                            <span class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 text-xs rounded-full">
+                                Reprovado pelo gestor
+                            </span>
+                        </h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ solicitacao.data_reprovacao|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Reprovado por: 
+                        <strong class="text-red-600 dark:text-red-400">
+                            {{ solicitacao.gestor_reprovador_nome|default:"Gestor" }}
+                        </strong>
+                    </p>
+                    {% if solicitacao.motivo_reprovacao %}
+                    <div class="mt-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 rounded-r-lg">
+                        <p class="text-xs text-red-700 dark:text-red-300 mb-1 font-semibold">
+                            <i class="fa-solid fa-pen mr-1"></i> Motivo da reprovação:
+                        </p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ solicitacao.motivo_reprovacao|linebreaksbr }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Item 2: Aprovação (se houver) -->
+            {% if solicitacao.data_aprovacao and not solicitacao.data_reprovacao and not solicitacao.data_cancelamento %}
+            <div class="relative mb-8">
+                <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i class="fa-solid fa-check text-white text-sm"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Aprovação</h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ solicitacao.data_aprovacao|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Aprovado por: 
+                        <strong class="text-green-600 dark:text-green-400">
+                            {{ solicitacao.gestor_responsavel_nome|default:"Gestor" }}
+                        </strong>
+                    </p>
+                    {% if solicitacao.observacao_aprovacao %}
+                    <div class="mt-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                        <p class="text-xs text-blue-700 dark:text-blue-300 mb-1 font-semibold">
+                            <i class="fa-solid fa-pen mr-1"></i> Observação:
+                        </p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ solicitacao.observacao_aprovacao|linebreaksbr }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Item 3: Saída (se houver e não tiver cancelamento/reprovação) -->
+            {% if solicitacao.data_saida and not solicitacao.data_cancelamento and not solicitacao.data_reprovacao %}
+            <div class="relative mb-8">
+                <div class="absolute left-[-17px] top-0 w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
+                    <i class="fa-solid fa-door-open text-white text-sm"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Saída Registrada</h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ solicitacao.data_saida|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Registrado na portaria
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>        
+    </div>
+</div>
         </div>
         
         <!-- COLUNA DIREITA (1/3) -->

@@ -1,6 +1,11 @@
 {% load static %}
 
 <!-- ==========================================================
+    VARIÁVEIS DE CONTROLE
+========================================================== -->
+{% with menu_financeiro_aberto='false' %}
+
+<!-- ==========================================================
     PERFIL USUÁRIO (BÁSICO)
 ========================================================== -->
 {% if perfilusuario and perfilusuario.nivel == "basico" %}
@@ -59,19 +64,66 @@
   <span class="menuText font-medium">Motoristas</span>
 </a>
 
-<!-- Frota -->
-<a href="/veiculos/"
-  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
-  <i class="fa-solid fa-truck-field text-base text-gray-500 group-hover:text-primary"></i>
-  <span class="menuText font-medium">Frota</span>
-</a>
+<!-- FROTA COM FINANCEIO (GESTOR) -->
+<div class="relative frota-container">
+  <button onclick="toggleFrotaSubmenu(this)"
+    class="menu-item group flex w-full items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+    <i class="fa-solid fa-truck-field text-base text-gray-500 group-hover:text-primary"></i>
+    <span class="menuText font-medium flex-1 text-left">Frota</span>
+    <i class="frota-arrow fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
+  </button>
 
-<!-- Movimentações -->
-<a href="/movimentacoes/"
-  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
-  <i class="fa-solid fa-traffic-light text-base text-gray-500 group-hover:text-primary"></i>
-  <span class="menuText font-medium">Movimentações</span>
-</a>
+  <div class="frota-submenu ml-10 mt-1 space-y-1 hidden animate-fadeIn">
+    <!-- Visão Geral da Frota -->
+    <a href="/veiculos/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-car text-xs"></i>
+      <span>Visão Geral</span>
+    </a>
+    
+    <!-- Movimentações -->
+    <a href="/movimentacoes/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-traffic-light text-xs"></i>
+      <span>Movimentações</span>
+    </a>
+    
+    <!-- Divisor Financeiro -->
+    <div class="relative my-2">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-300"></div>
+      </div>
+      <div class="relative flex justify-center">
+        <span class="bg-white dark:bg-gray-800 px-2 text-xs text-gray-500">Financeiro</span>
+      </div>
+    </div>
+    
+    <!-- Subitens do Financeiro -->
+    <a href="/financeiro/ipva/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-file-invoice text-xs"></i>
+      <span>IPVA</span>
+    </a>
+    
+    <a href="/financeiro/licenciamento/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-id-card text-xs"></i>
+      <span>Licenciamento</span>
+    </a>
+    
+    <a href="/financeiro/multas/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-exclamation-triangle text-xs"></i>
+      <span>Multas</span>
+    </a>
+    
+    <a href="/financeiro/manutencoes/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-wrench text-xs"></i>
+      <span>Manutenções</span>
+    </a>
+  </div>
+</div>
 
 <!-- Terceiros -->
 <a href="{% url 'terceiros_portaria_lista' %}"
@@ -82,9 +134,9 @@
 
 {% endif %}
 
-
-
-<!-- PERFIL PORTARIA-->
+<!-- ==========================================================
+    PERFIL PORTARIA
+========================================================== -->
 {% if perfilusuario and perfilusuario.nivel == "portaria" %}
 
 <!-- SEÇÃO PORTARIA -->
@@ -116,7 +168,6 @@
 </a>
 
 {% endif %}
-
 
 <!-- ==========================================================
     PERFIL ADMINISTRADOR
@@ -157,23 +208,91 @@
   <span class="menuText font-medium">Motoristas</span>
 </a>
 
-<!-- Gestão de Frota -->
+<!-- GESTÃO DE FROTA COM FINANCEIRO (ADMIN) -->
 <div class="px-4 py-2 mt-4">
   <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Gestão de Frota</h3>
 </div>
 
-<a href="/veiculos/"
-  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
-  <i class="fa-solid fa-car-rear text-base text-gray-500 group-hover:text-primary"></i>
-  <span class="menuText font-medium">Veículos</span>
-</a>
+<div class="relative frota-container">
+  <button onclick="toggleFrotaSubmenu(this)"
+    class="menu-item group flex w-full items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
+    <i class="fa-solid fa-car-rear text-base text-gray-500 group-hover:text-primary"></i>
+    <span class="menuText font-medium flex-1 text-left">Frota</span>
+    <i class="frota-arrow fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
+  </button>
 
-<a href="/movimentacoes/"
-  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
-  <i class="fa-solid fa-route text-base text-gray-500 group-hover:text-primary"></i>
-  <span class="menuText font-medium">Movimentações</span>
-</a>
+  <div class="frota-submenu ml-10 mt-1 space-y-1 hidden animate-fadeIn">
+    <!-- Visão Geral da Frota -->
+    <a href="/veiculos/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-car text-xs"></i>
+      <span>Veículos</span>
+    </a>
+    
+    <!-- Movimentações -->
+    <a href="/movimentacoes/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-route text-xs"></i>
+      <span>Movimentações</span>
+    </a>
+    
+    <!-- Divisor Financeiro -->
+    <div class="relative my-2">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+      </div>
+      <div class="relative flex justify-center">
+        <span class="bg-white dark:bg-gray-800 px-2 text-xs text-gray-500">Financeiro</span>
+      </div>
+    </div>
+    
+    <!-- Subitens do Financeiro -->
+    <a href="/financeiro/dashboard/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-chart-line text-xs"></i>
+      <span>Dashboard Financeiro</span>
+    </a>
+    
+    <a href="/financeiro/ipva/"
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-file-invoice text-xs"></i>
+      <span>IPVA</span>
+    </a>
+    
+    <a href="/financeiro/licenciamento/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-id-card text-xs"></i>
+      <span>Licenciamento</span>
+    </a>
+    
+    <a href="/financeiro/multas/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-exclamation-triangle text-xs"></i>
+      <span>Multas</span>
+    </a>
+    
+    <a href="/financeiro/manutencoes/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-wrench text-xs"></i>
+      <span>Manutenções</span>
+    </a>
+    <!--
+    <a href="/financeiro/combustivel/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-gas-pump text-xs"></i>
+      <span>Combustível</span>
+    </a>
+    
+    <a href="/financeiro/seguros/" 
+       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
+      <i class="fa-solid fa-shield-heart text-xs"></i>
+      <span>Seguros</span>
+    </a>
+  -->
+  </div>
+</div>
 
+<!-- Veículos Terceiros -->
 <a href="{% url 'terceiros_portaria_lista' %}"
   class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
   <i class="fa-solid fa-truck-ramp-box text-base text-gray-500 group-hover:text-primary"></i>
@@ -211,6 +330,8 @@
 
 {% endif %}
 
+{% endwith %}
+
 <style>
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
@@ -220,4 +341,102 @@
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }
+
+/* Estilo para manter submenu aberto quando ativo */
+.frota-submenu.active {
+  display: block !important;
+}
+
+.frota-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* Ajuste para o divisor */
+.border-t {
+  border-top-width: 1px;
+}
+
+/* Dark mode suporte */
+@media (prefers-color-scheme: dark) {
+  .bg-white {
+    background-color: #1f2937;
+  }
+}
 </style>
+
+<script>
+// Função para controlar o submenu da Frota (com Financeiro)
+function toggleFrotaSubmenu(button) {
+  const container = button.closest('.frota-container');
+  const submenu = container.querySelector('.frota-submenu');
+  const arrow = container.querySelector('.frota-arrow');
+  
+  // Fecha todos os outros submenus primeiro
+  document.querySelectorAll('.frota-submenu.active').forEach(menu => {
+    if (menu !== submenu) {
+      menu.classList.remove('active');
+      menu.classList.add('hidden');
+      const otherArrow = menu.closest('.frota-container').querySelector('.frota-arrow');
+      if (otherArrow) otherArrow.classList.remove('rotated');
+    }
+  });
+  
+  // Toggle do submenu atual
+  submenu.classList.toggle('hidden');
+  submenu.classList.toggle('active');
+  arrow.classList.toggle('rotated');
+  
+  // Salva estado no localStorage
+  const isOpen = !submenu.classList.contains('hidden');
+  localStorage.setItem('frotaMenuOpen', isOpen);
+}
+
+// Função para manter estado do menu ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+  // Verifica se o menu da frota deve ficar aberto
+  const shouldOpen = localStorage.getItem('frotaMenuOpen') === 'true';
+  const currentPath = window.location.pathname;
+  
+  // Se estiver em uma página de veículos ou financeiro, abre o menu automaticamente
+  if (currentPath.includes('/veiculos/') || 
+      currentPath.includes('/movimentacoes/') || 
+      currentPath.includes('/financeiro/')) {
+    
+    const frotaContainers = document.querySelectorAll('.frota-container');
+    frotaContainers.forEach(container => {
+      const submenu = container.querySelector('.frota-submenu');
+      const arrow = container.querySelector('.frota-arrow');
+      if (submenu && arrow) {
+        submenu.classList.remove('hidden');
+        submenu.classList.add('active');
+        arrow.classList.add('rotated');
+      }
+    });
+  } else if (shouldOpen) {
+    const frotaContainers = document.querySelectorAll('.frota-container');
+    frotaContainers.forEach(container => {
+      const submenu = container.querySelector('.frota-submenu');
+      const arrow = container.querySelector('.frota-arrow');
+      if (submenu && arrow) {
+        submenu.classList.remove('hidden');
+        submenu.classList.add('active');
+        arrow.classList.add('rotated');
+      }
+    });
+  }
+});
+
+// Função existente para submenu de configurações
+function toggleSubmenu() {
+  const submenu = document.getElementById('submenuAdm');
+  const arrow = document.getElementById('submenuArrow');
+  
+  submenu.classList.toggle('hidden');
+  arrow.classList.toggle('rotated');
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-theme');
+  localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+}
+</script>

@@ -13,6 +13,8 @@ from datetime import timedelta
 @login_required
 def dashboard_solicitante(request):
     hoje = timezone.now().date()
+    inicio_semana = hoje - timedelta(days=7)
+    inicio_mes = hoje.replace(day=1)
 
     #  QUERY BASE — ESSA É A CHAVE
     qs = SolicitacaoVeiculo.objects.filter(
@@ -39,25 +41,34 @@ def dashboard_solicitante(request):
             status="FINALIZADA"
         ).count(),
 
-        #  REPROVADA NÃO É STATUS
+        #  REPROVADA NÃO É STATUS (usa data_reprovacao)
         "reprovadas": qs.filter(
             data_reprovacao__isnull=False
         ).count(),
 
+        #   CANCELADAS (usa data_cancelamento)
+        "canceladas": qs.filter(
+            data_cancelamento__isnull=False
+        ).count(),
+
+        # Estatísticas temporais
         "hoje": qs.filter(
             data_criacao__date=hoje
         ).count(),
 
         "semana": qs.filter(
-            data_criacao__date__gte=hoje - timedelta(days=7)
+            data_criacao__date__gte=inicio_semana
         ).count(),
 
         "mes": qs.filter(
-            data_criacao__year=hoje.year,
-            data_criacao__month=hoje.month
+            data_criacao__date__gte=inicio_mes
         ).count(),
 
+        # Últimas 5 solicitações
         "recentes": qs.order_by("-data_criacao")[:5],
+        
+        # Data atual para o header
+        "data_atual": timezone.now(),
     }
 
     return render(request, "core/dashboard_solicitante.html", context)
