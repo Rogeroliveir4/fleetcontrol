@@ -1,0 +1,36 @@
+[33m3f96e13[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m sua ajuste de filtros de solicitações na visão de solicitante
+[33maac756a[m Ajuste no tempo de sessão ativa
+[33m6bb0cfb[m Ajuste de funcionalidades
+[33mad16ee3[m Ajuste de funcionalidades e templates
+[33m46ab45e[m Ajuste de funcionalidades e templates
+[33m89b1687[m Limpa as mensagens que aparecem na tela de login
+[33m9e882ca[m Limpa as mensagens que aparecem na tela de login
+[33m4247269[m Ajuste no cancelamento da solicitação - Usuário
+[33m815087b[m Ajuste no cancelamento da solicitação - Usuário
+[33m6c24a94[m Ajuste no cancelamento da solicitação - Usuário
+[33me6007ee[m add app financeiro
+[33mc5d8ffa[m Ajuste na redifinição de senhas
+[33m8c4b312[m Ajuste no cancelamento da solicitação
+[33m549dbaa[m Ajuste nos cards dos Veículos
+[33m4fa8276[m Ajuste na seção de usuário
+[33mb4eedcf[m Ajuste na seção de usuário
+[33m965914f[m Atualização no link do Sistema
+[33m412a569[m Removido django-browser-reload do ambiente de produção
+[33m67ebee2[m Ajuste no Staus da Aprovação da requisição
+[33mc030c96[m Ajusta refresh da tela de login
+[33m606b56a[m Ajusta refresh da tela de login
+[33m8f634d0[m Ajusta refresh da tela para 1h
+[33mcaf7f08[m Função para envio de email para Aprovação da solicitação
+[33ma3ac160[m Ajuste na redefinição de senhas
+[33m8fa1d4e[m Ajuste na redefinição de senhas
+[33mc492599[m Ajuste na redefinição de senhas
+[33mf72dd9d[m Ajuste na redefinição de senhas
+[33m38633ff[m Ajuste nas funcionalidades do status das solicitacoes
+[33mb7d6bba[m corrige finalizacao movimentacao terceiros - Permissão para Gestor e Adm gravarem
+[33md8f84f5[m Ajuste no status das solicitaçõe
+[33me64cbdb[m Ajuste nas funcionalidades do Sidebar-menu
+[33m00b1149[m Ajuste nas funcionalidades do Sidebar-menu
+[33mab472a3[m Configuração PostgreSQL + variáveis .env + ajuste static
+[33m826ceb6[m removendo arquivos desnecessários do git
+[33mbddce05[m configurando envio de email com gmail
+[33m3d9513f[m Inicializando repositório FleetControl
