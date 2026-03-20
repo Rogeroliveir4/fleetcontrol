@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     #'django_browser_reload',
-    'financeiro',
     'motoristas.apps.MotoristasConfig',
     'movimentacoes',
     'veiculos',
