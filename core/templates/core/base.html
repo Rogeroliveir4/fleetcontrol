@@ -460,8 +460,386 @@
                 font-size: 0.75rem !important;
             }
         }
+
+
+
+
+
+
+            <!-- DEFERED STYLES -->
+    <style>
+    /* Mobile First */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+    .menu {
+        flex-direction: column;
+    }
+}
+
+/* Para telas muito pequenas (celulares antigos) */
+@media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .btn { width: 100%; }
+}
+        @media (min-width: 1024px) {
+            .table-wrapper {
+                max-height: 600px !important;
+                min-height: 600px !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        html.dark body {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        /* Sidebar dark */
+        html.dark .sidebar-bg {
+            background-color: #0f3c2c !important;
+        }
+
+        /* Melhorar a paginação mobile */
+        #paginacao-mobile .pagination {
+            @apply flex flex-wrap justify-center items-center gap-1 xs:gap-2;
+        }
+
+        #paginacao-mobile .page-link {
+            @apply px-2 xs:px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 min-w-[36px] xs:min-w-[44px] min-h-[36px] xs:min-h-[44px] flex items-center justify-center text-sm xs:text-base;
+        }
+
+        #paginacao-mobile .page-link:hover {
+            @apply bg-gray-50 dark:bg-gray-700;
+        }
+
+        #paginacao-mobile .page-item.active .page-link {
+            @apply bg-primary border-primary text-white;
+        }
+
+        /* Scroll personalizado */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 3px;
+            width: 3px;
+        }
+
+        @media (hover: hover) {
+            .custom-scrollbar::-webkit-scrollbar {
+                height: 6px;
+                width: 6px;
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            @apply bg-gray-100 dark:bg-gray-800 rounded-full;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+        }
+
+        /* Sidebar + tooltip + collapse */
+        .sidebar-bg {
+            background-color: #00664e;
+        }
+
+        .tooltip {
+            position: absolute;
+            left: calc(5rem + 0.5rem);
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transform: translateY(-50%);
+            top: 50%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s ease;
+            z-index: 60;
+        }
+
+        body.sidebar-collapsed .menu-item:hover .tooltip {
+            opacity: 1;
+        }
+
+        #sidebarDesktop,
+        #sidebarMobile {
+            will-change: width, transform;
+        }
+
+        @media (min-width: 1024px) {
+            body:not(.sidebar-collapsed) #sidebarDesktop {
+                width: 16rem;
+            }
+
+            body:not(.sidebar-collapsed) main {
+                margin-left: 16rem;
+            }
+
+            body.sidebar-collapsed #sidebarDesktop {
+                width: 5rem;
+            }
+
+            body.sidebar-collapsed main {
+                margin-left: 5rem;
+            }
+        }
+
+        .menuText {
+            transition: opacity .15s ease, transform .15s ease;
+        }
+
+        /* Melhor comportamento ao alternar tema */
+        * {
+            transition: background-color 0.20s ease, color 0.20s ease, border-color 0.20s ease;
+        }
+
+        body.sidebar-collapsed .menuText {
+            opacity: 0;
+            transform: translateX(-6px);
+            pointer-events: none;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .2s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        /* MOBILE OVERLAY IMPROVEMENTS */
+        @media (max-width: 1023px) {
+            .overlay {
+                background: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        body.mobile-open .overlay {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* MOBILE SPECIFIC STYLES */
+        @media (max-width: 640px) {
+            main {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+            }
+
+            /* TOUCH-FRIENDLY INPUTS */
+            input:not([type="checkbox"]):not([type="radio"]),
+            select,
+            textarea {
+                font-size: 16px !important;
+                /* Prevents iOS zoom */
+                min-height: 48px !important;
+                padding: 12px !important;
+            }
+
+            /* IMPROVE TABLES ON MOBILE */
+            .mobile-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -0.5rem;
+                padding: 0 0.5rem;
+            }
+
+            /* BETTER CARDS ON MOBILE */
+            .mobile-card {
+                border-radius: 0.75rem !important;
+                padding: 1rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+        }
+
+        /* TABLET OPTIMIZATIONS */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            main {
+                padding: 1rem !important;
+            }
+
+            .tablet-optimized {
+                max-width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+        /* SAFE AREA SUPPORT */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* HAMBURGER MENU ANIMATION */
+        .hamburger-line {
+            transition: all 0.3s ease;
+        }
+
+        .mobile-open .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .mobile-open .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-open .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* LOADING STATE FOR MOBILE */
+        .loading-skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* BOTTOM SHEET EFFECT FOR MOBILE SIDEBAR */
+        @media (max-width: 1023px) {
+            #sidebarMobile {
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* IMPROVE READABILITY ON SMALL SCREENS */
+        @media (max-width: 380px) {
+            .text-xxs-responsive {
+                font-size: 0.625rem !important;
+            }
+
+            .text-xs-responsive {
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* ============================================
+           CORREÇÃO DOS CARDS - APENAS ISSO
+        ============================================ */
+        
+        /* Força o fundo dos cards no modo light */
+        .bg-white {
+            background-color: #ffffff !important;
+        }
+        
+        /* Força o fundo dos cards no modo dark */
+        html.dark .bg-white {
+            background-color: #1f2937 !important;
+        }
+        
+        /* Garante que os textos dentro dos cards fiquem escuros no modo light */
+        .bg-white,
+        .bg-white * {
+            color: #111827 !important;
+        }
+        
+        /* Garante que os textos dentro dos cards fiquem claros no modo dark */
+        html.dark .bg-white,
+        html.dark .bg-white * {
+            color: #f3f4f6 !important;
+        }
+
+
+        /* Garante que botões com fundo escuro tenham texto e ícones brancos */
+        .bg-gray-900\/90,
+        .bg-gray-900\/90 *,
+        .bg-gray-900,
+        .bg-gray-900 * {
+            color: #ffffff !important;
+        }
+
+        .bg-gray-900\/90 i,
+        .bg-gray-900 i {
+            color: #ffffff !important;
+        }
+
+
+
+        /* ============================================
+        GARANTE TEXTO BRANCO EM FUNDOS VERDES/GRADIENTES
+        ============================================ */
+        
+        /* Força texto branco em todos os elementos com gradiente verde */
+        .bg-gradient-to-r.from-\[\#00594C\] *,
+        .bg-gradient-to-r.from-\[\#00594C\] *,
+        [class*="bg-gradient-to-r"] [class*="from-\[#00594C\]"] *,
+        .bg-gradient-to-r.from-\[\#00594C\] i,
+        .bg-gradient-to-r.from-\[\#00594C\] span,
+        .bg-gradient-to-r.from-\[\#00594C\] p,
+        .bg-gradient-to-r.from-\[\#00594C\] h1,
+        .bg-gradient-to-r.from-\[\#00594C\] h2,
+        .bg-gradient-to-r.from-\[\#00594C\] h3,
+        .bg-gradient-to-r.from-\[\#00594C\] h4,
+        .bg-gradient-to-r.from-\[\#00594C\] a {
+            color: #ffffff !important;
+        }
+        
+        /* Garante que os ícones dentro do gradiente também fiquem brancos */
+        .bg-gradient-to-r.from-\[\#00594C\] i,
+        .bg-gradient-to-r.from-\[\#00594C\] .fas,
+        .bg-gradient-to-r.from-\[\#00594C\] .far,
+        .bg-gradient-to-r.from-\[\#00594C\] .fal {
+            color: #ffffff !important;
+        }
+        
+        /* Mantém o efeito de opacidade para ícones secundários (opcional) */
+        .bg-gradient-to-r.from-\[\#00594C\] .text-white\/80,
+        .bg-gradient-to-r.from-\[\#00594C\] i.text-white\/80 {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        /* Para o banner principal */
+        .bg-gradient-to-r.from-\[\#00594C\].via-\[\#007a62\],
+        .bg-gradient-to-r.from-\[\#00594C\].via-\[\#007a62\] * {
+            color: #ffffff !important;
+        }
+        
+        /* Para os stats cards dentro do banner */
+        .bg-white\/20 * {
+            color: #ffffff !important;
+        }
+        
+        /* Para os badges dentro do cabeçalho verde */
+        .bg-gradient-to-r.from-\[\#00594C\] .bg-white\/20,
+        .bg-gradient-to-r.from-\[\#00594C\] .bg-white\/20 * {
+            color: #ffffff !important;
+        }
+
+
+
     </style>
 </head>
+
+
+
+
+
+
+
 
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden relative">
     <!-- TOP SAFE AREA -->

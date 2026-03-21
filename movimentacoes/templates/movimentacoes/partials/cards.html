@@ -1,337 +1,249 @@
 {% load l10n humanize %}
 
 {% if movimentacoes %}
-<!-- VERSÃO MOBILE ENRIQUECIDA -->
-<div class="md:hidden space-y-3">
+<!-- VERSÃO MOBILE PROFISSIONAL -->
+<div class="md:hidden space-y-4">
     {% for mov in movimentacoes %}
-    <div
-        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 active:bg-gray-50 dark:active:bg-gray-750 transition-colors">
-
-        <!-- CABEÇALHO MOBILE - Informações principais -->
-        <div class="flex items-start justify-between mb-4">
-            <!-- LADO ESQUERDO: Placa + Status -->
-            <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                    <!-- Indicador de status -->
-                    <div class="relative">
-                        <div class="w-10 h-10 rounded-xl {% if mov.data_retorno %}bg-green-500/20{% else %}bg-amber-500/20 animate-pulse{% endif %} 
-                                        flex items-center justify-center">
-                            <div
-                                class="w-3 h-3 rounded-full {% if mov.data_retorno %}bg-green-500{% else %}bg-amber-500{% endif %}">
-                            </div>
-                        </div>
-                        {% if not mov.data_retorno %}
-                        <div class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-ping"></div>
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+        
+        <!-- CARD HEADER COM GRADIENTE SUTIL -->
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
+                    {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20{% endif %}">
+            <div class="flex justify-between items-center">
+            <!-- TAG DESTACADA PROFISSIONAL - VERDE COM TEXTO BRANCO -->
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r 
+                                {% if mov.data_retorno %}from-green-600 to-emerald-600{% else %}from-amber-500 to-orange-500{% endif %} 
+                                rounded-lg blur opacity-30"></div>
+                    <div class="relative px-3 py-1.5 rounded-lg shadow-sm"
+                        style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                        <span class="text-lg font-black tracking-wider" style="color: #ffffff !important;">
+                            {{ mov.veiculo.tag_interna|upper }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="text-lg font-black tracking-wider"> {{ mov.veiculo.modelo|upper }}</span>
+            </div>    
+                
+                <!-- DATA/HORA -->
+                <div class="text-right">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ mov.data_saida|date:"d/m/Y" }}</div>
+                    <div class="text-sm font-bold text-gray-900 dark:text-white">{{ mov.data_saida|date:"H:i" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="p-4">
+            <!-- MOTORISTA COM ÍCONE -->
+            <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                <div class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <i class="fa-solid fa-user text-blue-600 dark:text-blue-400 text-xs"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ mov.motorista.nome }}</span>
+            </div>
+            
+            <!-- DESTINO COM DESTAQUE -->
+            <div class="mb-4 p-2.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-l-3 border-blue-500">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-blue-500 text-sm"></i>
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ mov.destino }}</span>
+                </div>
+            </div>
+            
+            <!-- KMS COM DESTAQUE PROFISSIONAL -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <!-- KM SAÍDA -->
+                <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20">
+                    <div class="text-xl font-black text-blue-600 dark:text-blue-400">
+                        {{ mov.km_saida|intcomma|default:"---" }}
+                    </div>
+                    <div class="text-[10px] font-semibold text-blue-600/70 dark:text-blue-400/70 mt-0.5">KM SAÍDA</div>
+                </div>
+                
+                <!-- KM PERCORRIDO (DESTAQUE PRINCIPAL) -->
+                <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 
+                            {% if mov.distancia_percorrida %}ring-1 ring-emerald-300 dark:ring-emerald-700{% endif %}">
+                    <div class="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                        {% if mov.distancia_percorrida %}
+                            {{ mov.distancia_percorrida|intcomma }}
+                        {% else %}
+                            <span class="text-gray-400">---</span>
                         {% endif %}
                     </div>
-
-                    <!-- Placa e status -->
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ mov.veiculo.tag_interna|upper }}</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span
-                                class="text-sm px-2 py-1 rounded-full font-semibold
-                                            {% if mov.data_retorno %}bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300
-                                            {% else %}bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300{% endif %}">
-                                {% if mov.data_retorno %}Finalizada{% else %}Em Trânsito{% endif %}
-                            </span>
-                            {% if not mov.data_retorno %}
-                            <span class="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                <i class="fa-solid fa-clock mr-1"></i>
-                                {{ mov.data_saida|timesince }}
-                            </span>
-                            {% endif %}
+                    <div class="text-[10px] font-semibold text-emerald-600/70 dark:text-emerald-400/70 mt-0.5">PERCORRIDO</div>
+                </div>
+                
+                <!-- KM RETORNO -->
+                <div class="text-center rounded-xl py-2.5 px-1 {% if mov.km_retorno %}bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20{% else %}bg-gray-50 dark:bg-gray-800/50{% endif %}">
+                    <div class="text-xl font-black {% if mov.km_retorno %}text-green-600 dark:text-green-400{% else %}text-gray-400{% endif %}">
+                        {{ mov.km_retorno|intcomma|default:"--" }}
+                    </div>
+                    <div class="text-[10px] font-semibold {% if mov.km_retorno %}text-green-600/70 dark:text-green-400/70{% else %}text-gray-500{% endif %} mt-0.5">KM RETORNO</div>
+                </div>
+            </div>
+            
+            <!-- STATUS COM DESTAQUE -->
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <div class="w-2.5 h-2.5 rounded-full 
+                                    {% if mov.data_retorno %}bg-green-500{% else %}bg-amber-500 animate-pulse{% endif %}">
                         </div>
+                        {% if not mov.data_retorno %}
+                        <div class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
+                        {% endif %}
                     </div>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full
+                                {% if mov.data_retorno %}
+                                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
+                                {% else %}
+                                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
+                                {% endif %}">
+                        {% if mov.data_retorno %}
+                            <i class="fa-solid fa-check-circle mr-1 text-xs"></i>Finalizada
+                        {% else %}
+                            <i class="fa-solid fa-play mr-1 text-xs"></i>Em Trânsito · {{ mov.data_saida|timesince }}
+                        {% endif %}
+                    </span>
                 </div>
-
-                <!-- Motorista -->
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <i class="fa-solid fa-user text-blue-600 dark:text-blue-400 text-xs"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Motorista</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ mov.motorista.nome}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LADO DIREITO: Data e Hora -->
-            <div class="text-right">
-                <div class="mb-1">
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Saída</div>
-                    <div class="text-sm font-bold text-gray-900 dark:text-white">{{ mov.data_saida|date:"d/m/Y" }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ mov.data_saida|date:"H:i" }}</div>
-                </div>
-                {% if mov.data_retorno %}
-                <div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Retorno</div>
-                    <div class="text-sm font-bold text-green-600 dark:text-green-400">
-                        {{ mov.data_retorno|date:"d/m/Y"}}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ mov.data_retorno|date:"H:i" }}</div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- DESTINO MOBILE -->
-        <div class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-            <div class="flex items-start gap-3">
-                <div
-                    class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mt-0.5">
-                    <i class="fa-solid fa-location-dot text-blue-600 dark:text-blue-400"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Destino</div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ mov.destino }}</div>
+                
+                <!-- AÇÕES -->
+                <div class="flex gap-2">
+                    <a href="{% url 'movimentacao_detalhe' mov.id %}"
+                       class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
+                              flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all"
+                       title="Ver detalhes">
+                        <i class="fa-regular fa-eye text-sm"></i>
+                    </a>
+                    {% if not mov.data_retorno %}
+                    <a href="{% url 'registrar_retorno' mov.id %}"
+                       class="w-8 h-8 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 
+                              flex items-center justify-center text-white shadow-sm transition-all"
+                       title="Registrar retorno">
+                        <i class="fa-solid fa-flag-checkered text-sm"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-
-        <!-- QUILOMETRAGEM MOBILE -->
-        <div class="mb-4">
-            <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-3">Quilometragem</div>
-
-            <div class="flex items-center justify-between">
-        <!-- KM SAÍDA -->
-<div class="text-center">
-    <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-
-        {% if mov.km_saida %}
-            {{ mov.km_saida|intcomma }}
-        {% else %}
-            <span class="text-gray-400">--</span>
-        {% endif %}
-    </div>
-    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Saída</div>
-</div>
-
-<!-- SETA E DISTÂNCIA -->
-<div class="relative">
-    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <i class="fa-solid fa-arrow-right text-gray-400"></i>
-    </div>
-    
-    {% with km_saida=mov.km_saida|default:0 km_retorno=mov.km_retorno|default:0 %}
-        {% if km_saida > 0 and km_retorno > 0 and km_retorno >= km_saida %}
-            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap 
-                        text-xs font-bold text-emerald-600 dark:text-emerald-400 
-                        bg-white dark:bg-gray-800 px-2 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                {{ mov.distancia_percorrida|default:0|intcomma }} km
-            </div>
-        {% elif km_saida > 0 and km_retorno > 0 and km_retorno < km_saida %}
-            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap 
-                        text-xs font-bold text-red-600 dark:text-red-400 
-                        bg-white dark:bg-gray-800 px-2 py-1 rounded-full border border-red-200 dark:border-red-800"
-                        title="KM de retorno menor que KM de saída - verificar">
-                ⚠ {{ mov.distancia_percorrida|default:0|intcomma }} km
-            </div>
-        {% elif km_saida > 0 and not km_retorno %}
-            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap 
-                        text-xs font-medium text-yellow-600 dark:text-yellow-400 
-                        bg-white dark:bg-gray-800 px-2 py-1 rounded-full border border-yellow-200 dark:border-yellow-800">
-                Em andamento
-            </div>
-        {% elif mov.distancia_percorrida %}
-            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap 
-                        text-xs font-medium text-gray-600 dark:text-gray-400 
-                        bg-white dark:bg-gray-800 px-2 py-1 rounded-full">
-                {{ mov.distancia_percorrida|intcomma }} km
-            </div>
-        {% endif %}
-    {% endwith %}
-</div>
-
-<!-- KM RETORNO -->
-<div class="text-center">
-    <div class="text-lg font-bold 
-        {% if mov.km_retorno %}
-            text-green-600 dark:text-green-400
-        {% elif mov.km_saida %}
-            text-yellow-600 dark:text-yellow-400
-        {% else %}
-            text-gray-400
-        {% endif %}">
-        {% if mov.km_retorno %}
-            {{ mov.km_retorno|intcomma }}
-        {% else %}
-            --
-        {% endif %}
-    </div>
-    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Retorno</div>
-</div>
-            </div>
-        </div>
-
-        <!-- TIMELINE MOBILE -->
-        <div class="mb-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-            <div class="flex items-center justify-between">
+        
+        <!-- TIMELINE SUTIL (se houver retorno) -->
+        {% if mov.data_retorno %}
+        <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                    <div class="text-sm text-gray-700 dark:text-gray-300">
-                        <span class="font-medium">Saída:</span> {{ mov.data_saida|date:"H:i" }}
-                    </div>
+                    <i class="fa-regular fa-clock text-gray-400"></i>
+                    <span class="text-gray-500">Saída: {{ mov.data_saida|date:"H:i" }}</span>
                 </div>
-
-                {% if mov.data_retorno %}
                 <div class="flex items-center gap-2">
-                    <div class="text-sm text-green-600 dark:text-green-400 font-medium">
-                        <span class="font-medium">Retorno:</span> {{ mov.data_retorno|date:"H:i" }}
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    <i class="fa-regular fa-flag-checkered text-gray-400"></i>
+                    <span class="text-green-600 dark:text-green-400 font-medium">Retorno: {{ mov.data_retorno|date:"H:i" }}</span>
                 </div>
-                {% else %}
-                <div class="flex items-center gap-2">
-                    <div class="text-sm text-amber-600 dark:text-amber-400 font-medium">
-                        Em andamento
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                </div>
-                {% endif %}
             </div>
         </div>
-
-        <!-- AÇÕES MOBILE -->
-        <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
-            <div class="text-xs text-gray-500 dark:text-gray-400">
-                ID: #{{ mov.id|stringformat:"04d" }}
-            </div>
-
-            <div class="flex items-center gap-2">
-                <!--Detalhes-->
-                <a href="{% url 'movimentacao_detalhe' mov.id %}"
-                    class="px-4 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
-                               text-gray-700 dark:text-gray-300 font-medium text-sm transition-all flex items-center gap-2">
-                    <i class="fa-regular fa-eye"></i>
-
-                </a>
-
-                {% if not mov.data_retorno %}
-                <a href="{% url 'registrar_retorno' mov.id %}" class="px-4 py-2.5 rounded-lg bg-green-700 hover:bg-green-500 text-white font-medium text-sm 
-                               transition-all flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-flag-checkered"></i>
-                    Retorno
-                </a>
-                {% endif %}
-            </div>
-        </div>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
 
-<!-- VERSÃO DESKTOP - MÍNIMA + VISUAL -->
+<!-- VERSÃO DESKTOP PROFISSIONAL -->
 <div class="hidden md:block">
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
         {% for mov in movimentacoes %}
-        <div class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-3 
-                        hover:shadow-md transition-all duration-150 hover:border-blue-300 dark:hover:border-blue-600
-                        {% if not mov.data_retorno %}ring-1 ring-amber-200 dark:ring-amber-900/30{% endif %}">
-
-            <!-- CABEÇALHO ULTRA COMPACTO -->
-            <div class="flex items-center justify-between mb-2">
-                <!-- PLACA + STATUS ICON -->
-                <div class="flex items-center gap-2">
-                    <div class="relative">
-                        <div
-                            class="w-2 h-8 rounded {% if mov.data_retorno %}bg-green-500{% else %}bg-amber-500{% endif %}">
-                        </div>
-                    </div>
+        <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden 
+                    hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
+            
+            <!-- CARD HEADER -->
+            <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
+                        {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/30 to-transparent dark:from-amber-950/10{% endif %}">
+                <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ mov.veiculo.tag_interna|upper }}</h3>
+        <!-- TAG COM FUNDO VERDE E TEXTO BRANCO (FORÇADO) -->
+<div class="relative inline-block">
+    <div class="absolute -inset-0.5 bg-gradient-to-r 
+                {% if mov.data_retorno %}from-green-600 to-emerald-600{% else %}from-amber-500 to-orange-500{% endif %} 
+                rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+    <span class="relative inline-block px-3 py-1.5 rounded-lg text-xl font-black tracking-wider"
+          style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff !important;">
+        {{ mov.veiculo.tag_interna|upper }}
+    </span>
+</div>
+                        {% if mov.veiculo.modelo %}
+                        <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ mov.veiculo.modelo }}</div>
+                        {% endif %}
                     </div>
-                </div>
-
-                <!-- DATA COMPACTA -->
-                <div class="text-right">
-                    <div
-                        class="text-xs font-medium {% if not mov.data_retorno %}text-amber-600 dark:text-amber-400{% else %}text-gray-500 dark:text-gray-400{% endif %}">
-                        {{ mov.data_saida|date:"d/m" }}
+                    <div class="text-right">
+                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ mov.data_saida|date:"d/m/Y" }}</div>
+                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ mov.data_saida|date:"H:i" }}</div>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ mov.data_saida|date:"H:i" }}</div>
                 </div>
             </div>
-
-            <!-- MOTORISTA + DESTINO MÍNIMO -->
-            <div class="mb-3">
-                <div class="flex items-center gap-1.5 mb-1">
-                    <i class="fa-solid fa-user text-gray-400 text-xs"></i>
-                    <span class="text-xs text-gray-700 dark:text-gray-300 truncate">
-                       {{mov.motorista.nome|truncatechars:15}}</span>
+            
+            <!-- CONTEÚDO -->
+            <div class="p-4">
+                <!-- MOTORISTA -->
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-user-circle text-gray-400 text-sm"></i>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ mov.motorista.nome }}</span>
                 </div>
-                <div class="flex items-center gap-1.5">
+                
+                <!-- DESTINO -->
+                <div class="flex items-center gap-2 mb-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
                     <i class="fa-solid fa-location-dot text-blue-500 text-xs"></i>
-                    <span class="text-xs text-gray-900 dark:text-white font-medium truncate" title="{{ mov.destino }}">
-                        {{ mov.destino|truncatechars:20 }}
+                    <span class="text-sm text-gray-900 dark:text-white font-medium truncate" title="{{ mov.destino }}">
+                        {{ mov.destino }}
                     </span>
                 </div>
-            </div>
-
-            <!-- QUILOMETRAGEM VISUAL -->
-            <div class="mb-3">
-                <div class="flex items-center justify-between">
-                    <!-- KM SAÍDA -->
-                    <div class="text-center flex-1">
-                        <div class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ mov.km_saida|intcomma }}
-                        </div>
-                        <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-0.5">Saída
-                        </div>
+                
+                <!-- KMS EM GRID -->
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+                        <div class="text-base font-bold text-blue-600 dark:text-blue-400">{{ mov.km_saida|intcomma|default:"---" }}</div>
+                        <div class="text-[10px] text-blue-500/70">SAÍDA</div>
                     </div>
-
-                    <!-- SETA VISUAL -->
-                    <div class="relative px-1">
-                        <div class="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            <i class="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+                    <div class="text-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20">
+                        <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">
+                            {{ mov.distancia_percorrida|intcomma|default:"---" }}
                         </div>
-                        {% if mov.distancia_percorrida %}
-                        <div
-                            class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap 
-                                        text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-gray-800 px-0.5">
-                            {{ mov.distancia_percorrida|intcomma }}
-                        </div>
-                        {% endif %}
+                        <div class="text-[10px] text-emerald-500/70">PERCORRIDO</div>
                     </div>
-
-                    <!-- KM RETORNO -->
-                    <div class="text-center flex-1">
-                        <div
-                            class="text-sm font-bold {% if mov.km_retorno %}text-green-600 dark:text-green-400{% else %}text-gray-400{% endif %}">
-                            {% if mov.km_retorno %}{{ mov.km_retorno|intcomma }}{% else %}--{% endif %}
+                    <div class="text-center p-2 rounded-lg {% if mov.km_retorno %}bg-green-50 dark:bg-green-950/20{% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
+                        <div class="text-base font-bold {% if mov.km_retorno %}text-green-600{% else %}text-gray-400{% endif %}">
+                            {{ mov.km_retorno|intcomma|default:"--" }}
                         </div>
-                        <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-0.5">Retorno
-                        </div>
+                        <div class="text-[10px] {% if mov.km_retorno %}text-green-500/70{% else %}text-gray-500{% endif %}">RETORNO</div>
                     </div>
                 </div>
-            </div>
-
-            <!-- STATUS BAR + TEMPO -->
-            <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
-                <div class="flex items-center justify-between">
-                    <!-- STATUS VISUAL -->
-                    <div class="flex items-center gap-1.5">
-                        {% if mov.data_retorno %}
-                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                        <span class="text-[10px] text-green-600 dark:text-green-400 font-medium">Finalizada</span>
-                        {% else %}
-                        <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                        <span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                            {{ mov.data_saida|timesince }}
-                        </span>
-                        {% endif %}
-                    </div>
-
-                    <!-- AÇÕES MÍNIMAS -->
-                    <div class="flex items-center gap-1">
-                        <a href="{% url 'movimentacao_detalhe' mov.id %}" class="w-6 h-6 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
-                                       flex items-center justify-center text-gray-600 dark:text-gray-400"
-                            title="Detalhes">
-                            <i class="fa-regular fa-eye text-[10px]"></i>
+                
+                <!-- STATUS E AÇÕES -->
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full
+                                {% if mov.data_retorno %}
+                                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
+                                {% else %}
+                                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
+                                {% endif %}">
+                        <i class="fa-solid {% if mov.data_retorno %}fa-check-circle{% else %}fa-clock{% endif %} text-xs"></i>
+                        {% if mov.data_retorno %}Finalizada{% else %}Em trânsito{% endif %}
+                    </span>
+                    
+                    <div class="flex gap-1.5">
+                        <a href="{% url 'movimentacao_detalhe' mov.id %}" 
+                           class="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
+                                  flex items-center justify-center text-gray-500 dark:text-gray-400 transition-all"
+                           title="Detalhes">
+                            <i class="fa-regular fa-eye text-xs"></i>
                         </a>
-
                         {% if not mov.data_retorno %}
-                        <a href="{% url 'registrar_retorno' mov.id %}" class="w-6 h-6 rounded bg-green-500 hover:bg-green-600 flex items-center justify-center 
-                                       text-white shadow-sm" title="Registrar retorno">
-                            <i class="fa-solid fa-flag-checkered text-[10px]"></i>
+                        <a href="{% url 'registrar_retorno' mov.id %}" 
+                           class="w-7 h-7 rounded-lg bg-green-500 hover:bg-green-600 
+                                  flex items-center justify-center text-white shadow-sm transition-all"
+                           title="Registrar retorno">
+                            <i class="fa-solid fa-flag-checkered text-xs"></i>
                         </a>
                         {% endif %}
                     </div>
@@ -343,25 +255,21 @@
 </div>
 
 {% else %}
-<!-- EMPTY STATE -->
-<div class="md:hidden text-center py-16">
-    <div class="w-20 h-20 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-        <i class="fa-solid fa-car text-2xl text-gray-400 dark:text-gray-600"></i>
+<!-- EMPTY STATE PROFISSIONAL -->
+<div class="text-center py-16 md:py-20">
+    <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 
+                flex items-center justify-center mb-4 shadow-inner">
+        <i class="fa-solid fa-truck-fast text-3xl text-gray-400 dark:text-gray-500"></i>
     </div>
-    <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">Nenhuma movimentação</h3>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Nenhum registro encontrado com os filtros atuais</p>
+    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Nenhuma movimentação</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+        Nenhum registro encontrado com os filtros atuais
+    </p>
     <button onclick="filtrarPorStatus('')"
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all">
-        Mostrar todas
+            class="mt-6 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium 
+                   transition-all shadow-sm hover:shadow-md">
+        <i class="fa-solid fa-rotate-left mr-2"></i>Limpar filtros
     </button>
-</div>
-
-<div class="hidden md:block text-center py-12">
-    <div class="w-12 h-12 mx-auto rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
-        <i class="fa-solid fa-car text-gray-400 dark:text-gray-600"></i>
-    </div>
-    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nenhuma movimentação</h3>
-    <p class="text-xs text-gray-500 dark:text-gray-400">Nenhum registro encontrado</p>
 </div>
 {% endif %}
 
@@ -371,15 +279,32 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-
-    /* Ajustes específicos para mobile */
-    @media (max-width: 768px) {
-        .mobile\:text-base {
-            font-size: 1rem !important;
-        }
-
-        .mobile\:p-4 {
-            padding: 1rem !important;
-        }
+    
+    /* Animação suave para cards */
+    .group {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Melhorias de acessibilidade */
+    button, a {
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    /* Efeito de hover nos cards de KM */
+    [class*="rounded-xl"]:hover {
+        transform: translateY(-1px);
+    }
+    
+    /* Ajustes para o modo dark nos botões de filtro (adicionar no seu arquivo de filtros) */
+    .dark .filter-button {
+        background-color: #1f2937 !important;
+        color: #e5e7eb !important;
+        border-color: #374151 !important;
+    }
+    
+    .dark .filter-button-active {
+        background-color: #3b82f6 !important;
+        color: white !important;
     }
 </style>
