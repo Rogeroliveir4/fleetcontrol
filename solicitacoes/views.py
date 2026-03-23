@@ -64,7 +64,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
         Sistema de Gestão de pátio
         """
 
-        # 🔹 HTML (usa seu template)
+        #  HTML (usa seu template)
         html_message = render_to_string(
             "contas/email_nova_solicitacao.html",
             {
@@ -82,7 +82,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
             to=[gestor.email],
         )
 
-        # 🔥 Aqui ativa o HTML
+        #  Aqui ativa o HTML
         email.attach_alternative(html_message, "text/html")
 
         email.send(fail_silently=True)
@@ -279,7 +279,7 @@ def cancelar_solicitacao(request, pk):
 
 
 
-# DASHBOARD GESTOR - LISTAGEM COM FILTROS COMPLETOS
+# DASHBOARD GESTOR - LISTAGEM COM FILTROS COMPLETOS (TELA DE APROVAÇÕES DO GESTOR)
 def gestor_solicitacoes(request):
     perfil = request.user.perfilusuario
     
@@ -304,9 +304,8 @@ def gestor_solicitacoes(request):
     # Guardar o queryset original para estatísticas
     solicitacoes_originais = solicitacoes
     
-    # -----------------------------
+
     # CONTAGEM PARA DASHBOARD (ESTATÍSTICAS) - usar o queryset original
-    # -----------------------------
     total_solicitacoes = solicitacoes_originais.count()
     pendentes_count = solicitacoes_originais.filter(status="PENDENTE").count()
     # Nota: No seu template você usa "APROVADA", mas no modelo é "AGUARDANDO_SAIDA_PORTARIA"
@@ -315,6 +314,8 @@ def gestor_solicitacoes(request):
     em_transito_count = solicitacoes_originais.filter(status="EM_TRANSITO").count()
     finalizadas_count = solicitacoes_originais.filter(status="FINALIZADA").count()
     reprovadas_count = solicitacoes_originais.filter(status="REPROVADA").count()
+    canceladas_count = solicitacoes_originais.filter(status="CANCELADA").count()
+    aguardando_saida_count = solicitacoes_originais.filter(status="AGUARDANDO_SAIDA_PORTARIA").count()
     
     # FILTROS COMPLETOS (aplicar no queryset)
     status = request.GET.get("status")
@@ -394,6 +395,8 @@ def gestor_solicitacoes(request):
         "em_transito_count": em_transito_count,
         "finalizadas_count": finalizadas_count,
         "reprovadas_count": reprovadas_count,
+        "canceladas_count": canceladas_count,
+        "aguardando_saida_count": aguardando_saida_count,
         
         # Para o template acessar choices
         "SolicitacaoVeiculo": SolicitacaoVeiculo,

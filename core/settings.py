@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['192.168.0.11', 'localhost', '127.0.0.1', '54.242.113.40']
+ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '54.242.113.40']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'veiculos',
     'contas',
     'contratos',
+    'financeiro',
     'solicitacoes.apps.SolicitacoesConfig',
     'channels',
     'solicitantes',
