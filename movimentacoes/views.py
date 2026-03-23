@@ -15,7 +15,59 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import MovimentacaoTerceiro
 from contratos.models import Contrato
+from django.utils.timezone import localtime
 
+
+
+# FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
+def aplicar_filtros_movimentacoes(request, queryset):
+    status = request.GET.get("status", "")
+    search = request.GET.get("search", "").strip()
+    inicio = request.GET.get("inicio")
+    fim = request.GET.get("fim")
+
+    perfil = getattr(request.user, "perfilusuario", None)
+
+    #  Restrição por contrato
+    if perfil and perfil.nivel == "gestor" and perfil.contrato:
+        queryset = queryset.filter(
+            solicitacao__contrato=perfil.contrato
+        )
+
+    # 🔍 SEARCH
+    if search:
+        if "-" in search and search.upper().startswith("VA"):
+            queryset = queryset.filter(veiculo__tag_interna__iexact=search)
+
+        elif "-" in search and len(search) >= 7:
+            queryset = queryset.filter(veiculo__placa__iexact=search)
+
+        elif search.isdigit():
+            queryset = queryset.filter(id=int(search))
+
+        else:
+            queryset = queryset.filter(
+                Q(veiculo__placa__icontains=search) |
+                Q(motorista__nome__icontains=search) |
+                Q(veiculo__modelo__icontains=search) |
+                Q(veiculo__marca__icontains=search) |
+                Q(veiculo__tag_interna__icontains=search)
+            )
+
+    #  STATUS
+    if status == "transito":
+        queryset = queryset.filter(data_retorno__isnull=True)
+    elif status == "finalizada":
+        queryset = queryset.filter(data_retorno__isnull=False)
+
+    #  DATA
+    if inicio:
+        queryset = queryset.filter(data_saida__date__gte=inicio)
+
+    if fim:
+        queryset = queryset.filter(data_saida__date__lte=fim)
+
+    return queryset
 
 
 # NOVA VIEW: Lista para portaria registrar retorno (movs em andamento)
@@ -64,9 +116,22 @@ def lista_movimentacoes(request):
 
     # APLICAR FILTROS
     if search:
-        movs = movs.filter(
-            Q(veiculo__placa__icontains=search) |
-            Q(motorista__nome__icontains=search)
+        search = search.strip()
+
+        if "-" in search and search.upper().startswith("VA"):
+            movs = movs.filter(veiculo__tag_interna__iexact=search)
+
+        elif "-" in search and len(search) >= 7:
+            movs = movs.filter(veiculo__placa__iexact=search)
+
+        elif search.isdigit():
+            movs = movs.filter(id=int(search))
+
+        else:
+            movs = movs.filter(
+                Q(veiculo__placa__icontains=search) |
+                Q(motorista__nome__icontains=search) |
+                Q(veiculo__tag_interna__icontains=search)
         )
 
     if status == "transito":
@@ -498,93 +563,27 @@ def registrar_retorno(request, pk):
 
 # EXPORTAÇÃO COM FILTROS
 def exportar_movimentacoes_excel(request):
-    # Query base
-    movs = Movimentacao.objects.select_related("veiculo", "motorista")
 
-    #  Filtro automático por contrato para gestores
-    if hasattr(request.user, "perfilusuario") and request.user.perfilusuario.nivel == "gestor":
-        movs = movs.filter(contrato=request.user.perfilusuario.contrato)
-    
-    # Obter filtros
-    status = request.GET.get("status", "")
-    search = request.GET.get("search", "").strip()
-    inicio = request.GET.get("inicio", "")
-    fim = request.GET.get("fim", "")
+    #   Query base com select_related para otimizar acesso a dados relacionados
+    movs = Movimentacao.objects.select_related("veiculo", "motorista", "solicitacao")
 
-    # Converter datas
-    if inicio:
-        try:
-            movs = movs.filter(data_saida__date__gte=inicio)
-        except:
-            pass
-        
-    # Converter datas        
-    if fim:
-        try:
-            movs = movs.filter(data_saida__date__lte=fim)
-        except:
-            pass
-    
-    # Aplicar filtros
-    if search:
+    #  AQUI É O PONTO PRINCIPAL
+    movs = aplicar_filtros_movimentacoes(request, movs)
 
-        search = search.strip()
-
-        # TAG do veículo (ex: VA-100)
-        if "-" in search and search.upper().startswith("VA"):
-            movs = movs.filter(veiculo__tag_interna__iexact=search)
-
-        # Placa exata
-        elif "-" in search and len(search) >= 7:
-            movs = movs.filter(veiculo__placa__iexact=search)
-
-        # ID da movimentação
-        elif search.isdigit():
-            movs = movs.filter(id=int(search))
-
-        # Busca geral
-        else:
-            movs = movs.filter(
-                Q(veiculo__placa__icontains=search) |
-                Q(motorista__nome__icontains=search) |
-                Q(veiculo__modelo__icontains=search) |
-                Q(veiculo__marca__icontains=search) |
-                Q(veiculo__tag_interna__icontains=search)
-            )
-    
-    if status == "transito":
-        movs = movs.filter(data_retorno__isnull=True)
-    elif status == "finalizada":
-        movs = movs.filter(data_retorno__isnull=False)
-    
-    if inicio:
-        movs = movs.filter(data_saida__date__gte=inicio)
-    if fim:
-        movs = movs.filter(data_saida__date__lte=fim)
-    
-    # Ordenação
     movs = movs.order_by("-data_saida")
-    
-    # Criar Excel
+
     wb = Workbook()
     ws = wb.active
     ws.title = "Movimentações"
-    
-    # Cabeçalhos
+
     headers = [
-        "ID", "Placa", "Tag Interna", "Motorista", "Destino",
-        "KM Saída", "KM Retorno", "KM Percorrida",
-        "Data Saída", "Data Retorno", "Status", "Observação"
+        "ID", "Placa", "Tag", "Motorista", "Destino",
+        "KM Saída", "KM Retorno", "KM Percorrido",
+        "Data Saída", "Data Retorno", "Status"
     ]
-    
+
     ws.append(headers)
-    
-    # Estilizar cabeçalhos
-    for cell in ws[1]:
-        cell.font = Font(bold=True)
-        cell.alignment = Alignment(horizontal="center")
-    
-    # Adicionar dados
+
     for mov in movs:
         ws.append([
             mov.id,
@@ -593,30 +592,19 @@ def exportar_movimentacoes_excel(request):
             mov.motorista.nome,
             mov.destino,
             mov.km_saida,
-            mov.km_retorno if mov.km_retorno else "-",
-            mov.distancia_percorrida if mov.distancia_percorrida else "-",
-            mov.data_saida.strftime("%d/%m/%Y %H:%M"),
-            mov.data_retorno.strftime("%d/%m/%Y %H:%M") if mov.data_retorno else "-",
+            mov.km_retorno or "-",
+            mov.distancia_percorrida or "-",
+            localtime(mov.data_saida).strftime("%d/%m/%Y %H:%M"),
+            localtime(mov.data_retorno).strftime("%d/%m/%Y %H:%M") if mov.data_retorno else "-",
             "Finalizada" if mov.data_retorno else "Em Trânsito",
-            mov.observacao or "-"
         ])
-    
-    # Auto-ajustar colunas
-    for col in ws.columns:
-        max_length = 0
-        column = col[0].column_letter
-        for cell in col:
-            if cell.value:
-                max_length = max(max_length, len(str(cell.value)))
-        ws.column_dimensions[column].width = min(max_length + 2, 50)
-    
-    # Configurar resposta
+
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
     response["Content-Disposition"] = 'attachment; filename="movimentacoes.xlsx"'
+
     wb.save(response)
-    
     return response
 
 
