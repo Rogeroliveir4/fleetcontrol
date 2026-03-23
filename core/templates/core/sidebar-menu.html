@@ -64,7 +64,7 @@
   <span class="menuText font-medium">Motoristas</span>
 </a>
 
-<!-- FROTA COM FINANCEIO (GESTOR) -->
+<!-- FROTA (GESTOR) - SEM FINANCEIRO -->
 <div class="relative frota-container">
   <button onclick="toggleFrotaSubmenu(this)"
     class="menu-item group flex w-full items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
@@ -74,7 +74,7 @@
   </button>
 
   <div class="frota-submenu ml-10 mt-1 space-y-1 hidden animate-fadeIn">
-    <!-- Visão Geral da Frota -->
+    <!-- Veículos -->
     <a href="/veiculos/" 
        class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
       <i class="fa-solid fa-car text-xs"></i>
@@ -88,40 +88,7 @@
       <span>Movimentações</span>
     </a>
     
-    <!-- Divisor Financeiro -->
-    <div class="relative my-2">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-300"></div>
-      </div>
-      <div class="relative flex justify-center">
-        <span class="bg-white dark:bg-gray-800 px-2 text-xs text-gray-500">Financeiro</span>
-      </div>
-    </div>
-    
-    <!-- Subitens do Financeiro -->
-    <a href="/financeiro/ipva/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-file-invoice text-xs"></i>
-      <span>IPVA</span>
-    </a>
-    
-    <a href="/financeiro/licenciamento/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-id-card text-xs"></i>
-      <span>Licenciamento</span>
-    </a>
-    
-    <a href="/financeiro/multas/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-exclamation-triangle text-xs"></i>
-      <span>Multas</span>
-    </a>
-    
-    <a href="/financeiro/manutencoes/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-wrench text-xs"></i>
-      <span>Manutenções</span>
-    </a>
+    <!-- NOTA: PARTE FINANCEIRO REMOVIDA PARA GESTOR -->
   </div>
 </div>
 
@@ -236,7 +203,7 @@
       <span>Movimentações</span>
     </a>
     
-    <!-- Divisor Financeiro -->
+    <!-- Divisor Financeiro (APENAS PARA ADM) -->
     <div class="relative my-2">
       <div class="absolute inset-0 flex items-center">
         <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
@@ -246,7 +213,7 @@
       </div>
     </div>
     
-    <!-- Subitens do Financeiro -->
+    <!-- Subitens do Financeiro (APENAS PARA ADM) -->
     <a href="/financeiro/dashboard/" 
        class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
       <i class="fa-solid fa-chart-line text-xs"></i>
@@ -276,19 +243,6 @@
       <i class="fa-solid fa-wrench text-xs"></i>
       <span>Manutenções</span>
     </a>
-    <!--
-    <a href="/financeiro/combustivel/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-gas-pump text-xs"></i>
-      <span>Combustível</span>
-    </a>
-    
-    <a href="/financeiro/seguros/" 
-       class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors">
-      <i class="fa-solid fa-shield-heart text-xs"></i>
-      <span>Seguros</span>
-    </a>
-  -->
   </div>
 </div>
 
@@ -397,10 +351,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const shouldOpen = localStorage.getItem('frotaMenuOpen') === 'true';
   const currentPath = window.location.pathname;
   
-  // Se estiver em uma página de veículos ou financeiro, abre o menu automaticamente
+  // Se estiver em uma página de veículos ou movimentações, abre o menu automaticamente
   if (currentPath.includes('/veiculos/') || 
-      currentPath.includes('/movimentacoes/') || 
-      currentPath.includes('/financeiro/')) {
+      currentPath.includes('/movimentacoes/')) {
     
     const frotaContainers = document.querySelectorAll('.frota-container');
     frotaContainers.forEach(container => {

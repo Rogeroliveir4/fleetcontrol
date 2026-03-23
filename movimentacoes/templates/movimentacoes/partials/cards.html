@@ -16,11 +16,15 @@
                   <div class="absolute -inset-0.5 bg-gradient-to-r 
                                 {% if mov.data_retorno %}
                       
+                      
                       from-green-600 to-emerald-600
+
 
                     {% else %}
                       
+                      
                       from-amber-500 to-orange-500
+
 
                     {% endif %} 
                                 rounded-lg blur opacity-30"></div>
@@ -76,31 +80,40 @@
             </div>
 
             <!-- KM RETORNO -->
-            <div class="text-center rounded-xl py-2.5 px-1 {% if mov.km_retorno %}
+            <div class="text-center rounded-xl py-2.5 px-1 
+                {% if mov.km_retorno and mov.km_retorno > 0 %}
                 
-                bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20
+                    bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20
 
               {% else %}
-                
-                bg-gray-50 dark:bg-gray-800/50
+                     
+                    bg-gray-50 dark:bg-gray-800/50
 
               {% endif %}">
-              <div class="text-xl font-black {% if mov.km_retorno %}
+              <div class="text-xl font-black 
+                    {% if mov.km_retorno and mov.km_retorno > 0 %}
                   
-                  text-green-600 dark:text-green-400
+                        text-green-600 dark:text-green-400
+
+                {% else %}
+                                  
+                        text-gray-400
+
+                {% endif %}">
+                {% if mov.km_retorno and mov.km_retorno > 0 %}
+                  {{ mov.km_retorno|intcomma }}
+                {% else %}
+                  ---
+                {% endif %}
+              </div>
+              <div class="text-[10px] font-semibold 
+                    {% if mov.km_retorno and mov.km_retorno > 0 %}
+                  
+                        text-green-600/70 dark:text-green-400/70
 
                 {% else %}
                   
-                  text-gray-400
-
-                {% endif %}">{{ mov.km_retorno|intcomma|default:'--' }}</div>
-              <div class="text-[10px] font-semibold {% if mov.km_retorno %}
-                  
-                  text-green-600/70 dark:text-green-400/70
-
-                {% else %}
-                  
-                  text-gray-500
+                        text-gray-500
 
                 {% endif %} mt-0.5">KM RETORNO</div>
             </div>
@@ -110,49 +123,63 @@
           <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
             <div class="flex items-center gap-2">
               <div class="relative">
-                <div class="w-2.5 h-2.5 rounded-full 
-                                    {% if mov.data_retorno %}
-                    
+                <div class="w-2 h-2 rounded-full 
+                {% if mov.data_retorno %}
                     bg-green-500
-
                   {% else %}
-                    
                     bg-amber-500 animate-pulse
+                 {% endif %}"></div>
 
-                  {% endif %}"></div>
                 {% if not mov.data_retorno %}
-                  <div class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
+                    <div class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
                 {% endif %}
               </div>
+
               <span class="text-xs font-semibold px-2.5 py-1 rounded-full
-                                {% if mov.data_retorno %}
-                  
-                  
-                                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-
-
-                {% else %}
-                  
-                  
-                                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
-
-
-                {% endif %}">
                 {% if mov.data_retorno %}
-                  <i class="fa-solid fa-check-circle mr-1 text-xs"></i>Finalizada
+                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
                 {% else %}
-                  <i class="fa-solid fa-play mr-1 text-xs"></i>Em Trânsito · {{ mov.data_saida|timesince }}
+                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
+                {% endif %}">
+
+                {% if mov.data_retorno %}
+                     <i class="fa-solid fa-check-circle mr-1 text-xs"></i>Finalizada
+                {% else %}
+                   {{ mov.data_saida|timesince }} 
                 {% endif %}
               </span>
             </div>
 
             <!-- AÇÕES -->
-            <div class="flex gap-2">
-              <a href="{% url 'movimentacao_detalhe' mov.id %}" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all" title="Ver detalhes"><i class="fa-regular fa-eye text-sm"></i></a>
-              {% if not mov.data_retorno %}
-                <a href="{% url 'registrar_retorno' mov.id %}" class="w-8 h-8 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 flex items-center justify-center text-white shadow-sm transition-all" title="Registrar retorno"><i class="fa-solid fa-flag-checkered text-sm"></i></a>
-              {% endif %}
-            </div>
+<!-- AÇÕES -->
+<div class="flex gap-2 mt-2">
+
+  <!-- DETALHES -->
+  <a href="{% url 'movimentacao_detalhe' mov.id %}"
+     class="flex items-center gap-1.5 px-3 h-10 rounded-lg 
+            bg-gray-100 dark:bg-gray-700 
+            hover:bg-gray-200 dark:hover:bg-gray-600 
+            text-gray-700 dark:text-gray-300 
+            text-xs font-medium transition-all">
+
+      <i class="fa-regular fa-eye text-sm"></i>
+      <span>Detalhes</span>
+  </a>
+
+  <!-- RETORNO -->
+  {% if not mov.data_retorno %}
+  <a href="{% url 'registrar_retorno' mov.id %}"
+     class="flex items-center gap-1.5 px-3 h-10 rounded-lg 
+            bg-gradient-to-r from-green-500 to-emerald-500 
+            hover:from-green-600 hover:to-emerald-600 
+            text-white text-xs font-semibold shadow-sm transition-all">
+
+      <i class="fa-solid fa-flag-checkered text-sm"></i>
+      <span>Retorno</span>
+  </a>
+  {% endif %}
+
+</div>
           </div>
         </div>
 
@@ -192,11 +219,15 @@
                   <div class="absolute -inset-0.5 bg-gradient-to-r 
                                 {% if mov.data_retorno %}
                       
+                      
                       from-green-600 to-emerald-600
+
 
                     {% else %}
                       
+                      
                       from-amber-500 to-orange-500
+
 
                     {% endif %} 
                                 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
@@ -227,42 +258,56 @@
               <span class="text-sm text-gray-900 dark:text-white font-medium truncate" title="{{ mov.destino }}">{{ mov.destino }}</span>
             </div>
 
-            <!-- KMS EM GRID -->
+            <!-- KMS EM GRID - DESKTOP (VERSÃO SIMPLES E FUNCIONAL) -->
             <div class="grid grid-cols-3 gap-2 mb-4">
+              <!-- KM SAÍDA -->
               <div class="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                <div class="text-base font-bold text-blue-600 dark:text-blue-400">{{ mov.km_saida|intcomma|default:'---' }}</div>
+                <div class="text-base font-bold text-blue-600 dark:text-blue-400">
+                  {% if mov.km_saida %}
+                    {{ mov.km_saida|intcomma }}
+                  {% else %}
+                    ---
+                  {% endif %}
+                </div>
                 <div class="text-[10px] text-blue-500/70">SAÍDA</div>
               </div>
+
+              <!-- KM PERCORRIDO -->
               <div class="text-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20">
-                <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">{{ mov.distancia_percorrida|intcomma|default:'---' }}</div>
+                <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">
+                  {% if mov.distancia_percorrida %}
+                    {{ mov.distancia_percorrida|intcomma }}
+                  {% else %}
+                    ---
+                  {% endif %}
+                </div>
                 <div class="text-[10px] text-emerald-500/70">KM PERCORRIDOS</div>
               </div>
-              <div class="text-center p-2 rounded-lg {% if mov.km_retorno %}
-                  
+
+              <!-- KM RETORNO -->
+              <div class="text-center p-2 rounded-lg 
+        {% if mov.km_retorno %}
                   bg-green-50 dark:bg-green-950/20
-
                 {% else %}
-                  
                   bg-gray-50 dark:bg-gray-800
-
                 {% endif %}">
-                <div class="text-base font-bold {% if mov.km_retorno %}
-                    
-                    text-green-600
-
+                <div class="text-base font-bold 
+            {% if mov.km_retorno %}
+                    text-green-600 dark:text-green-400
                   {% else %}
-                    
                     text-gray-400
-
-                  {% endif %}">{{ mov.km_retorno|intcomma|default:'--' }}</div>
-                <div class="text-[10px] {% if mov.km_retorno %}
-                    
-                    text-green-500/70
-
+                  {% endif %}">
+                  {% if mov.km_retorno %}
+                    {{ mov.km_retorno|intcomma }}
                   {% else %}
-                    
+                    ---
+                  {% endif %}
+                </div>
+                <div class="text-[10px] 
+            {% if mov.km_retorno %}
+                    text-green-500/70
+                  {% else %}
                     text-gray-500
-
                   {% endif %}">RETORNO</div>
               </div>
             </div>
@@ -270,27 +315,17 @@
             <!-- STATUS E AÇÕES -->
             <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
               <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full
-                                {% if mov.data_retorno %}
-                  
-                  
+                {% if mov.data_retorno %}
                                     bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-
-
                 {% else %}
-                  
-                  
-                                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
-
-
+                        bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
                 {% endif %}">
-                <i class="fa-solid {% if mov.data_retorno %}
-                    
+
+                <i class="fa-solid 
+                {% if mov.data_retorno %}                 
                     fa-check-circle
-
-                  {% else %}
-                    
+                {% else %}  
                     fa-clock
-
                   {% endif %} text-xs">
 
                 </i>
