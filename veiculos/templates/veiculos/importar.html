@@ -1,0 +1,498 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Importar Veículos{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+    
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex items-center gap-3 mb-2">
+            <a href="{% url 'lista_veiculos' %}" 
+               class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </a>
+            <i class="fa-solid fa-truck text-3xl text-[#00594C]"></i>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Importar Veículos</h1>
+        </div>
+        <p class="text-gray-600 dark:text-gray-400">
+            Importe veículos em massa a partir de uma planilha Excel.
+        </p>
+    </div>
+
+    <!-- Instruções -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-6">
+        <div class="flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-blue-600 text-lg"></i>
+            <div>
+                <h3 class="font-medium text-blue-800 dark:text-blue-300 text-sm">Instruções:</h3>
+                <ul class="text-xs text-blue-700 dark:text-blue-400 mt-1 space-y-1">
+                    <li>• <strong>Placa:</strong> Formatos aceitos: <code>ABC-1234</code> (padrão antigo) ou <code>ABC1D23</code> (Mercosul)</li>
+                    <li>• <strong>Renavam:</strong> Apenas números, 9 ou 11 dígitos</li>
+                    <li>• <strong>Tag Interna:</strong> Formato sugerido: <code>VA-100</code></li>
+                    <li>• Registros existentes serão atualizados (baseado na placa)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Baixar Modelo -->
+    <div class="mb-6">
+        <a href="{% url 'baixar_modelo_veiculos' %}" 
+           class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+            <i class="fa-solid fa-download"></i>
+            Baixar modelo de planilha
+        </a>
+    </div>
+
+    <!-- Formulário de Importação -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
+        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-cloud-upload-alt text-[#00594C]"></i>
+            Importar Planilha
+        </h2>
+        
+        <form method="post" enctype="multipart/form-data" id="form-importar">
+            {% csrf_token %}
+            
+            <!-- Contrato -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Contrato *
+                </label>
+                <select name="contrato" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="">Selecione um contrato</option>
+                    {% for contrato in contratos %}
+                    <option value="{{ contrato.id }}">{{ contrato.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Arquivo -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Arquivo Excel (.xlsx) *
+                </label>
+                <input type="file" name="arquivo" accept=".xlsx, .xls" required
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <p class="text-xs text-gray-500 mt-1">Formatos aceitos: .xlsx, .xls</p>
+            </div>
+            
+            <!-- Botões -->
+            <div class="flex gap-3 mt-6">
+                <button type="submit" 
+                        id="btn-importar"
+                        class="px-6 py-2 bg-[#00594C] hover:bg-[#004d41] text-white rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i>
+                    Importar
+                </button>
+                <a href="{% url 'lista_veiculos' %}" 
+                   class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Exibir erros da importação anterior -->
+    {% if request.session.importacao_erros %}
+    <div class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+        <div class="flex items-start gap-3">
+            <i class="fa-solid fa-circle-exclamation text-red-600 text-lg"></i>
+            <div class="flex-1">
+                <h3 class="font-medium text-red-800 dark:text-red-300 text-sm">
+                    ❌ Erros encontrados na planilha
+                </h3>
+                <p class="text-xs text-red-700 dark:text-red-400 mt-1">
+                    Foram encontrados problemas em {{ request.session.importacao_linhas_invalidas }} linha(s). 
+                    Nenhum dado foi importado. Corrija os erros e tente novamente.
+                </p>
+                
+                <div class="mt-3 max-h-96 overflow-y-auto">
+                    <table class="min-w-full text-xs">
+                        <thead class="bg-red-100 dark:bg-red-900/50 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-red-800 dark:text-red-300">Linha</th>
+                                <th class="px-3 py-2 text-left text-red-800 dark:text-red-300">Placa</th>
+                                <th class="px-3 py-2 text-left text-red-800 dark:text-red-300">Erros</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-red-200 dark:divide-red-800">
+                            {% for erro in request.session.importacao_erros %}
+                            <tr class="hover:bg-red-50 dark:hover:bg-red-900/30">
+                                <td class="px-3 py-2 text-red-700 dark:text-red-400 font-mono">#{{ erro.linha }}</td>
+                                <td class="px-3 py-2 text-red-700 dark:text-red-400 font-mono">{{ erro.placa }}</td>
+                                <td class="px-3 py-2 text-red-700 dark:text-red-400">
+                                    <ul class="list-disc list-inside">
+                                        {% for item in erro.erros %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- MODAL DE SUCESSO -->
+<!-- MODAL DE SUCESSO -->
+<div id="modalSucesso" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-modal-fadein">
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 p-5">
+            <div class="flex items-center justify-center">
+                <div class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fa-solid fa-check-circle text-white text-4xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 text-center">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">✅ Importação Concluída!</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6" id="mensagemSucesso"></p>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 text-center">
+                    <p class="text-3xl font-bold text-green-600" id="totalCriados">0</p>
+                    <p class="text-xs text-gray-500 mt-1">Veículos<br>Criados</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 text-center">
+                    <p class="text-3xl font-bold text-blue-600" id="totalAtualizados">0</p>
+                    <p class="text-xs text-gray-500 mt-1">Veículos<br>Atualizados</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 text-center">
+                    <p class="text-3xl font-bold text-gray-600" id="totalProcessados">0</p>
+                    <p class="text-xs text-gray-500 mt-1">Total<br>Processados</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="fecharModalEVoltar()" class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl transition-colors font-medium">
+                    <i class="fa-solid fa-arrow-left"></i> Continuar Importando
+                </button>
+                <button onclick="fecharModalEIrParaLista()" class="flex-1 px-4 py-3 bg-[#00594C] hover:bg-[#004d41] text-white rounded-xl transition-colors font-medium">
+                    <i class="fa-solid fa-list"></i> Ver Lista
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE ERRO (erro inesperado) -->
+<div id="modalErro" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-modal-fadein">
+        <div class="bg-gradient-to-r from-red-600 to-rose-600 p-5">
+            <div class="flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fa-solid fa-circle-exclamation text-white text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 text-center">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">❌ Erro na Importação</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6" id="mensagemErro"></p>
+            <div id="listaErros" class="mt-4 space-y-2 max-h-64 overflow-y-auto"></div>
+            <button onclick="fecharModalErro()" class="w-full mt-6 px-4 py-3 bg-[#00594C] hover:bg-[#004d41] text-white rounded-xl transition-colors font-medium">
+                <i class="fa-solid fa-check"></i> OK, Entendi
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE AVISO (erros na planilha com detalhes) -->
+<div id="modalAviso" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-modal-fadein">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-5">
+            <div class="flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-white text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">⚠️ Erros na Planilha</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4 text-center" id="mensagemAviso"></p>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm border-collapse">
+                    <thead class="bg-amber-100 dark:bg-amber-900/50 sticky top-0">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Linha</th>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Placa</th>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Erros</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaErros" class="divide-y divide-amber-200 dark:divide-amber-800">
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="fecharModalAviso()" class="w-full mt-6 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors font-medium">
+                <i class="fa-solid fa-check"></i> OK, Corrigir
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes modal-fadein {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    .animate-modal-fadein {
+        animation: modal-fadein 0.2s ease-out;
+    }
+</style>
+
+<!-- MODAL DE AVISO COM DETALHES (erros na planilha) -->
+<div id="modalAviso" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-modal-fadein">
+        <!-- Cabeçalho com ícone -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-5">
+            <div class="flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-white text-3xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">
+                ⚠️ Erros na Planilha
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4 text-center" id="mensagemAviso">
+                <!-- Mensagem resumo será inserida via JavaScript -->
+            </p>
+            
+            <!-- Tabela de erros detalhados -->
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-sm border-collapse">
+                    <thead class="bg-amber-100 dark:bg-amber-900/50 sticky top-0">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Linha</th>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Placa</th>
+                            <th class="px-3 py-2 text-left text-amber-800 dark:text-amber-300">Erros</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaErros" class="divide-y divide-amber-200 dark:divide-amber-800">
+                        <!-- Erros serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Botão -->
+            <button onclick="fecharModalAviso()" 
+                    class="w-full mt-6 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors font-medium">
+                <i class="fa-solid fa-check"></i> OK, Corrigir
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes modal-fadein {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .animate-modal-fadein {
+        animation: modal-fadein 0.2s ease-out;
+    }
+</style>
+
+<script>
+    // Variáveis para armazenar dados da importação
+    let dadosImportacao = null;
+    
+    // Função para mostrar modal de sucesso
+    function mostrarModalSucesso(criados, atualizados, total) {
+        document.getElementById('totalCriados').textContent = criados;
+        document.getElementById('totalAtualizados').textContent = atualizados;
+        document.getElementById('totalProcessados').textContent = total;
+        
+        let mensagem = '';
+        if (criados > 0 && atualizados > 0) {
+            mensagem = `${criados} veículo${criados !== 1 ? 's' : ''} foram criado${criados !== 1 ? 's' : ''} e ${atualizados} foram atualizado${atualizados !== 1 ? 's' : ''} com sucesso.`;
+        } else if (criados > 0) {
+            mensagem = `${criados} veículo${criados !== 1 ? 's' : ''} foram criado${criados !== 1 ? 's' : ''} com sucesso.`;
+        } else if (atualizados > 0) {
+            mensagem = `${atualizados} veículo${atualizados !== 1 ? 's' : ''} foram atualizado${atualizados !== 1 ? 's' : ''} com sucesso.`;
+        } else {
+            mensagem = 'Nenhum registro foi processado.';
+        }
+        document.getElementById('mensagemSucesso').textContent = mensagem;
+        
+        document.getElementById('modalSucesso').classList.remove('hidden');
+        document.getElementById('modalSucesso').style.display = 'flex';
+    }
+    
+    // Função para mostrar modal de erro (erro inesperado)
+    function mostrarModalErro(mensagem) {
+        document.getElementById('mensagemErro').textContent = mensagem;
+        document.getElementById('listaErros').innerHTML = '';
+        document.getElementById('modalErro').classList.remove('hidden');
+        document.getElementById('modalErro').style.display = 'flex';
+    }
+    
+    // Função para mostrar modal de aviso com detalhes dos erros da planilha
+    function mostrarModalAviso(mensagem, erros) {
+        document.getElementById('mensagemAviso').textContent = mensagem;
+        
+        const tbody = document.getElementById('tabelaErros');
+        if (tbody) {
+            tbody.innerHTML = '';
+            
+            if (erros && erros.length > 0) {
+                erros.forEach(erro => {
+                    const row = tbody.insertRow();
+                    
+                    const cellLinha = row.insertCell(0);
+                    cellLinha.className = 'px-3 py-2 text-amber-700 dark:text-amber-400 font-mono';
+                    cellLinha.textContent = `#${erro.linha}`;
+                    
+                    const cellPlaca = row.insertCell(1);
+                    cellPlaca.className = 'px-3 py-2 text-amber-700 dark:text-amber-400 font-mono';
+                    cellPlaca.textContent = erro.placa;
+                    
+                    const cellErros = row.insertCell(2);
+                    cellErros.className = 'px-3 py-2 text-amber-700 dark:text-amber-400';
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-disc list-inside text-xs';
+                    erro.erros.forEach(e => {
+                        const li = document.createElement('li');
+                        li.textContent = e;
+                        ul.appendChild(li);
+                    });
+                    cellErros.appendChild(ul);
+                });
+            } else {
+                const row = tbody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 3;
+                cell.className = 'px-3 py-6 text-center text-amber-700 dark:text-amber-400';
+                cell.textContent = 'Nenhum detalhe disponível.';
+            }
+        }
+        
+        document.getElementById('modalAviso').classList.remove('hidden');
+        document.getElementById('modalAviso').style.display = 'flex';
+    }
+    
+    // Fechar modal de sucesso e voltar para tela de importação
+    function fecharModalEVoltar() {
+        document.getElementById('modalSucesso').classList.add('hidden');
+        document.getElementById('modalSucesso').style.display = 'none';
+        window.location.href = "{% url 'importar_veiculos' %}";
+    }
+    
+    // Fechar modal de sucesso e ir para lista
+    function fecharModalEIrParaLista() {
+        window.location.href = "{% url 'lista_veiculos' %}";
+    }
+    
+    // Fechar modal de erro
+    function fecharModalErro() {
+        document.getElementById('modalErro').classList.add('hidden');
+        document.getElementById('modalErro').style.display = 'none';
+    }
+    
+    // Fechar modal de aviso e recarregar página
+    function fecharModalAviso() {
+        document.getElementById('modalAviso').classList.add('hidden');
+        document.getElementById('modalAviso').style.display = 'none';
+        window.location.reload();
+    }
+    
+    // Fechar modais ao clicar fora
+    document.getElementById('modalSucesso')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalEVoltar();
+        }
+    });
+    
+    document.getElementById('modalErro')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalErro();
+        }
+    });
+    
+    document.getElementById('modalAviso')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModalAviso();
+        }
+    });
+    
+    // Processar o formulário via AJAX
+    document.getElementById('form-importar')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btn-importar');
+        const formData = new FormData(this);
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('🔍 Dados recebidos:', data); // 👈 ADICIONE ESTE LOG
+            
+            if (data.success) {
+                mostrarModalSucesso(data.criados, data.atualizados, data.total);
+            } else {
+                // 👈 SEMPRE MOSTRAR MODAL DE AVISO QUANDO HOUVER ERROS NA PLANILHA
+                if (data.erros && data.erros.length > 0) {
+                    mostrarModalAviso(data.mensagem, data.erros);
+                } else if (data.mensagem && data.mensagem.includes('erro')) {
+                    // Tentar extrair o número de erros da mensagem
+                    const match = data.mensagem.match(/(\d+)\s*erro/);
+                    const totalErros = match ? match[1] : '?';
+                    mostrarModalAviso(data.mensagem, []);
+                } else {
+                    mostrarModalErro(data.mensagem || 'Erro na importação');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarModalErro('Erro ao processar a importação. Verifique o arquivo e tente novamente.');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Importar';
+        });
+    });
+    
+    // Se houver erros na sessão, mostrar modal de aviso com detalhes
+    {% if request.session.importacao_erros %}
+    document.addEventListener('DOMContentLoaded', function() {
+        const erros = {{ request.session.importacao_erros|safe }};
+        const totalErros = {{ request.session.importacao_linhas_invalidas }};
+        mostrarModalAviso(`Foram encontrados ${totalErros} erro(s) na planilha. Nenhum dado foi importado.`, erros);
+    });
+    {% endif %}
+</script>
+
+{% endblock %}

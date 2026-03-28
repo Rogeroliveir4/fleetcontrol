@@ -1,6 +1,41 @@
+# veiculos/models.py
+
+import re
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from contratos.models import Contrato
 from django.apps import apps
+
+
+# ========== FUNÇÃO DE VALIDAÇÃO DE PLACA (DEFINIR ANTES DA CLASSE) ==========
+def validar_placa_modelo(valor):
+    """
+    Validador personalizado para placas nos formatos:
+    - Antigo: ABC-1234
+    - Mercosul: ABC1D23 (3 letras, 1 número, 1 letra, 2 números)
+    """
+    if not valor:
+        return
+    
+    placa = valor.upper().strip()
+    placa_sem_hifen = placa.replace("-", "")
+    
+    # Formato antigo: ABC-1234
+    padrao_antigo = re.compile(r'^[A-Z]{3}-\d{4}$')
+    # Formato Mercosul: AAA1A11
+    padrao_mercosul = re.compile(r'^[A-Z]{3}\d[A-Z]\d{2}$')
+    
+    if padrao_antigo.match(placa):
+        return
+    elif padrao_mercosul.match(placa_sem_hifen):
+        return
+    else:
+        raise ValidationError(
+            f'Placa "{valor}" inválida. '
+            f'Use o formato ABC-1234 (padrão antigo) ou ABC1D23 (Mercosul)'
+        )
+
 
 class Veiculo(models.Model):
     TIPO_VEICULO_CHOICES = [
@@ -47,11 +82,33 @@ class Veiculo(models.Model):
         ("Outros", "Outros"),
     ]
 
+    # Origem dos dados
+    ORIGEM_CHOICES = [
+        ("MANUAL", "Cadastro Manual"),
+        ("PROTHEUS", "Importado do Protheus"),
+        ("IMPORTACAO", "Importação por Planilha"),
+    ]
+
     # ------------------------------------------------
     # DADOS PRINCIPAIS
     # ------------------------------------------------
-    placa = models.CharField(max_length=10, unique=True)
-    renavam = models.CharField(max_length=20, blank=True, null=True)
+    placa = models.CharField(
+        max_length=10, 
+        unique=True,
+        validators=[validar_placa_modelo]  # 👈 AGORA A FUNÇÃO EXISTE
+    )
+    renavam = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^\d+$',
+                message='Renavam deve conter apenas números'
+            )
+        ]
+    )
     marca = models.CharField(max_length=100)
     modelo = models.CharField(max_length=100)
     ano = models.IntegerField()
@@ -59,7 +116,7 @@ class Veiculo(models.Model):
 
     contrato = models.ForeignKey(Contrato, on_delete=models.SET_NULL, null=True, blank=True)
 
-    tag_interna = models.CharField(max_length=50, blank=True, null=True)
+    tag_interna = models.CharField(max_length=50, blank=True, null=True, unique=True)
     tag_cliente = models.CharField(max_length=50, blank=True, null=True)
 
     tipo = models.CharField(max_length=20, choices=TIPO_VEICULO_CHOICES)
@@ -88,13 +145,151 @@ class Veiculo(models.Model):
 
     observacoes = models.TextField(blank=True, null=True)
     ativo = models.BooleanField(default=True)
+    
+    # Origem dos dados
+    origem = models.CharField(
+        max_length=20,
+        choices=ORIGEM_CHOICES,
+        default='MANUAL',
+        blank=True,
+        null=True
+    )
+    
+    # Campos de auditoria
+    criado_em = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    atualizado_em = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['placa'], name='unique_veiculo_placa'),
+            models.UniqueConstraint(fields=['renavam'], name='unique_veiculo_renavam'),
+            models.UniqueConstraint(fields=['tag_interna'], name='unique_veiculo_tag_interna'),
+        ]
+        ordering = ['placa']
 
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
 
+    def clean(self):
+        """Validações antes de salvar"""
+        from datetime import date
+        
+        # Validar placa (já validada pelo validator, mas reforça)
+        if self.placa:
+            placa_limpa = self.placa.upper().strip()
+            placa_sem_hifen = placa_limpa.replace("-", "")
+            
+            padrao_antigo = re.compile(r'^[A-Z]{3}-\d{4}$')
+            padrao_mercosul = re.compile(r'^[A-Z]{3}\d[A-Z]\d{2}$')
+            
+            if not (padrao_antigo.match(placa_limpa) or padrao_mercosul.match(placa_sem_hifen)):
+                raise ValidationError({'placa': 'Placa inválida. Use formato ABC-1234 ou ABC1D23 (Mercosul)'})
+            
+            # Se for Mercosul, salvar sem hífen
+            if padrao_mercosul.match(placa_sem_hifen):
+                self.placa = placa_sem_hifen
+            else:
+                self.placa = placa_limpa
+        
+        # Validar renavam
+        if self.renavam:
+            renavam_limpo = ''.join(filter(str.isdigit, self.renavam))
+            if not renavam_limpo:
+                raise ValidationError({'renavam': 'Renavam deve conter apenas números'})
+            if len(renavam_limpo) not in [9, 11]:
+                raise ValidationError({'renavam': 'Renavam deve ter 9 ou 11 dígitos'})
+            self.renavam = renavam_limpo
+        
+        # Validar ano
+        ano_atual = date.today().year
+        if self.ano and (self.ano < 1900 or self.ano > ano_atual + 1):
+            raise ValidationError({'ano': f'Ano deve estar entre 1900 e {ano_atual + 1}'})
+        
+        # Validar km
+        if self.km_atual < 0:
+            raise ValidationError({'km_atual': 'KM não pode ser negativo'})
+
+    def save(self, *args, **kwargs):
+        """Salva o veículo com formatação automática"""
+        # Formatar placa
+        if self.placa:
+            placa_limpa = self.placa.upper().strip()
+            placa_sem_hifen = placa_limpa.replace("-", "")
+            
+            # Se for Mercosul, salva sem hífen
+            if re.match(r'^[A-Z]{3}\d[A-Z]\d{2}$', placa_sem_hifen):
+                self.placa = placa_sem_hifen
+            # Se for antigo com hífen, mantém
+            elif re.match(r'^[A-Z]{3}-\d{4}$', placa_limpa):
+                self.placa = placa_limpa
+            # Se for antigo sem hífen, formata com hífen
+            elif re.match(r'^[A-Z]{3}\d{4}$', placa_limpa):
+                self.placa = f"{placa_limpa[:3]}-{placa_limpa[3:]}"
+        
+        # Limpar renavam
+        if self.renavam:
+            self.renavam = ''.join(filter(str.isdigit, self.renavam))
+        
+        # Limpar tag interna
+        if self.tag_interna:
+            self.tag_interna = self.tag_interna.upper().strip().replace(" ", "")
+        
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     @property
+    def placa_formatada(self):
+        """Retorna placa formatada para exibição"""
+        if not self.placa:
+            return ""
+        
+        # Se for formato Mercosul (AAA1A11), exibe com hífen
+        if re.match(r'^[A-Z]{3}\d[A-Z]\d{2}$', self.placa):
+            return f"{self.placa[:3]}-{self.placa[3:]}"
+        return self.placa
+    
+    @property
+    def renavam_formatado(self):
+        """Retorna renavam formatado"""
+        if self.renavam and len(self.renavam) == 11:
+            return f"{self.renavam[:4]}.{self.renavam[4:8]}.{self.renavam[8:]}"
+        return self.renavam
+    
+    @property
+    def km_anterior_formatado(self):
+        """Retorna KM anterior formatado"""
+        return f"{self.km_anterior:,}".replace(",", ".")
+    
+    @property
+    def km_atual_formatado(self):
+        """Retorna KM atual formatado"""
+        return f"{self.km_atual:,}".replace(",", ".")
+    
+    @property
+    def status_display(self):
+        """Retorna status com ícone"""
+        status_icons = {
+            "Disponivel": "✅ Disponível",
+            "EmTransito": "🚚 Em Trânsito",
+            "Manutencao": "🔧 Manutenção",
+            "Reservado": "📅 Reservado",
+        }
+        return status_icons.get(self.status, self.status)
+    
+    @property
+    def status_color(self):
+        """Retorna cor do status"""
+        colors = {
+            "Disponivel": "green",
+            "EmTransito": "blue",
+            "Manutencao": "orange",
+            "Reservado": "purple",
+        }
+        return colors.get(self.status, "gray")
+    
+    @property
     def solicitacao_ativa(self):
+        """Retorna solicitação ativa do veículo"""
         SolicitacaoVeiculo = apps.get_model("solicitacoes", "SolicitacaoVeiculo")
         return SolicitacaoVeiculo.objects.filter(
             veiculo=self,
@@ -108,8 +303,6 @@ class Veiculo(models.Model):
         ).order_by("-id").first()
 
 
-
-
 class HistoricoKM(models.Model):
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, related_name='historico_km')
     km_anterior = models.PositiveIntegerField()
@@ -121,8 +314,13 @@ class HistoricoKM(models.Model):
         ('IMPORTACAO', 'Importação de Dados'),
     ])
 
+    class Meta:
+        ordering = ['-data_registro']
+
     def __str__(self):
         return f"{self.veiculo} - {self.km_anterior} → {self.km_novo}"
 
-
-
+    def clean(self):
+        """Validações do histórico KM"""
+        if self.km_novo < self.km_anterior:
+            raise ValidationError('KM novo não pode ser menor que KM anterior')

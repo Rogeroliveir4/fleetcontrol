@@ -23,6 +23,9 @@ urlpatterns = [
     path('portaria/saidas/exportar/', views.exportar_saidas_portaria_excel, name='exportar_saidas_portaria_excel'),
     # GESTOR / GERAL — exportar solicitações
     path('exportar/', views.exportar_excel_solicitacoes, name='exportar_excel_solicitacoes'),
+
+    # USUÁRIO — exportar minhas solicitações
+    path('minhas/exportar/', views.exportar_minhas_solicitacoes, name='exportar_minhas_solicitacoes'),
     
     path("visualizar/<int:pk>/", views.visualizar_solicitacao, name="visualizar_solicitacao"),
     path("<int:pk>/", views.solicitacao_detalhe, name="solicitacao_detalhe"),

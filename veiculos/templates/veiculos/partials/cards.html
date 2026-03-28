@@ -27,11 +27,11 @@
             {% elif veiculo.categoria == 'Passageiro' %}fa-car-side
             {% else %}fa-car{% endif %}
             text-2xl sm:text-2xl lg:text-2xl
-            text-white/90 dark:text-white/80
+            !text-white dark:text-white/80
             drop-shadow-sm">
         </i>
 
-        <!-- PLACA RESPONSIVA -->
+        <!-- TAG RESPONSIVA -->
         <div class="bg-black dark:bg-gray-900
                     px-3 sm:px-4 py-1.5 sm:py-2
                     rounded-lg 
@@ -42,34 +42,29 @@
             {{ veiculo.tag_interna }}
         </div>
 
-
-        <!-- STATUS BADGE -->
+                <!-- STATUS BADGE -->
         <div class="absolute right-3 sm:right-4 bottom-[-10px]">
             <span class="
                 px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full shadow-lg
                 border border-white/20
                 {% if not veiculo.ativo %}
                     bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700
-                {% elif veiculo.solicitacao_ativa and veiculo.ativo %}
-                    bg-purple-500 dark:bg-purple-600 text-white border-purple-600 dark:border-purple-700
                 {% elif veiculo.status == 'Disponivel' %}
                     bg-green-500 dark:bg-green-600 text-white border-green-600 dark:border-green-700
-                {% elif veiculo.status == 'Reservado' %}
-                    bg-yellow-500 dark:bg-yellow-600 text-gray-900 border-yellow-600 dark:border-yellow-700
                 {% elif veiculo.status == 'EmTransito' %}
-                    bg-blue-500 dark:bg-blue-600 text-white border-blue-600 dark:border-blue-700
-                {% elif veiculo.status == 'Manutencao' %}
                     bg-orange-500 dark:bg-orange-600 text-white border-orange-600 dark:border-orange-700
-                {% endif %}">
+                {% elif veiculo.status == 'Manutencao' %}
+                    bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700
+                {% elif veiculo.status == 'Reservado' %}
+                    bg-purple-500 dark:bg-purple-600 text-white border-purple-600 dark:border-purple-700
+                {% endif %}  ">            
             {% if not veiculo.ativo %}
                 Inativo
             {% elif veiculo.solicitacao_ativa and veiculo.ativo %}
                 {% with s=veiculo.solicitacao_ativa.status %}
                     {% if s == "PENDENTE" %}Aprovação
-                    {% elif s == "AGUARDANDO_CHECKLIST" %}Checklist
                     {% elif s == "AGUARDANDO_SAIDA_PORTARIA" %}Portaria
-                    {% elif s == "EM_TRANSITO" %}Trânsito
-                    {% elif s == "AGUARDANDO_CHECKLIST_RETORNO" %}Retorno
+                    {% elif s == "EM_TRANSITO" %}Em Trânsito
                     {% endif %}
                 {% endwith %}
             {% else %}

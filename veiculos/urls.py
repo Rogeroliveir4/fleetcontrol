@@ -22,4 +22,8 @@ urlpatterns = [
     # validação AJAX
     path('api/check-placa/', views.check_placa, name='check_placa'),
     path('api/check-tag-interna/', views.check_tag_interna, name='check_tag_interna'),
+
+    # Importação
+    path('importar/', views.importar_veiculos, name='importar_veiculos'),
+    path('modelo/', views.baixar_modelo_veiculos, name='baixar_modelo_veiculos'),
 ]

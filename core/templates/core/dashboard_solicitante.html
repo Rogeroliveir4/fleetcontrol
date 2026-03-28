@@ -32,99 +32,89 @@
         </div>
     </div>
 
-<!-- RESUMO GERAL COM ÍCONES - GRID RESPONSIVO -->
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-    <!-- Total -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                hover:shadow-md transition-shadow duration-200">
-        <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <div class="p-1.5 sm:p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg">
-                <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400 text-sm sm:text-base"></i>
+    <!-- RESUMO GERAL COM ÍCONES - 6 CARDS NO DESKTOP, 2 NO MOBILE -->
+    <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <!-- Total -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-[#00594C]/10 dark:bg-[#00594C]/20 rounded-lg">
+                    <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Total</span>
             </div>
-            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Total</span>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{{ total }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Solicitações</p>
         </div>
-        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{{ total }}</p>
-        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Solicitações</p>
+
+        <!-- Pendentes -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+                    <i class="fa-solid fa-clock text-yellow-600 dark:text-yellow-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Pendentes</span>
+            </div>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ pendentes }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Aguardando</p>
+        </div>
+
+        <!-- Aprovadas/Ativas -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                    <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Aprovadas</span>
+            </div>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400">{{ aprovadas }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Em andamento</p>
+        </div>
+
+        <!-- Finalizadas -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg">
+                    <i class="fa-solid fa-flag-checkered text-emerald-600 dark:text-emerald-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Finalizadas</span>
+            </div>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ finalizadas }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Concluídas</p>
+        </div>
+
+        <!-- Reprovadas -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                    <i class="fa-solid fa-times-circle text-red-600 dark:text-red-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Reprovadas</span>
+            </div>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-red-600 dark:text-red-400">{{ reprovadas }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Não aprovadas</p>
+        </div>
+
+        <!-- Canceladas -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
+                    hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-1 sm:mb-2">
+                <div class="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <i class="fa-solid fa-ban text-gray-600 dark:text-gray-400 text-sm sm:text-base"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Canceladas</span>
+            </div>
+            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600 dark:text-gray-400">{{ canceladas }}</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Canceladas</p>
+        </div>
     </div>
 
-    <!-- Pendentes -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                hover:shadow-md transition-shadow duration-200">
-        <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <div class="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-                <i class="fa-solid fa-clock text-yellow-600 dark:text-yellow-400 text-sm sm:text-base"></i>
-            </div>
-            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Pendentes</span>
-        </div>
-        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ pendentes }}</p>
-        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Aguardando</p>
-    </div>
-
-    <!-- Ativas -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                hover:shadow-md transition-shadow duration-200">
-        <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <div class="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400 text-sm sm:text-base"></i>
-            </div>
-            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Ativas</span>
-        </div>
-        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400">{{ aprovadas }}</p>
-        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Em andamento</p>
-    </div>
-
-    <!-- Reprovadas -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                hover:shadow-md transition-shadow duration-200">
-        <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <div class="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                <i class="fa-solid fa-times-circle text-red-600 dark:text-red-400 text-sm sm:text-base"></i>
-            </div>
-            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Reprovadas</span>
-        </div>
-        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-red-600 dark:text-red-400">{{ reprovadas }}</p>
-        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Não aprovadas</p>
-    </div>
-
-    <!-- Canceladas -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 dark:border-gray-700 
-                hover:shadow-md transition-shadow duration-200 col-span-2 sm:col-span-1">
-        <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <div class="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-900/20 rounded-lg">
-                <i class="fa-solid fa-ban text-gray-600 dark:text-gray-400 text-sm sm:text-base"></i>
-            </div>
-            <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Canceladas</span>
-        </div>
-        <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600 dark:text-gray-400">{{ canceladas }}</p>
-        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">Canceladas</p>
-    </div>
-</div>
-
-<!-- CSS para esconder scrollbar -->
-<style>
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-</style>
-
-<!-- JavaScript para navegação -->
-<script>
-function scrollCards(direction) {
-    const container = document.getElementById('cardsContainer');
-    const scrollAmount = 280; // Largura aproximada de um card
-    
-    if (direction === 'left') {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-}
-</script>
-    <!-- ESTATÍSTICAS TEMPORAIS 
+    <!-- ESTATÍSTICAS POR PERÍODO (OPCIONAL - DESCOMENTE SE QUISER) -->
+    <!--
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-5">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <i class="fa-solid fa-chart-bar text-[#00594C] dark:text-green-400"></i>
@@ -160,35 +150,35 @@ function scrollCards(direction) {
             </div>
         </div>
     </div>
--->
+    -->
 
-<!-- AÇÕES RÁPIDAS -->
-<div class="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 
-            rounded-xl p-4 sm:p-5 border border-gray-100 dark:border-gray-700">
-    <h3 class="font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-bolt text-yellow-500"></i>
-        Ações rápidas
-    </h3>
-    
-    <div class="flex flex-col sm:flex-row gap-3">
-        <a href="{% url 'minhas_solicitacoes' %}"
-           class="group inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl
-                  bg-[#00594C] hover:bg-[#004238] text-white font-semibold 
-                  text-sm sm:text-base transition-all hover:shadow-md">
-            <i class="fa-solid fa-list-check text-sm sm:text-base group-hover:animate-pulse"></i>
-            <span class="hidden sm:inline">Minhas Solicitações</span>
-            <span class="sm:hidden">Solicitações</span>
-        </a>
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 
+                rounded-xl p-4 sm:p-5 border border-gray-100 dark:border-gray-700">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-yellow-500"></i>
+            Ações rápidas
+        </h3>
         
-        <a href="{% url 'lista_veiculos' %}"
-           class="group inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl
-                  bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600
-                  text-white font-semibold text-sm sm:text-base transition-all hover:shadow-md">
-            <i class="fa-solid fa-plus text-sm sm:text-base group-hover:rotate-90 transition-transform"></i>
-            Nova Solicitação
-        </a>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a href="{% url 'minhas_solicitacoes' %}"
+               class="group inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl
+                      bg-[#00594C] hover:bg-[#004238] text-white font-semibold 
+                      text-sm sm:text-base transition-all hover:shadow-md">
+                <i class="fa-solid fa-list-check text-sm sm:text-base group-hover:animate-pulse"></i>
+                <span class="hidden sm:inline">Minhas Solicitações</span>
+                <span class="sm:hidden">Solicitações</span>
+            </a>
+            
+            <a href="{% url 'lista_veiculos' %}"
+               class="group inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl
+                      bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600
+                      text-white font-semibold text-sm sm:text-base transition-all hover:shadow-md">
+                <i class="fa-solid fa-plus text-sm sm:text-base group-hover:rotate-90 transition-transform"></i>
+                Nova Solicitação
+            </a>
+        </div>
     </div>
-</div>
 
     <!-- SOLICITAÇÕES RECENTES -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 
@@ -244,7 +234,7 @@ function scrollCards(direction) {
                                 <i class="fa-solid fa-clock mr-1.5 text-xs"></i>
                                 {{ s.get_status_display }}
                             </span>
-                            {% elif s.status == 'APROVADA' %}
+                            {% elif s.status == 'APROVADA' or s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                         bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                                 <i class="fa-solid fa-check mr-1.5 text-xs"></i>
@@ -252,38 +242,28 @@ function scrollCards(direction) {
                             </span>
                             {% elif s.status == 'FINALIZADA' %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                                        bg-green-100 dark:bg-green-700 text-gray-700 dark:text-gray-300">
+                                        bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300">
                                 <i class="fa-solid fa-flag-checkered mr-1.5 text-xs"></i>
                                 {{ s.get_status_display }}
                             </span>
-
                             {% elif s.status == 'CANCELADA' %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                         bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                                 <i class="fa-solid fa-ban mr-1.5 text-xs"></i>
                                 {{ s.get_status_display }}
                             </span>
-
                             {% elif s.status == 'EM_TRANSITO' %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                         bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
                                 <i class="fa-solid fa-truck mr-1.5 text-xs"></i>
                                 {{ s.get_status_display }}
                             </span>
-                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                                        bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
-                                <i class="fa-solid fa-truck mr-1.5 text-xs"></i>
-                                {{ s.get_status_display }}
-                            </span>
-
                             {% elif s.status == 'REPROVADA' %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                         bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
                                 <i class="fa-solid fa-times mr-1.5 text-xs"></i>
                                 {{ s.get_status_display }}
                             </span>
-                            
                             {% else %}
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                         bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
@@ -332,24 +312,27 @@ function scrollCards(direction) {
             </div>
         {% endif %}
     </div>
-
-    
 </div>
 
 <style>
 /* Animações suaves */
 .bg-white, .bg-gray-800 {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .bg-white:hover, .bg-gray-800:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsividade aprimorada */
+/* Ajustes para mobile */
 @media (max-width: 640px) {
     .grid-cols-2 {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .bg-white:hover, .bg-gray-800:hover {
+        transform: translateY(-1px);
     }
 }
 
@@ -365,22 +348,20 @@ function scrollCards(direction) {
         animation: none !important;
     }
 }
+
+/* Hover effect nos cards */
+.grid > div {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.grid > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Adiciona efeito de hover nos cards
-    const cards = document.querySelectorAll('.bg-white, .bg-gray-800');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-2px)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-        });
-    });
-    
     // Atualiza a hora no header
     function updateTime() {
         const now = new Date();
@@ -400,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializa e atualiza a cada hora
     updateTime();
-    setInterval(updateTime, 3600000); // Atualiza a cada hora
+    setInterval(updateTime, 3600000);
 });
 </script>
 {% endblock %}

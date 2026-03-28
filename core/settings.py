@@ -8,9 +8,15 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if not SECRET_KEY:
+    raise Exception("SECRET_KEY não definida!")
+
+if DEBUG:
+    print(" DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
+
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['172.16.0.60', 'localhost', '127.0.0.1', '54.242.113.40']
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['54.242.113.40', 'seu-dominio.com']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)

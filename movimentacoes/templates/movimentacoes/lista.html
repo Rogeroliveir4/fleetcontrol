@@ -103,15 +103,147 @@
     input[type="date"]::-webkit-datetime-edit-text {
         padding: 0 2px;
     }
+    
+    /* ESTILOS UNIFICADOS PARA BOTÕES DESKTOP - COM SUPORTE DARK MODE */
+    .filter-btn-desktop {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid transparent;
+    }
+    
+    /* Botão Em Trânsito - Inativo */
+    .filter-btn-transito-desktop {
+        background-color: #fffbeb;
+        color: #d97706;
+        border-color: #fed7aa;
+    }
+    
+    .filter-btn-transito-desktop:hover:not(.active) {
+        background-color: #ffedd5;
+        transform: translateY(-1px);
+    }
+    
+    /* Botão Finalizadas - Inativo */
+    .filter-btn-finalizada-desktop {
+        background-color: #ecfdf5;
+        color: #059669;
+        border-color: #a7f3d0;
+    }
+    
+    .filter-btn-finalizada-desktop:hover:not(.active) {
+        background-color: #d1fae5;
+        transform: translateY(-1px);
+    }
+    
+    /* Botão Todas - Inativo */
+    .filter-btn-todas-desktop {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border-color: #e5e7eb;
+    }
+    
+    .filter-btn-todas-desktop:hover:not(.active) {
+        background-color: #e5e7eb;
+        transform: translateY(-1px);
+    }
+    
+    /* ESTILOS ATIVOS */
+    .filter-btn-transito-desktop.active {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    .filter-btn-finalizada-desktop.active {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    .filter-btn-todas-desktop.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    /* DARK MODE - CORREÇÃO DEFINITIVA */
+    @media (prefers-color-scheme: dark) {
+        /* Botão Em Trânsito - Dark Inativo */
+        .filter-btn-transito-desktop:not(.active) {
+            background-color: #2c1a0a !important;
+            color: #fbbf24 !important;
+            border-color: #78350f !important;
+        }
+        
+        .filter-btn-transito-desktop:not(.active):hover {
+            background-color: #3b2a1a !important;
+        }
+        
+        /* Botão Finalizadas - Dark Inativo */
+        .filter-btn-finalizada-desktop:not(.active) {
+            background-color: #0a2f2a !important;
+            color: #34d399 !important;
+            border-color: #0a5c4a !important;
+        }
+        
+        .filter-btn-finalizada-desktop:not(.active):hover {
+            background-color: #1a4a3e !important;
+        }
+        
+        /* Botão Todas - Dark Inativo */
+        .filter-btn-todas-desktop:not(.active) {
+            background-color: #1f2937 !important;
+            color: #9ca3af !important;
+            border-color: #374151 !important;
+        }
+        
+        .filter-btn-todas-desktop:not(.active):hover {
+            background-color: #2d3a4a !important;
+        }
+        
+        /* Botões Ativos no Dark Mode - mantêm o gradiente */
+        .filter-btn-transito-desktop.active,
+        .filter-btn-finalizada-desktop.active,
+        .filter-btn-todas-desktop.active {
+            color: white !important;
+        }
+    }
+    
+    /* Classe utilitária para quando o tema dark é ativado via classe */
+    .dark .filter-btn-transito-desktop:not(.active) {
+        background-color: #2c1a0a !important;
+        color: #fbbf24 !important;
+        border-color: #78350f !important;
+    }
+    
+    .dark .filter-btn-finalizada-desktop:not(.active) {
+        background-color: #0a2f2a !important;
+        color: #34d399 !important;
+        border-color: #0a5c4a !important;
+    }
+    
+    .dark .filter-btn-todas-desktop:not(.active) {
+        background-color: #1f2937 !important;
+        color: #9ca3af !important;
+        border-color: #374151 !important;
+    }
 </style>
 
-    
 
-
-    <!-- =======================================================================
-        MOBILE
-    ======================================================================= -->
-    <div class="lg:hidden min-h-screen bg-white dark:bg-gray-900 mobile-safe-padding">
+<!-- =======================================================================
+    MOBILE
+======================================================================= -->
+<div class="lg:hidden min-h-screen bg-white dark:bg-gray-900 mobile-safe-padding">
     <!-- HEADER MOBILE -->
     <div class="pt-3 sm:pt-4 pb-2">
         <div class="bg-[#00594C] rounded-xl p-4 mb-3 shadow-sm">
@@ -120,73 +252,73 @@
         </div>
     </div>
 
-<!-- FILTROS HORIZONTAIS - Mobile com UI moderna -->
-<div class="mb-4">
-    <div class="flex gap-2">
-        <button onclick="filtrarPorStatus('transito')" data-status="transito" 
-                class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
-                       overflow-hidden active:scale-[0.97]
-                       {% if status == 'transito' %}
-                           bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25
-                       {% else %}
-                           bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
-                           border border-gray-200 dark:border-gray-700 
-                           hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
-                       {% endif %}">
-            <div class="flex items-center justify-center gap-2">
-                <i class="fa-solid fa-truck-fast text-sm {% if status == 'transito' %}text-white{% else %}text-amber-500 dark:text-amber-400{% endif %}"></i>
-                <span>Em Trânsito</span>
-                <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
-                            {% if status == 'transito' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
-                            text-xs font-bold px-1.5">
-                    {{ total_transito }}
-                </span>
-            </div>
-        </button>
-        
-        <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
-                class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
-                       overflow-hidden active:scale-[0.97]
-                       {% if status == 'finalizada' %}
-                           bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md shadow-emerald-500/25
-                       {% else %}
-                           bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
-                           border border-gray-200 dark:border-gray-700 
-                           hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
-                       {% endif %}">
-            <div class="flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check-circle text-sm {% if status == 'finalizada' %}text-white{% else %}text-emerald-500 dark:text-emerald-400{% endif %}"></i>
-                <span>Finalizadas</span>
-                <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
-                            {% if status == 'finalizada' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
-                            text-xs font-bold px-1.5">
-                    {{ total_finalizada }}
-                </span>
-            </div>
-        </button>
-        
-        <button onclick="filtrarPorStatus('')" data-status=""
-                class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
-                       overflow-hidden active:scale-[0.97]
-                       {% if status == '' %}
-                           bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25
-                       {% else %}
-                           bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
-                           border border-gray-200 dark:border-gray-700 
-                           hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
-                       {% endif %}">
-            <div class="flex items-center justify-center gap-2">
-                <i class="fa-solid fa-chart-simple text-sm {% if status == '' %}text-white{% else %}text-blue-500 dark:text-blue-400{% endif %}"></i>
-                <span>Todas</span>
-                <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
-                            {% if status == '' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
-                            text-xs font-bold px-1.5">
-                    {{ total_geral }}
-                </span>
-            </div>
-        </button>
+    <!-- FILTROS HORIZONTAIS - Mobile com UI moderna -->
+    <div class="mb-4">
+        <div class="flex gap-2">
+            <button onclick="filtrarPorStatus('transito')" data-status="transito" 
+                    class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
+                           overflow-hidden active:scale-[0.97]
+                           {% if status == 'transito' %}
+                               bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25
+                           {% else %}
+                               bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
+                               border border-gray-200 dark:border-gray-700 
+                               hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
+                           {% endif %}">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-truck-fast text-sm {% if status == 'transito' %}text-white{% else %}text-amber-500 dark:text-amber-400{% endif %}"></i>
+                    <span>Em Trânsito</span>
+                    <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
+                                {% if status == 'transito' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
+                                text-xs font-bold px-1.5">
+                        {{ total_transito }}
+                    </span>
+                </div>
+            </button>
+            
+            <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
+                    class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
+                           overflow-hidden active:scale-[0.97]
+                           {% if status == 'finalizada' %}
+                               bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md shadow-emerald-500/25
+                           {% else %}
+                               bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
+                               border border-gray-200 dark:border-gray-700 
+                               hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
+                           {% endif %}">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle text-sm {% if status == 'finalizada' %}text-white{% else %}text-emerald-500 dark:text-emerald-400{% endif %}"></i>
+                    <span>Finalizadas</span>
+                    <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
+                                {% if status == 'finalizada' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
+                                text-xs font-bold px-1.5">
+                        {{ total_finalizada }}
+                    </span>
+                </div>
+            </button>
+            
+            <button onclick="filtrarPorStatus('')" data-status=""
+                    class="relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold
+                           overflow-hidden active:scale-[0.97]
+                           {% if status == '' %}
+                               bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25
+                           {% else %}
+                               bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 
+                               border border-gray-200 dark:border-gray-700 
+                               hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300
+                           {% endif %}">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-chart-simple text-sm {% if status == '' %}text-white{% else %}text-blue-500 dark:text-blue-400{% endif %}"></i>
+                    <span>Todas</span>
+                    <span class="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full 
+                                {% if status == '' %}bg-white/20 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400{% endif %} 
+                                text-xs font-bold px-1.5">
+                        {{ total_geral }}
+                    </span>
+                </div>
+            </button>
+        </div>
     </div>
-</div>
 
     <!-- FORMULÁRIO MOBILE -->
     <div class="mb-4">
@@ -197,76 +329,70 @@
                 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
         </div>
 
-<div class="grid grid-cols-2 gap-2 mb-2">
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <!-- INÍCIO -->
+            <div class="relative">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
+                </div>
+                <input id="inicio-mobile" type="date" value="{{ inicio }}"
+                    class="mobile-form-input w-full pl-9 pr-8 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 
+                           bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                    style="min-height: 48px; font-size: 16px;">
+                <button type="button"
+                    onclick="limparData('inicio-mobile')"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm">
+                    ✕
+                </button>
+            </div>
 
-    <!-- INÍCIO -->
-    <div class="relative">
-        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
+            <!-- FIM -->
+            <div class="relative">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
+                </div>
+                <input id="fim-mobile" type="date" value="{{ fim }}"
+                    class="mobile-form-input w-full pl-9 pr-8 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 
+                           bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                    style="min-height: 48px; font-size: 16px;">
+                <button type="button"
+                    onclick="limparData('fim-mobile')"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm">
+                    ✕
+                </button>
+            </div>
         </div>
-
-        <input id="inicio-mobile" type="date" value="{{ inicio }}"
-            class="mobile-form-input w-full pl-9 pr-8 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 
-                   bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-            style="min-height: 48px; font-size: 16px;">
-
-        <!-- BOTÃO LIMPAR -->
-        <button type="button"
-            onclick="limparData('inicio-mobile')"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm">
-            ✕
-        </button>
-    </div>
-
-    <!-- FIM -->
-    <div class="relative">
-        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
-        </div>
-
-        <input id="fim-mobile" type="date" value="{{ fim }}"
-            class="mobile-form-input w-full pl-9 pr-8 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 
-                   bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-            style="min-height: 48px; font-size: 16px;">
-
-        <!-- BOTÃO LIMPAR -->
-        <button type="button"
-            onclick="limparData('fim-mobile')"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm">
-            ✕
-        </button>
-    </div>
-
-</div>
+        
         <button type="button" onclick="aplicarFiltro()"
         class="mobile-action-btn w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all
                active:scale-[0.98] active:opacity-90"
         style="color: #ffffff !important;">
-    Filtrar
-</button>
+            Filtrar
+        </button>
     </div>
 
     <!-- BOTÕES DE AÇÃO -->
-<div class="flex gap-2 mb-4">
-    {% if perfilusuario and perfilusuario.nivel == "gestor" %}
-   <a href="{% url 'criar_movimentacao' %}"
-   class="mobile-action-btn flex-1 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all
-          active:scale-[0.98] active:opacity-90 shadow-sm"
-   style="color: #ffffff !important;">
-    <i class="fa-solid fa-plus text-xs" style="color: #ffffff !important;"></i>
-    <span style="color: #ffffff !important;">Nova</span>
-</a>
-    {% endif %}    
-
+    <div class="flex gap-2 mb-4">
+        <!--
+        {% if perfilusuario and perfilusuario.nivel == "gestor" %}
+        <a href="{% url 'criar_movimentacao' %}"
+           class="mobile-action-btn flex-1 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all
+                  active:scale-[0.98] active:opacity-90 shadow-sm"
+           style="color: #ffffff !important;">
+            <i class="fa-solid fa-plus text-xs" style="color: #ffffff !important;"></i>
+            <span style="color: #ffffff !important;">Nova</span>
+        </a>
+        {% endif %}    
+        -->
         <a id="btn-exportar-mobile" href="{% url 'exportar_movimentacoes' %}?{{ request.GET.urlencode }}"
-        class="mobile-action-btn flex-1 bg-gray-600 hover:bg-gray-700 text-white rounded-lg 
-                flex items-center justify-center gap-1.5 font-medium transition-all
-                active:scale-[0.98] active:opacity-90 shadow-sm"
-        style="color: #ffffff !important;">
+           class="mobile-action-btn flex-1 bg-gray-600 hover:bg-gray-700 text-white rounded-lg 
+                   flex items-center justify-center gap-1.5 font-medium transition-all
+                   active:scale-[0.98] active:opacity-90 shadow-sm"
+           style="color: #ffffff !important;">
             <i class="fa-solid fa-download text-xs" style="color: #ffffff !important;"></i>
             <span style="color: #ffffff !important;">Exportar</span>
         </a>
-</div>
+    </div>
 
     <!-- RESULTADOS MOBILE -->
     <div id="resultados-mobile" class="mb-16 mobile-safe-bottom">
@@ -300,354 +426,96 @@ DESKTOP - APENAS O HEADER E FILTROS
                         <i class="fa-solid fa-file-export"></i>
                         Exportar Excel
                     </a>
-                    <!-- Botão de criar movimentação disponível apenas para gestores e Adms -->
-                    {% if perfilusuario and perfilusuario.nivel == "gestor" %}
-                        <a href="{% url 'criar_movimentacao' %}"
-                        class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 text-sm font-semibold
-                                transition-all hover:shadow-md">
-                            <i class="fa-solid fa-plus"></i>
-                            Nova Movimentação
-                        </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FILTROS DESKTOP -->
+    <!-- FILTROS DESKTOP - CORRIGIDO -->
     <div class="sticky top-[88px] z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 py-4 px-6">
-        
-<!-- FILTROS DESKTOP COM CORREÇÃO DEFINITIVA PARA DARK MODE -->
-<div class="sticky top-[88px] z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 py-4 px-6">
-    <div class="flex items-center gap-4 mb-4">
-        <div class="flex gap-2">
-            <!-- Botão Em Trânsito -->
-            <button onclick="filtrarPorStatus('transito')" data-status="transito"
-                    id="btn-transito-desktop"
-                    class="filter-btn filter-btn-transito {% if status == 'transito' %}active{% endif %}"
-                    style="padding: 10px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-                           {% if status == 'transito' %}
-                           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                           {% else %}
-                           background: #fffbeb; color: #d97706; border: 1px solid #fed7aa;
-                           {% endif %}">
-                <i class="fa-solid fa-truck-fast" style="font-size: 0.75rem;"></i>
-                Em Trânsito ({{ total_transito }})
-            </button>
-            
-            <!-- Botão Finalizadas -->
-            <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
-                    id="btn-finalizada-desktop"
-                    class="filter-btn filter-btn-finalizada {% if status == 'finalizada' %}active{% endif %}"
-                    style="padding: 10px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-                           {% if status == 'finalizada' %}
-                           background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                           {% else %}
-                           background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
-                           {% endif %}">
-                <i class="fa-solid fa-check-circle" style="font-size: 0.75rem;"></i>
-                Finalizadas ({{ total_finalizada }})
-            </button>
-            
-            <!-- Botão Todas -->
-            <button onclick="filtrarPorStatus('')" data-status=""
-                    id="btn-todas-desktop"
-                    class="filter-btn filter-btn-todas {% if status == '' %}active{% endif %}"
-                    style="padding: 10px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-                           {% if status == '' %}
-                           background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                           {% else %}
-                           background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;
-                           {% endif %}">
-                <i class="fa-solid fa-chart-simple" style="font-size: 0.75rem;"></i>
-                Todas ({{ total_geral }})
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Aplicar estilos dinâmicos para dark mode
-    function aplicarDarkModeButtons() {
-        const isDark = document.documentElement.classList.contains('dark') || 
-                       window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        const statusAtual = '{{ status }}';
-        
-        // Botão Em Trânsito
-        const btnTransito = document.getElementById('btn-transito-desktop');
-        if (btnTransito) {
-            if (statusAtual === 'transito') {
-                btnTransito.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-                btnTransito.style.color = '#ffffff';
-                btnTransito.style.border = 'none';
-            } else if (isDark) {
-                btnTransito.style.background = '#2c1a0a';
-                btnTransito.style.color = '#fbbf24';
-                btnTransito.style.border = '1px solid #78350f';
-            } else {
-                btnTransito.style.background = '#fffbeb';
-                btnTransito.style.color = '#d97706';
-                btnTransito.style.border = '1px solid #fed7aa';
-            }
-        }
-        
-        // Botão Finalizadas
-        const btnFinalizada = document.getElementById('btn-finalizada-desktop');
-        if (btnFinalizada) {
-            if (statusAtual === 'finalizada') {
-                btnFinalizada.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                btnFinalizada.style.color = '#ffffff';
-                btnFinalizada.style.border = 'none';
-            } else if (isDark) {
-                btnFinalizada.style.background = '#0a2f2a';
-                btnFinalizada.style.color = '#34d399';
-                btnFinalizada.style.border = '1px solid #0a5c4a';
-            } else {
-                btnFinalizada.style.background = '#ecfdf5';
-                btnFinalizada.style.color = '#059669';
-                btnFinalizada.style.border = '1px solid #a7f3d0';
-            }
-        }
-        
-        // Botão Todas
-        const btnTodas = document.getElementById('btn-todas-desktop');
-        if (btnTodas) {
-            if (statusAtual === '') {
-                btnTodas.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
-                btnTodas.style.color = '#ffffff';
-                btnTodas.style.border = 'none';
-            } else if (isDark) {
-                btnTodas.style.background = '#1f2937';
-                btnTodas.style.color = '#9ca3af';
-                btnTodas.style.border = '1px solid #374151';
-            } else {
-                btnTodas.style.background = '#f3f4f6';
-                btnTodas.style.color = '#4b5563';
-                btnTodas.style.border = '1px solid #e5e7eb';
-            }
-        }
-    }
-    
-    // Aplicar ao carregar
-    document.addEventListener('DOMContentLoaded', aplicarDarkModeButtons);
-    
-    // Observar mudanças no tema
-    const observer = new MutationObserver(aplicarDarkModeButtons);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    
-    // Observar mudanças na preferência do sistema
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', aplicarDarkModeButtons);
-</script>
-
-<style>
-    /* Estilos base para os botões no dark mode (fallback) */
-    @media (prefers-color-scheme: dark) {
-        .filter-btn-transito:not(.active) {
-            background-color: #2c1a0a !important;
-            color: #fbbf24 !important;
-            border-color: #78350f !important;
-        }
-        
-        .filter-btn-finalizada:not(.active) {
-            background-color: #0a2f2a !important;
-            color: #34d399 !important;
-            border-color: #0a5c4a !important;
-        }
-        
-        .filter-btn-todas:not(.active) {
-            background-color: #1f2937 !important;
-            color: #9ca3af !important;
-            border-color: #374151 !important;
-        }
-        
-        .filter-btn-transito.active,
-        .filter-btn-finalizada.active,
-        .filter-btn-todas.active {
-            color: #ffffff !important;
-        }
-    }
-</style>
-
-
-<style>
-    /* ESTILOS GLOBAIS PARA BOTÕES DE FILTRO */
-    
-    /* Botão Em Trânsito */
-    .filter-btn-transito {
-        background-color: #fffbeb;
-        color: #d97706;
-        border: 1px solid #fed7aa;
-    }
-    
-    .filter-btn-transito.active {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: none;
-    }
-    
-    /* Botão Finalizadas */
-    .filter-btn-finalizada {
-        background-color: #ecfdf5;
-        color: #059669;
-        border: 1px solid #a7f3d0;
-    }
-    
-    .filter-btn-finalizada.active {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: none;
-    }
-    
-    /* Botão Todas */
-    .filter-btn-todas {
-        background-color: #f3f4f6;
-        color: #4b5563;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .filter-btn-todas.active {
-        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: none;
-    }
-    
-    /* HOVER EFFECTS */
-    .filter-btn-transito:hover:not(.active) {
-        background-color: #ffedd5;
-        border-color: #fed7aa;
-        transform: translateY(-1px);
-    }
-    
-    .filter-btn-finalizada:hover:not(.active) {
-        background-color: #d1fae5;
-        border-color: #6ee7b7;
-        transform: translateY(-1px);
-    }
-    
-    .filter-btn-todas:hover:not(.active) {
-        background-color: #e5e7eb;
-        border-color: #d1d5db;
-        transform: translateY(-1px);
-    }
-    
-    /* DARK MODE - CORREÇÃO DEFINITIVA */
-    @media (prefers-color-scheme: dark) {
-        /* Botão Em Trânsito - Dark Mode */
-        .filter-btn-transito {
-            background-color: #2c1a0a !important;
-            color: #fbbf24 !important;
-            border-color: #78350f !important;
-        }
-        
-        .filter-btn-transito.active {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-            color: white !important;
-            border: none !important;
-        }
-        
-        .filter-btn-transito:hover:not(.active) {
-            background-color: #3b2a1a !important;
-            border-color: #92400e !important;
-        }
-        
-        /* Botão Finalizadas - Dark Mode */
-        .filter-btn-finalizada {
-            background-color: #0a2f2a !important;
-            color: #34d399 !important;
-            border-color: #0a5c4a !important;
-        }
-        
-        .filter-btn-finalizada.active {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            color: white !important;
-            border: none !important;
-        }
-        
-        .filter-btn-finalizada:hover:not(.active) {
-            background-color: #1a4a3e !important;
-            border-color: #0e6b54 !important;
-        }
-        
-        /* Botão Todas - Dark Mode */
-        .filter-btn-todas {
-            background-color: #1f2937 !important;
-            color: #9ca3af !important;
-            border-color: #374151 !important;
-        }
-        
-        .filter-btn-todas.active {
-            background: linear-gradient(135deg, #4b5563 0%, #374151 100%) !important;
-            color: white !important;
-            border: none !important;
-        }
-        
-        .filter-btn-todas:hover:not(.active) {
-            background-color: #2d3a4a !important;
-            border-color: #4b5563 !important;
-        }
-    }
-</style>
-<br>
-        <span class="text-gray-200 text-sm mb-1 block">Filtrar por status, data, motorista, placa ou destino</span>
-        <div class="flex items-center gap-4">
-            <div class="flex-1 max-w-lg">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input id="search-desktop" type="text" placeholder="Tag, motorista ou Placa..." value="{{ search }}"
-                           class="w-full h-10 pl-9 pr-3 rounded-lg border dark:border-gray-700 
-                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-4 flex-wrap">
+                <!-- BOTÕES DE STATUS -->
+                <div class="flex gap-2">
+                    <!-- Botão Em Trânsito -->
+                    <button onclick="filtrarPorStatus('transito')" data-status="transito"
+                            id="btn-transito-desktop"
+                            class="filter-btn-desktop filter-btn-transito-desktop transition-all duration-200 cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                                   {% if status == 'transito' %}active{% endif %}">
+                        <i class="fa-solid fa-truck-fast text-xs"></i>
+                        <span>Em Trânsito (<span class="total-transito">{{ total_transito }}</span>)</span>
+                    </button>
+                    
+                    <!-- Botão Finalizadas -->
+                    <button onclick="filtrarPorStatus('finalizada')" data-status="finalizada"
+                            id="btn-finalizada-desktop"
+                            class="filter-btn-desktop filter-btn-finalizada-desktop transition-all duration-200 cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                                   {% if status == 'finalizada' %}active{% endif %}">
+                        <i class="fa-solid fa-check-circle text-xs"></i>
+                        <span>Finalizadas (<span class="total-finalizada">{{ total_finalizada }}</span>)</span>
+                    </button>
+                    
+                    <!-- Botão Todas -->
+                    <button onclick="filtrarPorStatus('')" data-status=""
+                            id="btn-todas-desktop"
+                            class="filter-btn-desktop filter-btn-todas-desktop transition-all duration-200 cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                                   {% if status == '' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-simple text-xs"></i>
+                        <span>Todas (<span class="total-geral">{{ total_geral }}</span>)</span>
+                    </button>
+                </div>
+                
+                <!-- INPUTS DE BUSCA E DATA -->
+                <div class="flex items-center gap-3 flex-1 flex-wrap">
+                    <div class="flex-1 min-w-[200px]">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input id="search-desktop" type="text" placeholder="Tag, motorista ou Placa..." value="{{ search }}"
+                                   class="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
+                            </div>
+                            <input id="inicio-desktop" type="date" value="{{ inicio }}"
+                                   class="h-10 pl-9 pr-8 rounded-lg border border-gray-300 dark:border-gray-600 
+                                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                   style="cursor: pointer;">
+                            {% if inicio %}
+                            <button type="button" onclick="limparDataDesktop('inicio-desktop')"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="fa-solid fa-circle-xmark text-sm"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">até</span>
+                        <div class="relative">
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
+                            </div>
+                            <input id="fim-desktop" type="date" value="{{ fim }}"
+                                   class="h-10 pl-9 pr-8 rounded-lg border border-gray-300 dark:border-gray-600 
+                                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                                   style="cursor: pointer;">
+                            {% if fim %}
+                            <button type="button" onclick="limparDataDesktop('fim-desktop')"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="fa-solid fa-circle-xmark text-sm"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <button onclick="aplicarFiltro()"
+                            class="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm">
+                        Filtrar
+                    </button>
                 </div>
             </div>
-      <div class="flex items-center gap-2">
-    <div class="relative">
-        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
-        </div>
-        <input id="inicio-desktop" type="date" value="{{ inicio }}"
-               class="h-10 pl-9 pr-8 rounded-lg border dark:border-gray-700 
-                      bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-               style="cursor: pointer;"
-               onclick="this.showPicker ? this.showPicker() : null;">
-        {% if inicio %}
-        <button type="button" onclick="limparDataDesktop('inicio-desktop')"
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            <i class="fa-solid fa-circle-xmark text-sm"></i>
-        </button>
-        {% endif %}
-    </div>
-    <span class="text-gray-400">até</span>
-    <div class="relative">
-        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <i class="fa-regular fa-calendar text-gray-400 text-sm"></i>
-        </div>
-        <input id="fim-desktop" type="date" value="{{ fim }}"
-               class="h-10 pl-9 pr-8 rounded-lg border dark:border-gray-700 
-                      bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-               style="cursor: pointer;"
-               onclick="this.showPicker ? this.showPicker() : null;">
-        {% if fim %}
-        <button type="button" onclick="limparDataDesktop('fim-desktop')"
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            <i class="fa-solid fa-circle-xmark text-sm"></i>
-        </button>
-        {% endif %}
-    </div>
-</div>
-
-<script>
-    function limparDataDesktop(campoId) {
-        document.getElementById(campoId).value = '';
-        aplicarFiltro();
-    }
-</script>
-            <button onclick="aplicarFiltro()"
-                    class="h-10 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all">
-                Filtrar
-            </button>
         </div>
     </div>
 
@@ -665,81 +533,107 @@ DESKTOP - APENAS O HEADER E FILTROS
 </div>
 
 <script>
-
-    function limparData(id) {
-        const input = document.getElementById(id);
-        if (input) {
-            input.value = '';
-            aplicarFiltro(); // já reaplica sem data
-        }
+    // Variável global para armazenar o status atual
+    let currentStatus = '{{ status|default:"" }}';
+    
+    // CORREÇÃO: Garantir que status vazio seja tratado como string vazia
+    if (currentStatus === 'None' || currentStatus === null) {
+        currentStatus = '';
     }
-
-    // JavaScript otimizado para mobile
-    let timeoutId;
-    let currentStatus = "{{ status|default:'' }}";
-    let isApplyingFilter = false;
-
-    // Atualizar cores dos botões de status
-    function atualizarCoresStatus(novoStatus) {
-        currentStatus = novoStatus;
+    
+    // Função para atualizar as cores dos botões de status
+    function atualizarCoresStatus(status) {
         const isMobile = window.innerWidth < 1024;
-
+        
+        // Atualiza a variável global
+        currentStatus = status;
+        
+        // Para todos os botões com atributo data-status
         document.querySelectorAll('[data-status]').forEach(btn => {
             const btnStatus = btn.getAttribute('data-status');
             
-            // Remover classes de cor
-            btn.classList.remove(
-                // Mobile
-                'bg-blue-600', 'text-white', 'shadow-sm',
-                'bg-gray-100', 'bg-gray-800', 'text-gray-700', 'text-gray-300',
-                
-                // Desktop
-                'bg-amber-500', 'bg-emerald-500',
-                'bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300'
-            );
-
-            if (isMobile) {
-                // Mobile: azul para ativo, cinza para inativo
-                if (btnStatus === novoStatus) {
-                    btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-                } else {
-                    btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
-                }
-            } else {
-                // Desktop: cores diferentes por status
-                if (btnStatus === novoStatus) {
-                    switch(novoStatus) {
-                        case 'transito':
-                            btn.classList.add('bg-amber-500', 'text-white', 'shadow-sm');
-                            break;
-                        case 'finalizada':
-                            btn.classList.add('bg-emerald-500', 'text-white', 'shadow-sm');
-                            break;
-                        case '':
-                            btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-                            break;
+            if (btnStatus === status) {
+                // BOTÃO ATIVO - Aplica cores específicas por status
+                if (isMobile) {
+                    // Estilos para mobile
+                    btn.className = 'relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold overflow-hidden active:scale-[0.97]';
+                    
+                    if (status === 'transito') {
+                        btn.classList.add('bg-gradient-to-r', 'from-amber-500', 'to-orange-500', 'text-white', 'shadow-md', 'shadow-amber-500/25');
+                    } else if (status === 'finalizada') {
+                        btn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-green-500', 'text-white', 'shadow-md', 'shadow-emerald-500/25');
+                    } else {
+                        btn.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-md', 'shadow-blue-500/25');
                     }
                 } else {
-                    btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                    // Estilos para desktop - usando classes CSS
+                    btn.classList.add('active');
+                }
+            } else {
+                // BOTÃO INATIVO
+                if (isMobile) {
+                    btn.className = 'relative flex-1 rounded-xl py-3 transition-all duration-200 text-sm font-semibold overflow-hidden active:scale-[0.97] bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300';
+                } else {
+                    // Remove classe active para desktop
+                    btn.classList.remove('active');
                 }
             }
         });
     }
 
-    // Filtrar por status
+    // Função para filtrar por status
     function filtrarPorStatus(status) {
         if (isApplyingFilter) return;
         
+        // CORREÇÃO: Garantir que status vazio seja enviado corretamente
+        const params = new URLSearchParams(window.location.search);
+        
+        if (status === '') {
+            params.delete('status');
+        } else {
+            params.set('status', status);
+        }
+        
+        params.set('page', 1);
+        
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.pushState({}, '', newUrl);
+        
+        // Atualiza as cores dos botões
         atualizarCoresStatus(status);
+        
+        // Aplica o filtro
         aplicarFiltro();
     }
-
-    // Coletar dados dos filtros
+    
+    // Função para limpar data
+    function limparData(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = '';
+            aplicarFiltro();
+        }
+    }
+    
+    // Função para limpar data no desktop
+    function limparDataDesktop(campoId) {
+        document.getElementById(campoId).value = '';
+        aplicarFiltro();
+    }
+    
+    // Variáveis de controle
+    let timeoutId;
+    let isApplyingFilter = false;
+    
+    // Função para coletar dados dos filtros - CORRIGIDA
     function coletarDadosFiltro() {
         const isMobile = window.innerWidth < 1024;
-
+        
+        // CORREÇÃO: Usar currentStatus que já está atualizado
+        const statusValue = currentStatus === '' ? '' : currentStatus;
+        
         return {
-            status: currentStatus,
+            status: statusValue,
             search: isMobile
                 ? document.getElementById('search-mobile')?.value || ''
                 : document.getElementById('search-desktop')?.value || '',
@@ -751,29 +645,43 @@ DESKTOP - APENAS O HEADER E FILTROS
                 : document.getElementById('fim-desktop')?.value || ''
         };
     }
-
-    // Aplicar filtros com debounce
+    
+    // Função para aplicar filtros com debounce - CORRIGIDA
     function aplicarFiltro() {
         if (isApplyingFilter) return;
         isApplyingFilter = true;
-
+        
         const dados = coletarDadosFiltro();
         const params = new URLSearchParams();
-
-        for (const [key, value] of Object.entries(dados)) {
-            if (value) params.append(key, value);
+        
+        // CORREÇÃO: Só adiciona status se não for vazio
+        if (dados.status && dados.status !== '') {
+            params.append('status', dados.status);
         }
-
+        
+        if (dados.search && dados.search !== '') {
+            params.append('search', dados.search);
+        }
+        
+        if (dados.inicio && dados.inicio !== '') {
+            params.append('inicio', dados.inicio);
+        }
+        
+        if (dados.fim && dados.fim !== '') {
+            params.append('fim', dados.fim);
+        }
+        
         // Atualizar links de exportação
         document.querySelectorAll('[id^="btn-exportar-"]').forEach(btn => {
             btn.href = `/movimentacoes/exportar/?${params.toString()}`;
         });
-
+        
         // Debounce para evitar múltiplas requisições
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
             // Mostrar loading state
-            const resultadosContainer = window.innerWidth < 1024 
+            const isMobile = window.innerWidth < 1024;
+            const resultadosContainer = isMobile 
                 ? document.getElementById('resultados-mobile')
                 : document.getElementById('resultados-desktop');
             
@@ -787,8 +695,11 @@ DESKTOP - APENAS O HEADER E FILTROS
                     </div>
                 `;
             }
-
-            fetch(`/movimentacoes/filtrar/?${params.toString()}`, {
+            
+            // CORREÇÃO: Garantir que a URL está correta
+            const url = params.toString() ? `/movimentacoes/filtrar/?${params.toString()}` : '/movimentacoes/filtrar/';
+            
+            fetch(url, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
                 .then(response => response.json())
@@ -796,126 +707,106 @@ DESKTOP - APENAS O HEADER E FILTROS
                     if (data.html_cards) {
                         const isMobile = window.innerWidth < 1024;
                         if (isMobile) {
-                            document.getElementById('resultados-mobile').innerHTML = data.html_cards;
-                            if (data.paginacao_mobile) {
-                                document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
-                            }
+                            const resultadosMobile = document.getElementById('resultados-mobile');
+                            const paginacaoMobile = document.getElementById('paginacao-mobile');
+                            if (resultadosMobile) resultadosMobile.innerHTML = data.html_cards;
+                            if (paginacaoMobile && data.paginacao_mobile) paginacaoMobile.innerHTML = data.paginacao_mobile;
                         } else {
-                            document.getElementById('resultados-desktop').innerHTML = data.html_cards;
-                            if (data.paginacao_desktop) {
-                                document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
-                            }
-                        }
-
-                        if (data.status !== undefined) {
-                            atualizarCoresStatus(data.status);
+                            const resultadosDesktop = document.getElementById('resultados-desktop');
+                            const paginacaoDesktop = document.getElementById('paginacao-desktop');
+                            if (resultadosDesktop) resultadosDesktop.innerHTML = data.html_cards;
+                            if (paginacaoDesktop && data.paginacao_desktop) paginacaoDesktop.innerHTML = data.paginacao_desktop;
                         }
                     }
-                    window.history.pushState({}, '', `?${params.toString()}`);
+                    
+                    // CORREÇÃO: Atualizar URL sem status quando for vazio
+                    if (dados.status === '' || dados.status === null) {
+                        const pathUrl = window.location.pathname;
+                        window.history.pushState({}, '', pathUrl);
+                    } else if (params.toString()) {
+                        window.history.pushState({}, '', `?${params.toString()}`);
+                    } else {
+                        window.history.pushState({}, '', window.location.pathname);
+                    }
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.error('Erro ao aplicar filtro:', error);
                     // Fallback para recarregamento completo
-                    window.location.href = `?${params.toString()}`;
+                    const urlParams = params.toString() ? `?${params.toString()}` : '';
+                    window.location.href = window.location.pathname + urlParams;
                 })
                 .finally(() => {
                     isApplyingFilter = false;
                 });
         }, 350);
     }
-
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            aplicarFiltro();
-        }
-    });
+    
+    // Configurar eventos dos inputs de busca
+    function setupInputEvents(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        
+        let inputTimeout;
+        
+        input.addEventListener('input', (e) => {
+            clearTimeout(inputTimeout);
+            
+            // Força uppercase
+            let valor = e.target.value.toUpperCase();
+            e.target.value = valor;
+            valor = valor.trim();
+            
+            // Verifica se é TAG completa
+            const isTagCompleta = /^VA-\d{3,}$/.test(valor);
+            
+            if (isTagCompleta) {
+                aplicarFiltro();
+                return;
+            }
+            
+            // Para outros casos, aplica debounce
+            inputTimeout = setTimeout(aplicarFiltro, 600);
+        });
+    }
+    
     // Inicialização
     document.addEventListener('DOMContentLoaded', function () {
-        // Inicializar cores
+        // CORREÇÃO: Pegar status da URL corretamente
+        const urlParams = new URLSearchParams(window.location.search);
+        let statusFromUrl = urlParams.get('status');
+        
+        if (statusFromUrl === null) {
+            statusFromUrl = '{{ status|default:"" }}';
+        }
+        
+        // Atualizar currentStatus
+        currentStatus = statusFromUrl;
+        
+        // Inicializar cores dos botões
         atualizarCoresStatus(currentStatus);
-
-        const setupInputEvents = (inputId) => {
-            const input = document.getElementById(inputId);
-
-            if (input) {
-                let inputTimeout;
-
-                input.addEventListener('input', (e) => {
-                    clearTimeout(inputTimeout);
-
-                    //  força uppercase
-                    let valor = e.target.value.toUpperCase();
-                    e.target.value = valor;
-
-                    valor = valor.trim();
-
-                    //  TAG incompleta (VA ou VA- ou VA-1)
-                    const isTagIncompleta = /^VA-?$/.test(valor) || /^VA-\d{0,2}$/.test(valor);
-
-                    //  TAG completa
-                    const isTagCompleta = /^VA-\d{3,}$/.test(valor);
-
-                    //  placa
-                    const isPlaca = /^[A-Z]{3}-?\d{4}$/.test(valor);
-
-                    //  ID
-                    const isID = /^\d+$/.test(valor);
-
-                    //  NÃO FILTRAR se for TAG incompleta
-                    if (isTagIncompleta) {
-                        return;
-                    }
-
-                    //  TAG completa → imediato
-                    if (isTagCompleta) {
-                        aplicarFiltro();
-                        return;
-                    }
-
-                    //  placa ou ID → rápido
-                    if (isPlaca || isID) {
-                        inputTimeout = setTimeout(aplicarFiltro, 300);
-                        return;
-                    }
-
-                    // 🔍 busca normal
-                    inputTimeout = setTimeout(aplicarFiltro, 600);
-                });
-
-                   // input.addEventListener('change', () => {
-                    // evita disparo prematuro
-                    //if (!input.value) return;
-                    //});
-
-                   // input.addEventListener('blur', () => {
-                     //   aplicarFiltro();
-                    //});
-
-               // input.addEventListener('change', aplicarFiltro);
-            }
-        };
-
-        // Configurar todos os inputs
+        
+        // Configurar eventos dos inputs
         ['search-mobile', 'search-desktop', 'inicio-mobile', 'fim-mobile', 'inicio-desktop', 'fim-desktop']
             .forEach(setupInputEvents);
-
+        
         // Paginação via AJAX
         document.addEventListener('click', function (e) {
-            const link = e.target.closest('a[href*="page="]');
+            const link = e.target.closest('a[href*="page="], button.page-link');
             if (link) {
                 e.preventDefault();
-                
-                const url = new URL(link.href);
-                const page = url.searchParams.get('page');
+                const page = link.dataset.page || new URL(link.href).searchParams.get('page');
+
                 const dados = coletarDadosFiltro();
                 dados.page = page;
-
+                
                 const params = new URLSearchParams();
                 for (const [key, value] of Object.entries(dados)) {
-                    if (value) params.append(key, value);
+                    if (value && value !== '') params.append(key, value);
                 }
-
-                fetch(`/movimentacoes/filtrar/?${params.toString()}`, {
+                
+                const fetchUrl = params.toString() ? `/movimentacoes/filtrar/?${params.toString()}` : '/movimentacoes/filtrar/';
+                
+                fetch(fetchUrl, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                     .then(response => response.json())
@@ -923,34 +814,37 @@ DESKTOP - APENAS O HEADER E FILTROS
                         if (data.html_cards) {
                             const isMobile = window.innerWidth < 1024;
                             if (isMobile) {
-                                document.getElementById('resultados-mobile').innerHTML = data.html_cards;
-                                if (data.paginacao_mobile) {
-                                    document.getElementById('paginacao-mobile').innerHTML = data.paginacao_mobile;
-                                }
+                                const resultadosMobile = document.getElementById('resultados-mobile');
+                                const paginacaoMobile = document.getElementById('paginacao-mobile');
+                                if (resultadosMobile) resultadosMobile.innerHTML = data.html_cards;
+                                if (paginacaoMobile && data.paginacao_mobile) paginacaoMobile.innerHTML = data.paginacao_mobile;
                             } else {
-                                document.getElementById('resultados-desktop').innerHTML = data.html_cards;
-                                if (data.paginacao_desktop) {
-                                    document.getElementById('paginacao-desktop').innerHTML = data.paginacao_desktop;
-                                }
-                            }
-
-                            if (data.status !== undefined) {
-                                atualizarCoresStatus(data.status);
+                                const resultadosDesktop = document.getElementById('resultados-desktop');
+                                const paginacaoDesktop = document.getElementById('paginacao-desktop');
+                                if (resultadosDesktop) resultadosDesktop.innerHTML = data.html_cards;
+                                if (paginacaoDesktop && data.paginacao_desktop) paginacaoDesktop.innerHTML = data.paginacao_desktop;
                             }
                         }
-                        window.history.pushState({}, '', `?${params.toString()}`);
+                        
+                        const urlParams = new URLSearchParams();
+                        for (const [key, value] of Object.entries(dados)) {
+                            if (value && value !== '') urlParams.append(key, value);
+                        }
+                        const newUrl = urlParams.toString() ? `?${urlParams.toString()}` : window.location.pathname;
+                        window.history.pushState({}, '', newUrl);
                     });
             }
         });
-
+        
         // Lidar com botões voltar/avançar do navegador
         window.addEventListener('popstate', function () {
             const params = new URLSearchParams(window.location.search);
             const statusFromUrl = params.get('status') || '';
+            currentStatus = statusFromUrl;
             atualizarCoresStatus(statusFromUrl);
             aplicarFiltro();
         });
-
+        
         // Prevenir zoom em inputs no iOS
         document.addEventListener('focusin', function(e) {
             if (e.target.matches('input, select, textarea')) {
@@ -958,7 +852,7 @@ DESKTOP - APENAS O HEADER E FILTROS
             }
         });
     });
-
+    
     // Detectar resize e ajustar layout
     let resizeTimeout;
     window.addEventListener('resize', function() {

@@ -22,6 +22,7 @@ from django.utils.timezone import localtime
 # FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
 def aplicar_filtros_movimentacoes(request, queryset):
     status = request.GET.get("status", "")
+        
     search = request.GET.get("search", "").strip()
     inicio = request.GET.get("inicio")
     fim = request.GET.get("fim")
@@ -30,11 +31,12 @@ def aplicar_filtros_movimentacoes(request, queryset):
 
     #  Restrição por contrato
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
-        queryset = queryset.filter(
-            solicitacao__contrato=perfil.contrato
-        )
+            queryset = queryset.filter(
+                Q(contrato=perfil.contrato) |
+                Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
+            )
 
-    # 🔍 SEARCH
+    #  SEARCH
     if search:
         if "-" in search and search.upper().startswith("VA"):
             queryset = queryset.filter(veiculo__tag_interna__iexact=search)
@@ -85,7 +87,7 @@ def portaria_retorno_list(request):
 
 # LISTA DE MOVIMENTAÇÕES COM FILTROS E PAGINAÇÃO
 def lista_movimentacoes(request):
-    status = request.GET.get("status", "")
+    status = request.GET.get("status", "transito")
 
     try:
         limite = int(request.GET.get("limite", 10))
@@ -111,7 +113,8 @@ def lista_movimentacoes(request):
 
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
         movs = movs.filter(
-            solicitacao__contrato=perfil.contrato
+            Q(contrato=perfil.contrato) |
+            Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
         )
 
     # APLICAR FILTROS
@@ -154,7 +157,8 @@ def lista_movimentacoes(request):
 
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
         base_count = base_count.filter(
-            solicitacao__contrato=perfil.contrato
+            Q(contrato=perfil.contrato) |
+            Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
         )
 
     total_transito = base_count.filter(data_retorno__isnull=True).count()
@@ -189,10 +193,7 @@ def filtrar_movimentacoes(request):
     fim = request.GET.get("fim", "")  # Voltar para "fim"
     page = request.GET.get("page", 1)
 
-    if request.user.perfilusuario.nivel == "gestor":
-        movs = movs.filter(contrato=request.user.perfilusuario.contrato)
 
-    
     # Limite de itens por página
     try:
         limite = int(request.GET.get("limite", 12))
@@ -204,14 +205,15 @@ def filtrar_movimentacoes(request):
     # Query base
     movs = Movimentacao.objects.select_related("veiculo", "motorista").order_by("-data_saida")
 
-    #  Restringir gestor ao próprio contrato
-    if hasattr(request.user, "perfilusuario") and request.user.perfilusuario.nivel == "gestor":
-        movs = movs.filter(contrato=request.user.perfilusuario.contrato)
-
+    #  FILTRO CORRETO DE CONTRATO
+    perfil = getattr(request.user, "perfilusuario", None)
     
-    #  Filtro automático por contrato para gestores
-    if hasattr(request.user, "perfilusuario") and request.user.perfilusuario.nivel == "gestor":
-        movs = movs.filter(contrato=request.user.perfilusuario.contrato)
+    # se for gestor, filtrar por contrato (tanto no campo direto quanto na solicitação relacionada)
+    if perfil and perfil.nivel == "gestor" and perfil.contrato:
+        movs = movs.filter(
+            Q(contrato=perfil.contrato) |
+            Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
+    )
     
     # Aplicar filtros
     if search:
@@ -460,6 +462,7 @@ def movimentacao_detalhe(request, pk):
 
 
 # REGISTRAR RETORNO (PORTARIA)
+
 @login_required
 def registrar_retorno(request, pk):
     mov = get_object_or_404(Movimentacao, pk=pk)
@@ -500,11 +503,9 @@ def registrar_retorno(request, pk):
         # ATUALIZAR MOVIMENTAÇÃO
         observacao = request.POST.get("observacao", "")
         
-        # 🔹 SALVAR OBSERVAÇÕES ESPECÍFICAS DO RETORNO
         if perfil and perfil.nivel == "portaria":
-            mov.observacao_portaria_retorno = observacao  # NOVO CAMPO
+            mov.observacao_portaria_retorno = observacao
         else:
-            # Para outros perfis, salva nas observações gerais
             if observacao:
                 mov.observacao = (mov.observacao or "") + f"\n[Retorno] {observacao}"
         
@@ -514,20 +515,17 @@ def registrar_retorno(request, pk):
         mov.status = "finalizado"
         
 
-        # PORTEIRO + FOTOS (RETORNO) - CORRIGIDO
+        # PORTEIRO + FOTOS (RETORNO)
         if perfil and perfil.nivel == "portaria":
             mov.porteiro_retorno = request.user
             mov.porteiro_retorno_nome = (
                 request.user.get_full_name() or request.user.username
             )
             
-            # Fotos padrão do retorno
             mov.foto_retorno_geral = request.FILES.get("foto_retorno_geral")
             mov.foto_retorno_painel = request.FILES.get("foto_retorno_painel")
             mov.foto_retorno_avaria = request.FILES.get("foto_retorno_avaria")
             mov.foto_retorno_equipamento = request.FILES.get("foto_retorno_equipamento")
-            
-            # Fotos específicas do retorno
             mov.foto_retorno_cacamba = request.FILES.get("foto_retorno_cacamba")
             mov.foto_retorno_prancha = request.FILES.get("foto_retorno_prancha")
             mov.foto_retorno_porta_malas = request.FILES.get("foto_retorno_porta_malas")
@@ -543,11 +541,13 @@ def registrar_retorno(request, pk):
             mov.solicitacao.save()
         
 
-        # VEÍCULO
-        veiculo = mov.veiculo
-        veiculo.status = "Disponivel"
-        veiculo.km_atual = km_retorno_valor
-        veiculo.save()
+        # 👈 VEÍCULO - ATUALIZAR SEM VALIDAÇÕES (USANDO QUERY DIRETA)
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE veiculos_veiculo SET status = %s, km_atual = %s WHERE id = %s",
+                ["Disponivel", km_retorno_valor, mov.veiculo.id]
+            )
         
         # REDIRECT FINAL
         messages.success(request, "Retorno registrado com sucesso!")
@@ -685,6 +685,18 @@ def checklist_saida_motorista(request, solicitacao_id):
 def portaria_registrar_saida(request, solicitacao_id):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
 
+
+    contrato = None
+
+    if solicitacao and solicitacao.contrato:
+        contrato = solicitacao.contrato
+
+    elif solicitacao.veiculo and solicitacao.veiculo.contrato:
+        contrato = solicitacao.veiculo.contrato
+
+    elif request.user.perfilusuario.contrato:
+        contrato = request.user.perfilusuario.contrato
+
     # Se movimentação ainda não existe, criar
     mov, created = Movimentacao.objects.get_or_create(
         solicitacao=solicitacao,
@@ -694,15 +706,27 @@ def portaria_registrar_saida(request, solicitacao_id):
             "destino": solicitacao.destino,
             "status": "aguardando_saida_portaria",
             "origem": solicitacao.origem,
+            "contrato": contrato,
         }
     )
 
+    #  Garantir que a movimentação tenha o contrato definido (caso criada pela primeira vez sem contrato)
+    if not mov.contrato:
+        mov.contrato = contrato
+        mov.save(update_fields=["contrato"])
+
+    # Garantir que a movimentação tenha o contrato definido (caso criada manualmente sem solicitação)
+    if not mov.contrato:
+        mov.contrato = contrato
+        mov.save()
+
+    # Verificar se a movimentação já está em andamento
     if request.method == "POST":
         mov.km_saida = mov.veiculo.km_atual
         mov.data_saida = timezone.now()
         mov.status = "em_andamento"
         
-        # 🔹 IMPORTANTE: Salvar observações da portaria
+        #  IMPORTANTE: Salvar observações da portaria
         mov.observacao_portaria = request.POST.get("observacao_portaria", "")
         
         # Outras observações (para compatibilidade)

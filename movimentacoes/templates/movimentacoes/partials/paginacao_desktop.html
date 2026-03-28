@@ -15,9 +15,10 @@
         
         <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+
                 {% if movimentacoes.has_previous %}
-                <a href="?page={{ movimentacoes.previous_page_number }}"
-                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="?status={{ status }}&search={{ search }}&inicio={{ inicio }}&fim={{ fim }}&page={{ movimentacoes.previous_page_number }}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <span class="sr-only">Anterior</span>
                     <i class="fa-solid fa-chevron-left"></i>
                 </a>
@@ -29,29 +30,30 @@
                         {{ num }}
                     </span>
                     {% elif num > movimentacoes.number|add:'-3' and num < movimentacoes.number|add:'3' %}
-                    <a href="?page={{ num }}"
-                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <a href="?status={{ status }}&search={{ search }}&inicio={{ inicio }}&fim={{ fim }}&page={{ num }}"
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                         {{ num }}
                     </a>
                     {% endif %}
                 {% endfor %}
                 
                 {% if movimentacoes.has_next %}
-                <a href="?page={{ movimentacoes.next_page_number }}"
-                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="?status={{ status }}&search={{ search }}&inicio={{ inicio }}&fim={{ fim }}&page={{ movimentacoes.next_page_number }}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <span class="sr-only">Próximo</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
                 {% endif %}
+
             </nav>
         </div>
     </div>
     
-    <!-- Versão mobile da paginação (para telas pequenas em desktop) -->
+    <!-- Versão mobile da paginação (fallback) -->
     <div class="flex-1 flex justify-between sm:hidden">
         {% if movimentacoes.has_previous %}
-        <a href="?page={{ movimentacoes.previous_page_number }}"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+        <a href="?status={{ status }}&search={{ search }}&inicio={{ inicio }}&fim={{ fim }}&page={{ movimentacoes.previous_page_number }}"
+           class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
             Anterior
         </a>
         {% else %}
@@ -61,8 +63,8 @@
         {% endif %}
         
         {% if movimentacoes.has_next %}
-        <a href="?page={{ movimentacoes.next_page_number }}"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+        <a href="?status={{ status }}&search={{ search }}&inicio={{ inicio }}&fim={{ fim }}&page={{ movimentacoes.next_page_number }}"
+           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
             Próximo
         </a>
         {% else %}

@@ -39,6 +39,68 @@
   .input-container:hover {
     transform: translateY(-2px);
   }
+  
+  /* Melhorias para dark mode */
+  .dark .form-section {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-left-color: #0a7c6c;
+  }
+  
+  .dark input, .dark select {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+  
+  .dark input:focus, .dark select:focus {
+    border-color: #0a7c6c;
+    ring-color: #0a7c6c;
+  }
+  
+  .dark input::placeholder {
+    color: #6b7280;
+  }
+  
+  .dark .bg-gray-50 {
+    background-color: #111827;
+  }
+  
+  /* Tooltip para dark mode */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #1f2937;
+    color: #f3f4f6;
+    text-align: center;
+    border-radius: 8px;
+    padding: 6px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 11px;
+    border: 1px solid #374151;
+  }
+  
+  .tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  /* Dark mode tooltip */
+  .dark .tooltip .tooltip-text {
+    background-color: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-6">
@@ -52,7 +114,7 @@
             <i class="fa-solid fa-id-card text-white text-xl"></i>
           </div>
           <div>
-            <h1 class="text-white text-center text-2xl font-bold dark:text-white tracking-tight">
+            <h1 class="text-white text-center text-2xl font-bold tracking-tight">
               {% if motorista %}✏️ Editar Motorista{% else %}👤 Novo Motorista{% endif %}
             </h1>
             <p class="text-sm text-green-100 text-center opacity-90 mt-1">
@@ -64,9 +126,9 @@
     </div>
 
     <!-- FORMULÁRIO -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-0 overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       <!-- HEADER DO CARD -->
-      <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900">
+      <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/50">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-file-lines text-[#00594C] dark:text-[#0a7c6c]"></i>
           <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -80,10 +142,43 @@
         
         <!-- GRID RESPONSIVO -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+<!-- MATRICULA -->
+<div class="input-container">
+  <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
+    <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+      <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+        <i class="fa-solid fa-id-card text-amber-600 dark:text-amber-400"></i>
+      </div>
+      <span>Matrícula *</span>
+      <div class="tooltip">
+        <i class="fa-regular fa-circle-question text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help"></i>
+        <span class="tooltip-text">Número de matrícula do funcionário. Apenas números.</span>
+      </div>
+    </label>
+    <input 
+      name="matricula" 
+      type="text"
+      required 
+      value="{{ motorista.matricula|default:'' }}" 
+      placeholder="Ex: 007515"
+      oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+      class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+             rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+             focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+             transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500
+             font-mono"
+    >
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+      <i class="fa-solid fa-info-circle"></i>
+      Apenas números. Ex: 007515
+    </p>
+  </div>
+</div>
           
           <!-- NOME -->
           <div class="input-container">
-            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
               <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                 <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                   <i class="fa-solid fa-user text-blue-600 dark:text-blue-400"></i>
@@ -105,7 +200,7 @@
 
           <!-- CPF -->
           <div class="input-container">
-            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
               <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                 <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
                   <i class="fa-solid fa-id-card text-amber-600 dark:text-amber-400"></i>
@@ -127,7 +222,7 @@
 
           <!-- TELEFONE -->
           <div class="input-container">
-            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
               <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                 <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                   <i class="fa-solid fa-phone text-green-600 dark:text-green-400"></i>
@@ -149,7 +244,7 @@
 
           <!-- CNH NÚMERO -->
           <div class="input-container">
-            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
               <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                 <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                   <i class="fa-solid fa-id-badge text-purple-600 dark:text-purple-400"></i>
@@ -171,7 +266,7 @@
 
           <!-- CNH CATEGORIA -->
           <div class="input-container">
-            <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
               <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                 <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                   <i class="fa-solid fa-layer-group text-blue-500 dark:text-blue-400"></i>
@@ -199,41 +294,38 @@
             </div>
           </div>
 
-
-      <!-- CNH VENCIMENTO -->
-        <div class="input-container">
-          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
-            <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
-              <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                <i class="fa-solid fa-calendar-xmark text-red-600 dark:text-red-400"></i>
-              </div>
-              <span>Vencimento da CNH *</span>
-            </label>
-            <input 
-              type="date" 
-              name="cnh_vencimento" 
-              required 
-              value="{{ motorista.cnh_vencimento|date:'Y-m-d' }}"
-              min="1900-01-01"
-              max="9999-12-31"
-              pattern="\d{4}-\d{2}-\d{2}"
-              oninput="validarData(this)"
-              class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
-                    rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
-                    focus:ring-2 focus:ring-[#00594C] focus:border-transparent
-                    transition-all duration-200 cursor-pointer"
-            >
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Formato: DD-MM-AAAA (ano com 4 dígitos)
-            </p>
+          <!-- CNH VENCIMENTO -->
+          <div class="input-container">
+            <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
+              <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                  <i class="fa-solid fa-calendar-xmark text-red-600 dark:text-red-400"></i>
+                </div>
+                <span>Vencimento da CNH *</span>
+              </label>
+              <input 
+                type="date" 
+                name="cnh_vencimento" 
+                required 
+                value="{{ motorista.cnh_vencimento|date:'Y-m-d' }}"
+                min="1900-01-01"
+                max="9999-12-31"
+                class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700
+                       rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white
+                       focus:ring-2 focus:ring-[#00594C] focus:border-transparent
+                       transition-all duration-200 cursor-pointer"
+              >
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <i class="fa-regular fa-calendar"></i> Formato: DD/MM/AAAA
+              </p>
+            </div>
           </div>
-        </div>
 
         </div> <!-- Fim do Grid -->
 
         <!-- CONTRATO - COM COMBOBOX -->
         <div class="input-container">
-          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+          <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
             <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
               <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                 <i class="fa-solid fa-file-contract text-indigo-600 dark:text-indigo-400"></i>
@@ -273,7 +365,7 @@
 
         <!-- STATUS -->
         <div class="input-container">
-          <div class="form-section dark:form-section-dark p-4 rounded-xl shadow-sm">
+          <div class="form-section p-4 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-900/50 border-l-4 border-[#00594C] dark:border-[#0a7c6c]">
             <label class="input-label text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
               <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
                 <i class="fa-solid fa-toggle-on text-emerald-600 dark:text-emerald-400"></i>
@@ -395,10 +487,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Validação de matrícula (apenas números)
+  const matriculaInput = document.querySelector('input[name="matricula"]');
+  if (matriculaInput) {
+    matriculaInput.addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+  }
+  
   // Mostrar/ocultar informações do contrato selecionado
   const selectContrato = document.querySelector('select[name="contrato"]');
   if (selectContrato) {
-    // Armazenar informações dos contratos em um objeto
     const contratosInfo = {
       {% for contrato in contratos %}
       "{{ contrato.id }}": {
@@ -407,12 +506,10 @@ document.addEventListener('DOMContentLoaded', function() {
       {% endfor %}
     };
     
-    // Criar elemento para mostrar a localização
     const localizacaoDiv = document.createElement('div');
     localizacaoDiv.className = 'mt-2 text-xs text-gray-600 dark:text-gray-400 localizacao-info';
     selectContrato.parentElement.appendChild(localizacaoDiv);
     
-    // Função para atualizar a localização
     function atualizarLocalizacao() {
       const contratoId = selectContrato.value;
       if (contratoId && contratosInfo[contratoId]) {
@@ -426,7 +523,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Inicializar e adicionar listener
     atualizarLocalizacao();
     selectContrato.addEventListener('change', atualizarLocalizacao);
   }

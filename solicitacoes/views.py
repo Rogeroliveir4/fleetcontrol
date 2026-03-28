@@ -40,7 +40,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
     protocol = "https" if request.is_secure() else "http"
     domain = request.get_host()
 
-    # 🔹 URL dinâmica (melhor prática)
+    #  URL dinâmica (melhor prática)
     url = f"{protocol}://{domain}/login/"
 
     for gestor in gestores:
@@ -90,19 +90,17 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
 
 # SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
-from django.db import transaction
-
 @login_required
 def solicitar_veiculo(request, veiculo_id):
 
     with transaction.atomic():
 
-        #  LOCK no veículo para gravação da solicitação
+        # LOCK no veículo para gravação da solicitação
         veiculo = Veiculo.objects.select_for_update().get(id=veiculo_id)
 
         perfil = request.user.perfilusuario
 
-        #  VERIFICA SE existe alguma solicitação ativa para esse veículo"
+        # VERIFICA SE existe alguma solicitação ativa para esse veículo
         existe_ativa = SolicitacaoVeiculo.objects.filter(
             veiculo=veiculo,
             status__in=[
@@ -118,8 +116,6 @@ def solicitar_veiculo(request, veiculo_id):
                 "Este veículo já possui uma solicitação em andamento."
             )
             return redirect("lista_veiculos")
-
-        # ---------------- RESTO DO SEU CÓDIGO ---------------- #
 
         # DEFINIR NOME
         if perfil.nome_exibicao:
@@ -168,6 +164,18 @@ def solicitar_veiculo(request, veiculo_id):
                 contrato=contrato
             )
 
+            #  REGRA: gestor/adm já cria aprovado
+            if perfil.nivel == "gestor" or perfil.nivel == "adm":
+                status_inicial = "AGUARDANDO_SAIDA_PORTARIA"
+                data_aprovacao = timezone.now()
+                gestor_responsavel = request.user
+                gestor_responsavel_nome = request.user.get_full_name() or request.user.username
+            else:
+                status_inicial = "PENDENTE"
+                data_aprovacao = None
+                gestor_responsavel = None
+                gestor_responsavel_nome = None
+
             solicitacao = SolicitacaoVeiculo.objects.create(
                 origem="SISTEMA",
                 veiculo=veiculo,
@@ -177,18 +185,25 @@ def solicitar_veiculo(request, veiculo_id):
                 destino=destino,
                 justificativa=justificativa,
                 previsao_retorno=previsao_retorno,
-                status="PENDENTE",
+                status=status_inicial,
+                data_aprovacao=data_aprovacao,
+                gestor_responsavel=gestor_responsavel,
+                gestor_responsavel_nome=gestor_responsavel_nome,
                 solicitante=request.user,
                 solicitante_nome=nome_solicitante,
                 data_criacao=timezone.now()
             )
 
-            notificar_gestores_nova_solicitacao(request, solicitacao)
+            if perfil.nivel != "gestor":
+                notificar_gestores_nova_solicitacao(request, solicitacao)
 
-            veiculo.status = "Reservado"
-            veiculo.save(update_fields=["status"])
+            Veiculo.objects.filter(id=veiculo.id).update(status="Reservado")
 
-            messages.success(request, "Solicitação enviada ao gestor.")
+            if perfil.nivel == "gestor":
+                messages.success(request, "Solicitação criada e aprovada automaticamente.")
+            else:
+                messages.success(request, "Solicitação enviada ao gestor.")
+            
             return redirect("lista_veiculos")
 
     # fora da transação (GET)
@@ -329,14 +344,35 @@ def gestor_solicitacoes(request):
     
     # Filtro por busca (motorista, veículo, destino)
     if search:
-        solicitacoes = solicitacoes.filter(
-            Q(motorista__nome__icontains=search) |
-            Q(veiculo__placa__icontains=search) |
-            Q(veiculo__modelo__icontains=search) |
-            Q(veiculo__marca__icontains=search) |
-            Q(destino__icontains=search) |
-            Q(justificativa__icontains=search)
-        )
+        search = search.strip().upper()
+
+        #  PRIORIDADE: TAG (ex: VA-132)
+        if "-" in search and search.startswith("VA"):
+            solicitacoes = solicitacoes.filter(
+                veiculo__tag_interna__iexact=search
+            )
+
+        # 🔍 PLACA (ABC-1234)
+        elif "-" in search and len(search) >= 7:
+            solicitacoes = solicitacoes.filter(
+                veiculo__placa__iexact=search
+            )
+
+        #  ID direto
+        elif search.isdigit():
+            solicitacoes = solicitacoes.filter(id=int(search))
+
+        #  BUSCA GERAL
+        else:
+            solicitacoes = solicitacoes.filter(
+                Q(veiculo__tag_interna__icontains=search) |   # ✅ NOVO
+                Q(motorista__nome__icontains=search) |
+                Q(destino__icontains=search) |
+                Q(veiculo__placa__icontains=search) |
+                Q(veiculo__modelo__icontains=search) |
+                Q(veiculo__marca__icontains=search) |
+                Q(justificativa__icontains=search)
+            )
     
     # Filtro por período (data criação)
     if data_inicio:
@@ -556,50 +592,67 @@ def reprovar_solicitacao(request, id):
 
 
 
-# SOLICITAÇÕES DO USUÁRIO LOGADO
+# SOLICITAÇÕES DO USUÁRIO LOGADO () SOLICITANTE VÊ APENAS AS SUAS, GESTOR VÊ TODOS DO CONTRATO, ADM VÊ TODOS
+# SOLICITAÇÕES DO USUÁRIO LOGADO (SOLICITANTE VÊ APENAS AS SUAS, GESTOR VÊ TODOS DO CONTRATO, ADM VÊ TODOS)
 @login_required
 def minhas_solicitacoes(request):
     perfil = request.user.perfilusuario
 
-    #  Apenas solicitante / gestor / adm
+    # Apenas solicitante / gestor / adm
     if perfil.nivel not in ["basico", "gestor", "adm"]:
         messages.error(request, "Acesso não autorizado.")
         return redirect("dashboard_solicitante")
 
-    #  SOLICITANTE → SEMPRE pelo campo solicitante
+    # SOLICITANTE → SEMPRE pelo campo solicitante
     if perfil.nivel == "basico":
         solicitacoes = SolicitacaoVeiculo.objects.filter(
             solicitante=request.user
         )
 
-    #  GESTOR → por contrato (todos os solicitantes do contrato)
+    # GESTOR → por contrato (todos os solicitantes do contrato)
     elif perfil.nivel == "gestor":
         solicitacoes = SolicitacaoVeiculo.objects.filter(
             contrato=perfil.contrato
         )
 
-    #  ADM → tudo
+    # ADM → tudo
     else:
         solicitacoes = SolicitacaoVeiculo.objects.all()
 
     # ===== FILTROS =====
-    # Pegar parâmetros da URL
     status_filter = request.GET.get('status', '')
     search_query = request.GET.get('search', '')
     sort_by = request.GET.get('sort', 'recentes')
+    data_inicio = request.GET.get('data_inicio', '')
+    data_fim = request.GET.get('data_fim', '')
     
-    # Aplicar filtro por status
+    # Filtro por status
     if status_filter and status_filter != 'todos':
         solicitacoes = solicitacoes.filter(status=status_filter)
     
-    # APLICAR BUSCA (AGORA COM TAG_INTERNA)
+    # ===== FILTRO POR PERÍODO =====
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            solicitacoes = solicitacoes.filter(data_criacao__date__gte=data_inicio_obj)
+        except ValueError:
+            pass
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            solicitacoes = solicitacoes.filter(data_criacao__date__lte=data_fim_obj)
+        except ValueError:
+            pass
+    
+    # ===== BUSCA =====
     if search_query:
         from django.db.models import Q
         
         query = Q()
         
-        #  BUSCA PRIORITÁRIA POR TAG INTERNA
-        query |= Q(tag_interna__icontains=search_query)
+        # BUSCA POR TAG INTERNA (prioridade)
+        query |= Q(veiculo__tag_interna__icontains=search_query)
         
         # Busca por ID (se for número)
         if search_query.isdigit():
@@ -638,7 +691,7 @@ def minhas_solicitacoes(request):
         
         solicitacoes = solicitacoes.filter(query).distinct()
     
-    # Aplicar ordenação
+    # Ordenação
     if sort_by == 'antigas':
         solicitacoes = solicitacoes.order_by('data_criacao')
     else:  # recentes (padrão)
@@ -671,6 +724,13 @@ def listar_saidas_portaria(request):
     if not perfil or perfil.nivel != "portaria":
         messages.error(request, "Acesso não autorizado.")
         return redirect("lista_movimentacoes")
+
+    request_get = request.GET.copy()
+
+    if not request_get.get("status"):
+        request_get["status"] = "pendentes"
+
+    request.GET = request_get
     
     # Usar função compartilhada de filtragem
     qs = filtrar_saidas_portaria(request)
@@ -805,6 +865,11 @@ def filtrar_saidas_portaria(request):
         )
 
     return qs
+
+
+
+
+
 
 # FUNÇÃO AUXILIAR PARA NORMALIZAR VALORES DE FILTRO (TRATAR CASOS DE "None", "", etc)
 def normalizar(valor):
@@ -1273,7 +1338,7 @@ def exportar_excel_solicitacoes(request):
         return response
 
 
-
+# EDITAR SOLICITAÇÃO (APENAS SE ESTIVER PENDENTE E FOR O SOLICITANTE)
 @login_required
 def editar_solicitacao(request, pk):
     solicitacao = get_object_or_404(
@@ -1333,9 +1398,136 @@ def editar_solicitacao(request, pk):
     return render(request, "solicitantes/solicitar.html", {
         "veiculo": solicitacao.veiculo,
         "motoristas": motoristas,
-        "solicitacao": solicitacao,  # 👈 chave
+        "solicitacao": solicitacao,
         "modo_edicao": True
     })
 
 
 
+# EXPORTAR MINHAS SOLICITAÇÕES PARA EXCEL (USUÁRIOS PERFIL)
+@login_required
+def exportar_minhas_solicitacoes(request):
+    """Exporta as solicitações do usuário logado para Excel com filtros aplicados"""
+    
+    perfil = request.user.perfilusuario
+    from datetime import datetime
+    
+    # ===== BUSCAR SOLICITAÇÕES DO USUÁRIO =====
+    if perfil.nivel == "basico":
+        solicitacoes = SolicitacaoVeiculo.objects.filter(
+            solicitante=request.user
+        )
+    elif perfil.nivel == "gestor":
+        solicitacoes = SolicitacaoVeiculo.objects.filter(
+            contrato=perfil.contrato
+        )
+    else:  # adm
+        solicitacoes = SolicitacaoVeiculo.objects.all()
+    
+    # ===== APLICAR OS MESMOS FILTROS DA VIEW MINHAS_SOLICITACOES =====
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'recentes')
+    data_inicio = request.GET.get('data_inicio', '')
+    data_fim = request.GET.get('data_fim', '')
+    
+    # Filtro por status
+    if status_filter and status_filter != 'todos':
+        solicitacoes = solicitacoes.filter(status=status_filter)
+    
+    # Filtro por período
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            solicitacoes = solicitacoes.filter(data_criacao__date__gte=data_inicio_obj)
+        except ValueError:
+            pass
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            solicitacoes = solicitacoes.filter(data_criacao__date__lte=data_fim_obj)
+        except ValueError:
+            pass
+    
+    # Filtro por busca
+    if search_query:
+        from django.db.models import Q
+        query = Q()
+        query |= Q(veiculo__tag_interna__icontains=search_query)
+        query |= Q(motorista__nome__icontains=search_query)
+        query |= Q(destino__icontains=search_query)
+        query |= Q(id__icontains=search_query) if search_query.isdigit() else Q()
+        query |= Q(justificativa__icontains=search_query)
+        query |= Q(solicitante_nome__icontains=search_query)
+        solicitacoes = solicitacoes.filter(query).distinct()
+    
+    # Ordenação
+    if sort_by == 'antigas':
+        solicitacoes = solicitacoes.order_by('data_criacao')
+    else:
+        solicitacoes = solicitacoes.order_by('-data_criacao')
+    
+    # ===== CRIAR WORKBOOK =====
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Minhas Solicitações"
+    
+    # Estilo cabeçalho
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="00594C", end_color="00594C", fill_type="solid")
+    header_align = Alignment(horizontal="center", vertical="center")
+    
+    headers = [
+        "ID", "Data Criação", "Veículo", "Placa", "Tag", "Motorista",
+        "Destino", "Justificativa", "Status", "Previsão Retorno",
+        "Data Saída", "Data Retorno", "Gestor Responsável", "Data Aprovação"
+    ]
+    
+    for col, header in enumerate(headers, 1):
+        cell = sheet.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_align
+    
+    for row, s in enumerate(solicitacoes, 2):
+        sheet.cell(row=row, column=1, value=s.id)
+        sheet.cell(row=row, column=2, value=s.data_criacao.strftime("%d/%m/%Y %H:%M") if s.data_criacao else "")
+        sheet.cell(row=row, column=3, value=f"{s.veiculo.marca} {s.veiculo.modelo}" if s.veiculo else "")
+        sheet.cell(row=row, column=4, value=s.veiculo.placa if s.veiculo else "")
+        sheet.cell(row=row, column=5, value=s.veiculo.tag_interna if s.veiculo else "")
+        sheet.cell(row=row, column=6, value=s.motorista.nome if s.motorista else "")
+        sheet.cell(row=row, column=7, value=s.destino)
+        sheet.cell(row=row, column=8, value=s.justificativa or "")
+        
+        status_display = dict(SolicitacaoVeiculo.STATUS_CHOICES).get(s.status, s.status)
+        sheet.cell(row=row, column=9, value=status_display)
+        sheet.cell(row=row, column=10, value=s.previsao_retorno.strftime("%d/%m/%Y %H:%M") if s.previsao_retorno else "")
+        sheet.cell(row=row, column=11, value=s.data_saida.strftime("%d/%m/%Y %H:%M") if s.data_saida else "")
+        sheet.cell(row=row, column=12, value=s.data_retorno.strftime("%d/%m/%Y %H:%M") if s.data_retorno else "")
+        sheet.cell(row=row, column=13, value=s.gestor_responsavel_nome or "")
+        sheet.cell(row=row, column=14, value=s.data_aprovacao.strftime("%d/%m/%Y %H:%M") if s.data_aprovacao else "")
+    
+    # Ajustar largura das colunas
+    for column in sheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        sheet.column_dimensions[column_letter].width = adjusted_width
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"minhas_solicitacoes_{timestamp}.xlsx"
+    
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    workbook.save(response)
+    return response

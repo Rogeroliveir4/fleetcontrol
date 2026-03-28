@@ -41,16 +41,17 @@
             </div>
         </div>
 
-        <!-- ========== SEÇÃO 1: RESUMO DE SOLICITAÇÕES (MESMOS CARDS DA TELA DE APROVAÇÕES) ========== -->
+        <!-- ========== SEÇÃO 1: RESUMO DE SOLICITAÇÕES ========== -->
         <div class="mb-8">
             <div class="flex items-center gap-2 mb-3">
                 <div class="w-1 h-6 bg-[#00594C] rounded-full"></div>
+                <i class="fa-solid fa-road text-green-600 text-sm"></i>
                 <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Resumo de Solicitações</h2>
                 <span class="text-xs text-gray-400">(solicitações criadas)</span>
             </div>
             
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <!-- Card Pendentes -->
+                <!-- Pendentes -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -62,26 +63,25 @@
                         </div>
                     </div>
                     {% if pendentes > 0 %}
-                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" class="text-xs text-yellow-600 hover:underline mt-1 inline-block">
-                        Ver →
-                    </a>
+                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" class="text-xs text-yellow-600 hover:underline mt-1 inline-block">Ver →</a>
                     {% endif %}
                 </div>
 
-                <!-- Card Aprovadas -->
+                <!-- Aprovadas -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Em Transito</p>
-                            <p class="text-2xl font-bold text-orange-700 dark:text-orange-700">{{ em_transito|default:0 }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Em Trânsito</p>
+                            <p class="text-2xl font-bold text-green-600 dark:text-green-500">{{ em_transito|default:0 }}</p>
                         </div>
                         <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                             <i class="fa-solid fa-check-circle text-green-600 text-sm"></i>
                         </div>
-                    </div>                  
+                    </div>
+                   
                 </div>
 
-                <!-- Card Aguardando Saída -->
+                <!-- Aguardando Saída -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-indigo-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                <!-- Card Finalizadas -->
+                <!-- Finalizadas -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
 
-                <!-- Card Reprovadas -->
+                <!-- Reprovadas -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -120,7 +120,7 @@
                     </div>
                 </div>
 
-                <!-- Card Canceladas -->
+                <!-- Canceladas -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-gray-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -134,12 +134,11 @@
                 </div>
             </div>
             
-            <!-- Total e período (igual à tela de aprovações) -->
             <div class="mt-3 text-right">
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     <i class="fa-regular fa-calendar"></i> {{ hoje }} hoje • {{ semana }} esta semana
                 </span>
-                <span class="text-xs text-gray-500 ml-3">
+                <span class="text-xs text-gray-500 dark:text-gray-400 ml-3">
                     <i class="fa-solid fa-chart-line"></i> Total: {{ total_solicitacoes }}
                 </span>
             </div>
@@ -149,12 +148,27 @@
         <div class="mb-8">
             <div class="flex items-center gap-2 mb-3">
                 <div class="w-1 h-6 bg-purple-600 rounded-full"></div>
+                <i class="fa-solid fa-car text-red-600 text-sm"></i>
                 <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Resumo de Movimentações</h2>
                 <span class="text-xs text-gray-400">(viagens realizadas)</span>
             </div>
             
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-                <!-- Card Em Trânsito -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+                <!-- Total -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
+                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ total_movimentacoes|default:0 }}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-simple text-blue-600 text-sm"></i>
+                        </div>
+                    </div>
+                </div>    
+
+                <!-- Em Trânsito -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -166,13 +180,11 @@
                         </div>
                     </div>
                     {% if mov_transito > 0 %}
-                    <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600 hover:underline mt-1 inline-block">
-                        Ver →
-                    </a>
+                    <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600 hover:underline mt-1 inline-block">Ver →</a>
                     {% endif %}
                 </div>
 
-                <!-- Card Finalizadas -->
+                <!-- Finalizadas -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -186,20 +198,9 @@
                     <p class="text-xs text-gray-400 mt-1">{{ mov_finalizadas_hoje }} hoje</p>
                 </div>
 
-                <!-- Card Total Movimentações -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ total_movimentacoes|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-simple text-blue-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
+       
 
-                <!-- Card Mês -->
+                <!-- Este Mês -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-teal-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -211,8 +212,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Card KM Mês -->
+            <!-- Cards de KM e Médias -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+                <!-- KM Mês -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-all">
                     <div class="flex items-center justify-between">
                         <div>
@@ -223,9 +227,180 @@
                             <i class="fa-solid fa-road text-orange-600 text-sm"></i>
                         </div>
                     </div>
+                    <p class="text-[10px] text-gray-400 mt-1">total percorrido</p>
+                </div>
+
+                <!-- Média Geral -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500 hover:shadow-lg transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Média Geral</p>
+                            <p class="text-xl font-bold text-emerald-600 dark:text-emerald-500">{{ km_medio_por_corrida|default:0|floatformat:1 }}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-emerald-600 text-sm"></i>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">por viagem ({{ mov_finalizadas }} viagens)</p>
+                </div>
+
+                <!-- Viagens Curtas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <i class="fa-solid fa-road text-red-600 text-sm"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"> Curtas</p>
+                            <p class="text-xl font-bold text-green-600 dark:text-green-500">{{ media_viagens_curtas|default:0|floatformat:1 }}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-simple text-green-600 text-sm"></i>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">média (< {{ limite_viagem_longa }} km) - {{ total_viagens_curtas }} viagens</p>
+                </div>
+
+                <!-- Viagens Longas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500 hover:shadow-lg transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <i class="fa-solid fa-road text-red-600 text-sm"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"> Longas</p>
+                            <p class="text-xl font-bold text-red-600 dark:text-red-500">{{ media_viagens_longas|default:0|floatformat:1 }}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-red-600 text-sm"></i>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">média (≥ {{ limite_viagem_longa }} km) - {{ total_viagens_longas }} viagens</p>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-right">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fa-regular fa-calendar"></i> {{ mov_hoje|default:0 }} hoje • {{ mov_semana|default:0 }} esta semana
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 ml-3">
+                    <i class="fa-solid fa-chart-line"></i> Total: {{ total_movimentacoes|default:0 }}
+                </span>
+            </div>
+        </div>
+
+        <!-- ========== SEÇÃO 3: ANÁLISE DE VIAGENS LONGAS ========== -->
+        {% if total_viagens_longas > 0 %}
+        <div class="mb-8">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-1 h-6 bg-red-600 rounded-full"></div>
+                <i class="fa-solid fa-road text-red-600 text-sm"></i>
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Análise de Viagens Longas</h2>
+                <span class="text-xs text-gray-400">(≥ {{ limite_viagem_longa }} km)</span>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Card Resumo -->
+                <div class="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-xs text-red-600 dark:text-red-400 font-medium">Total de Viagens Longas</p>
+                            <p class="text-2xl font-bold text-red-700 dark:text-red-400">{{ total_viagens_longas }}</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                            <i class="fa-solid fa-road text-red-600 text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <p class="text-gray-500 dark:text-gray-400">KM Total</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">{{ km_viagens_longas|floatformat:0 }} km</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 dark:text-gray-400">Média por viagem</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">{{ media_viagens_longas|floatformat:0 }} km</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 dark:text-gray-400">% do total viagens</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">{{ percentual_viagens_longas }}%</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 dark:text-gray-400">% do total KM</p>
+                            <p class="font-semibold text-gray-800 dark:text-white">{{ percentual_km_longas }}%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Veículos em Viagens Longas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-truck text-red-600 text-sm"></i>
+                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Veículos em Longas Distâncias</h3>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-2">
+                        {% if top_veiculos_longas %}
+                            {% for item in top_veiculos_longas %}
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                        <i class="fa-solid fa-car text-red-600 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-800 dark:text-white">
+                                            {{ item.veiculo.modelo }}
+                                        </p>
+                                        <p class="text-[10px] text-gray-500">{{ item.veiculo.tag_interna|default:item.veiculo.placa }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-bold text-red-600">{{ item.total_viagens }}</span>
+                                    <span class="text-[10px] text-gray-500"> viagens</span>
+                                    <p class="text-[9px] text-gray-400">{{ item.total_km|floatformat:0 }} km</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center text-xs text-gray-500 py-3">Nenhum dado</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Top Motoristas em Viagens Longas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-user text-red-600 text-sm"></i>
+                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Motoristas em Longas Distâncias</h3>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-2">
+                        {% if top_motoristas_longas %}
+                            {% for item in top_motoristas_longas %}
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                        <i class="fa-solid fa-user text-red-600 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-800 dark:text-white">
+                                            {{ item.motorista.nome|truncatechars:18 }}
+                                        </p>
+                                        <p class="text-[10px] text-gray-500">CNH: {{ item.motorista.cnh_categoria|default:"N/A" }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-bold text-red-600">{{ item.total_viagens }}</span>
+                                    <span class="text-[10px] text-gray-500"> viagens</span>
+                                    <p class="text-[9px] text-gray-400">{{ item.total_km|floatformat:0 }} km</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center text-xs text-gray-500 py-3">Nenhum dado</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- ========== ATIVIDADES RECENTES ========== -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -255,26 +430,26 @@
                                             {{ s.motorista.nome|default:"Motorista" }}
                                         </p>
                                         <span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap
-                                            {% if s.status == 'PENDENTE' %}bg-yellow-100 text-yellow-700
-                                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}bg-indigo-100 text-indigo-700
-                                            {% elif s.status == 'EM_TRANSITO' %}bg-purple-100 text-purple-700
-                                            {% elif s.status == 'FINALIZADA' %}bg-green-100 text-green-700
-                                            {% elif s.status == 'REPROVADA' %}bg-red-100 text-red-700
-                                            {% elif s.status == 'CANCELADA' %}bg-gray-100 text-gray-700
+                                            {% if s.status == 'PENDENTE' %}bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200
+                                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200
+                                            {% elif s.status == 'EM_TRANSITO' %}bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200
+                                            {% elif s.status == 'FINALIZADA' %}bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200
+                                            {% elif s.status == 'REPROVADA' %}bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200
+                                            {% elif s.status == 'CANCELADA' %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
                                             {% endif %}">
                                             {{ s.get_status_display|truncatechars:12 }}
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-gray-500">{{ s.veiculo.placa }} • {{ s.destino|truncatechars:30 }}</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">{{ s.data_criacao|date:"d/m H:i" }}</p>
+                                    <p class="text-[11px] text-gray-600 dark:text-gray-400">{{ s.veiculo.placa }} • {{ s.destino|truncatechars:30 }}</p>
+                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{{ s.data_criacao|date:"d/m H:i" }}</p>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="p-6 text-center">
-                            <i class="fa-solid fa-inbox text-2xl text-gray-300 mb-1"></i>
-                            <p class="text-xs text-gray-500">Nenhuma solicitação recente</p>
+                            <i class="fa-solid fa-inbox text-2xl text-gray-300 dark:text-gray-600 mb-1"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma solicitação recente</p>
                         </div>
                     {% endif %}
                 </div>
@@ -285,7 +460,7 @@
                 <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-truck-fast text-purple-600 text-sm"></i>
+                            <i class="fa-solid fa-truck-fast"></i>
                             <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Movimentações em Andamento</h3>
                         </div>
                         <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600 hover:underline">Ver todas →</a>
@@ -304,20 +479,20 @@
                                         <p class="font-medium text-gray-800 dark:text-white text-xs truncate">
                                             {{ mov.motorista.nome|default:"Motorista" }}
                                         </p>
-                                        <span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 whitespace-nowrap">
+                                        <span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200">
                                             Em Trânsito
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-gray-500">{{ mov.veiculo.placa }} • {{ mov.destino|truncatechars:30|default:"Sem destino" }}</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">Saída: {{ mov.data_saida|date:"d/m H:i" }}</p>
+                                    <p class="text-[11px] text-gray-600 dark:text-gray-400">{{ mov.veiculo.placa }} • {{ mov.destino|truncatechars:30|default:"Sem destino" }}</p>
+                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Saída: {{ mov.data_saida|date:"d/m H:i" }}</p>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="p-6 text-center">
-                            <i class="fa-solid fa-check-circle text-2xl text-green-300 mb-1"></i>
-                            <p class="text-xs text-gray-500">Nenhuma movimentação em andamento</p>
+                            <i class="fa-solid fa-check-circle text-2xl text-green-300 dark:text-green-700 mb-1"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma movimentação em andamento</p>
                         </div>
                     {% endif %}
                 </div>
@@ -339,29 +514,29 @@
                 <div class="p-3 space-y-2">
                     {% if veiculos_top %}
                         {% for veiculo in veiculos_top %}
-                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center text-white text-xs font-bold">
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center !text-white text-xs font-bold shadow-sm" style="color: #ffffff;">
                                     {{ forloop.counter }}
                                 </div>
                                 <div>
                                     <p class="text-xs font-medium text-gray-800 dark:text-white">{{ veiculo.veiculo__modelo }}</p>
-                                    <p class="text-[10px] text-gray-500">{{ veiculo.veiculo__placa }}</p>
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ veiculo.veiculo__tag_interna|default:veiculo.veiculo__placa }}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="text-sm font-bold text-[#00594C]">{{ veiculo.total_viagens }}</span>
-                                <span class="text-[10px] text-gray-500"> viagens</span>
+                                <span class="text-sm font-bold text-[#00594C] dark:text-[#0A7C6C]">{{ veiculo.total_viagens }}</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400"> viagens</span>
                                 {% if veiculo.total_km %}
-                                <p class="text-[9px] text-gray-400">{{ veiculo.total_km|floatformat:0 }} km</p>
+                                <p class="text-[9px] text-gray-400 dark:text-gray-500">{{ veiculo.total_km|floatformat:0 }} km</p>
                                 {% endif %}
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="text-center py-4">
-                            <i class="fa-solid fa-chart-line text-2xl text-gray-300"></i>
-                            <p class="text-xs text-gray-500 mt-1">Nenhuma movimentação</p>
+                            <i class="fa-solid fa-chart-line text-2xl text-gray-300 dark:text-gray-600"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nenhuma movimentação</p>
                         </div>
                     {% endif %}
                 </div>
@@ -379,29 +554,29 @@
                 <div class="p-3 space-y-2">
                     {% if motoristas_top %}
                         {% for motorista in motoristas_top %}
-                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white text-xs font-bold">
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center !text-white text-xs font-bold shadow-sm" style="color: #ffffff;">
                                     {{ forloop.counter }}
                                 </div>
                                 <div>
                                     <p class="text-xs font-medium text-gray-800 dark:text-white">{{ motorista.motorista__nome|truncatechars:18 }}</p>
-                                    <p class="text-[10px] text-gray-500">CPF: ***{{ motorista.motorista__cpf|slice:"-4" }}</p>
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">CNH: {{ motorista.motorista__cnh_categoria|default:"N/A" }}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="text-sm font-bold text-orange-600">{{ motorista.total_viagens }}</span>
-                                <span class="text-[10px] text-gray-500"> viagens</span>
+                                <span class="text-sm font-bold text-orange-600 dark:text-orange-500">{{ motorista.total_viagens }}</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400"> viagens</span>
                                 {% if motorista.total_km %}
-                                <p class="text-[9px] text-gray-400">{{ motorista.total_km|floatformat:0 }} km</p>
+                                <p class="text-[9px] text-gray-400 dark:text-gray-500">{{ motorista.total_km|floatformat:0 }} km</p>
                                 {% endif %}
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="text-center py-4">
-                            <i class="fa-solid fa-users-slash text-2xl text-gray-300"></i>
-                            <p class="text-xs text-gray-500 mt-1">Nenhum motorista</p>
+                            <i class="fa-solid fa-users-slash text-2xl text-gray-300 dark:text-gray-600"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nenhum motorista</p>
                         </div>
                     {% endif %}
                 </div>

@@ -21,16 +21,13 @@ urlpatterns = [
     path("terceiros/detalhe/<int:pk>/", views.terceiros_detalhe, name="terceiros_detalhe"),
 
 
-    # ===============================
-    # ✔ CHECKLIST MOTORISTA (CORRIGIDO)
-    # ===============================
+
+    #  CHECKLIST MOTORISTA (CORRIGIDO)
     path("solicitacao/<int:solicitacao_id>/checklist-saida/",views.checklist_saida_motorista, name="checklist_saida_motorista", ),
 
     path("portaria/saida/<int:movimentacao_id>/", views.portaria_registrar_saida, name="portaria_registrar_saida"),
 
-    # ===============================
-    # ✔ PORTARIA — RETORNO
-    # ===============================
+    #  PORTARIA — RETORNO
     path("portaria/retorno/", views.portaria_retorno_list,name="portaria_retorno_list",),
 
     

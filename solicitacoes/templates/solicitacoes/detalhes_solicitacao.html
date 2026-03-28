@@ -4,119 +4,142 @@
 
 {% block content %}
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
-    <!-- HEADER -->
-    <div class="max-w-7xl mx-auto mb-8">
-        <!-- Breadcrumb e Controles -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <!-- Breadcrumb -->
-            <div>
-                <nav class="flex items-center space-x-2 text-sm mb-2">
-                    <a href="{% url 'gestor_solicitacoes' %}" 
-                       class="text-gray-500 hover:text-[#00594C] dark:text-gray-400 dark:hover:text-[#0A7C6C] transition-colors">
-                        Solicitações
-                    </a>
-                    <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
-                    <span class="text-gray-700 dark:text-gray-300 font-medium">Detalhes #{{ solicitacao.id }}</span>
-                </nav>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Detalhes da Solicitação</h1>
-            </div>
-            
-            <!-- Status e ID -->
-            <div class="flex items-center gap-3">
-                <!-- ID -->
-                <div class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">ID</span>
-                    <p class="text-lg font-bold text-[#00594C] dark:text-[#0A7C6C] font-mono">#{{ solicitacao.id }}</p>
-                </div>
-                
-                <!-- Status -->
-                <div class="flex flex-col items-end">
-                    <span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Status</span>
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold text-sm
-                        {% if solicitacao.status == 'APROVADA' %}bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300
-                        {% elif solicitacao.status == 'REPROVADA' %}bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300
-                        {% elif solicitacao.status == 'EM_TRANSITO' %}bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300
-                        {% else %}bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300{% endif %}">
-                        <i class="fa-solid {% if solicitacao.status == 'APROVADA' %}fa-check-circle
-                            {% elif solicitacao.status == 'REPROVADA' %}fa-xmark-circle
-                            {% elif solicitacao.status == 'EM_TRANSITO' %}fa-car-side
-                            {% else %}fa-clock-rotate-left{% endif %} text-sm"></i>
-                        {{ solicitacao.get_status_display }}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- HEADER COM GRADIENTE -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00594C] via-[#0A7C6C] to-[#00594C] p-5 md:p-6 mb-8 shadow-xl">
+            <div class="relative z-10">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <!-- Breadcrumb -->
+                        <nav class="flex items-center gap-2 text-xs mb-2">
+                            <a href="{% url 'gestor_solicitacoes' %}" 
+                               class="text-white/80 hover:text-white transition-colors flex items-center gap-1">
+                                <i class="fa-solid fa-list-check text-[10px]"></i>
+                                <span>Solicitações</span>
+                            </a>
+                            <i class="fa-solid fa-chevron-right text-white/50 text-[8px]"></i>
+                            <span class="text-white font-medium">Detalhes #{{ solicitacao.id }}</span>
+                        </nav>
+                        
+                        <h1 class="text-xl md:text-2xl font-bold text-white mb-1">
+                            Solicitação de Veículo
+                        </h1>
+                        <p class="text-white/70 text-xs">
+                            Visualize todas as informações da solicitação e acompanhe o status
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <!-- ID Badge -->
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-1.5 text-center">
+                            <span class="text-[9px] text-white/70 uppercase tracking-wider">ID</span>
+                            <p class="text-lg font-bold text-white font-mono">#{{ solicitacao.id }}</p>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <div class="backdrop-blur-sm rounded-xl px-3 py-1.5 text-center
+                            {% if solicitacao.status == 'APROVADA' %}bg-green-500/30
+                            {% elif solicitacao.status == 'REPROVADA' %}bg-red-500/30
+                            {% elif solicitacao.status == 'EM_TRANSITO' %}bg-blue-500/30
+                            {% else %}bg-amber-500/30{% endif %}">
+                            <span class="text-[9px] text-white/70 uppercase tracking-wider">Status</span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <i class="fa-solid {% if solicitacao.status == 'APROVADA' %}fa-check-circle{% elif solicitacao.status == 'REPROVADA' %}fa-xmark-circle{% elif solicitacao.status == 'EM_TRANSITO' %}fa-car-side{% else %}fa-clock{% endif %} text-white text-xs"></i>
+                                <span class="text-white font-semibold text-sm">{{ solicitacao.get_status_display }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Elementos decorativos -->
+            <div class="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-24 translate-x-24"></div>
+            <div class="absolute bottom-0 left-0 w-36 h-36 bg-white/5 rounded-full translate-y-16 -translate-x-16"></div>
         </div>
 
-        <!-- Ações Principais -->
+        <!-- Ações Rápidas -->
         {% if solicitacao.status == "PENDENTE" and perms.solicitacoes.pode_aprovar %}
-        <div class="flex gap-3 mb-6">
+        <div class="flex gap-3 mb-8">
             <a href="{% url 'aprovar_solicitacao' solicitacao.id %}"
-               class="flex items-center gap-2 px-6 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-sm hover:shadow transition-all duration-200">
-                <i class="fa-solid fa-check text-sm"></i>
+               class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200">
+                <i class="fa-solid fa-check-circle text-sm"></i>
                 <span>Aprovar Solicitação</span>
             </a>
-            
             <a href="{% url 'reprovar_solicitacao' solicitacao.id %}"
-               class="flex items-center gap-2 px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-sm hover:shadow transition-all duration-200">
-                <i class="fa-solid fa-xmark text-sm"></i>
+               class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200">
+                <i class="fa-solid fa-ban text-sm"></i>
                 <span>Reprovar Solicitação</span>
             </a>
         </div>
         {% elif solicitacao.status == "EM_TRANSITO" %}
-        <div class="mb-6">
+        <div class="mb-8">
             <a href="{% url 'registrar_retorno' solicitacao.id %}"
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#00594C] hover:bg-[#0A7C6C] text-white font-semibold shadow-sm hover:shadow transition-all duration-200">
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00594C] to-[#0A7C6C] hover:from-[#004d41] hover:to-[#0A7C6C] text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200">
                 <i class="fa-solid fa-flag-checkered text-sm"></i>
                 <span>Registrar Retorno do Veículo</span>
             </a>
         </div>
         {% endif %}
-    </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="max-w-7xl mx-auto">
+        <!-- CONTEÚDO PRINCIPAL -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- COLUNA ESQUERDA -->
+            <!-- COLUNA ESQUERDA (MAIOR) -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- CARD SOLICITAÇÃO -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-lg bg-[#00594C]/10 dark:bg-[#0A7C6C]/20 flex items-center justify-center">
-                                <i class="fa-solid fa-file-lines text-[#00594C] dark:text-[#0A7C6C] text-lg"></i>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-[#00594C]/10 dark:bg-[#0A7C6C]/20 flex items-center justify-center">
+                                <i class="fa-solid fa-file-lines text-[#00594C] dark:text-[#0A7C6C] text-sm"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Solicitação</h2>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</p>
+                                <h2 class="text-base font-bold text-gray-900 dark:text-white">Detalhes da Solicitação</h2>
+                                <p class="text-[10px] text-gray-500">Informações principais da viagem</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-6 space-y-6">
-                        <!-- Informações Básicas -->
+                    <div class="p-5 space-y-4">
+                        <!-- Destino e Data -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-1">
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Destino</p>
-                                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ solicitacao.destino|default:"Não informado" }}</p>
-                            </div>
-                            
-                            <div class="space-y-1">
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Data de Saída</p>
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-calendar text-gray-400 text-sm"></i>
-                                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ solicitacao.data_criacao|date:"d/m/Y" }}</p>
+                            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3.5">
+                                <div class="flex items-center gap-1.5 mb-1.5">
+                                    <i class="fa-solid fa-location-dot text-emerald-500 text-xs"></i>
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Destino</span>
                                 </div>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ solicitacao.destino|default:"Não informado" }}</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3.5">
+                                <div class="flex items-center gap-1.5 mb-1.5">
+                                    <i class="fa-regular fa-calendar text-blue-500 text-xs"></i>
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Data Solicitação</span>
+                                </div>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</p>
                             </div>
                         </div>
 
+                        <!-- Previsão de Retorno -->
+                        {% if solicitacao.previsao_retorno %}
+                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3.5 border border-amber-200 dark:border-amber-800">
+                            <div class="flex items-center gap-1.5 mb-1.5">
+                                <i class="fa-regular fa-clock text-amber-500 text-xs"></i>
+                                <span class="text-[10px] font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wider">Previsão de Retorno</span>
+                            </div>
+                            <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">{{ solicitacao.previsao_retorno|date:"d/m/Y • H:i" }}</p>
+                        </div>
+                        {% endif %}
+
                         <!-- Justificativa -->
                         {% if solicitacao.justificativa %}
-                        <div class="space-y-2">
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Justificativa da Viagem</p>
-                            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-2">
+                                <i class="fa-solid fa-clipboard-list text-purple-500 text-xs"></i>
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Justificativa</span>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3.5">
+                                <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
                                     {{ solicitacao.justificativa }}
                                 </p>
                             </div>
@@ -125,10 +148,13 @@
 
                         <!-- Observações -->
                         {% if solicitacao.observacoes %}
-                        <div class="space-y-2">
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Observações Adicionais</p>
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-2">
+                                <i class="fa-solid fa-note-sticky text-gray-500 text-xs"></i>
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Observações</span>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3.5 border border-blue-200 dark:border-blue-800">
+                                <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
                                     {{ solicitacao.observacoes }}
                                 </p>
                             </div>
@@ -137,334 +163,318 @@
                     </div>
                 </div>
 
-                <!-- TIMELINE DA VIAGEM -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                                <i class="fa-solid fa-route text-blue-600 dark:text-blue-400 text-lg"></i>
+                <!-- TIMELINE -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                <i class="fa-solid fa-timeline text-blue-600 dark:text-blue-400 text-sm"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Cronograma da Viagem</h2>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Linha do tempo da solicitação</p>
+                                <h2 class="text-base font-bold text-gray-900 dark:text-white">Linha do Tempo</h2>
+                                <p class="text-[10px] text-gray-500">Acompanhe o histórico da solicitação</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-6">
-                        <!-- Timeline -->
+                    <div class="p-5">
                         <div class="relative">
-                            <!-- Linha central -->
-                            <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+                            <!-- Linha vertical -->
+                            <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-green-500 via-blue-500 to-gray-300 dark:from-green-600 dark:via-blue-600 dark:to-gray-700"></div>
                             
-                            <!-- Item 1: Solicitação -->
-                            <div class="relative flex items-start gap-4 mb-8">
-                                <div class="relative z-10">
-                                    <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                        <i class="fa-solid fa-paper-plane text-green-600 dark:text-green-400 text-lg"></i>
+                            <div class="space-y-5">
+                                <!-- Solicitação -->
+                                <div class="relative flex gap-3">
+                                    <div class="flex-shrink-0 z-10">
+                                        <div class="w-8 h-8 rounded-full bg-green-500 shadow-md flex items-center justify-center">
+                                            <i class="fa-solid fa-paper-plane text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-0.5">
+                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white">Solicitação Enviada</h3>
+                                            <span class="text-[10px] text-gray-500">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
+                                        </div>
+                                        <p class="text-[10px] text-gray-600 dark:text-gray-400">Solicitado por <span class="font-medium">{{ solicitacao.solicitante_nome }}</span></p>
                                     </div>
                                 </div>
-                                <div class="flex-1 pt-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h3 class="font-bold text-gray-900 dark:text-white">Solicitação Enviada</h3>
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
-                                    </div>
-                                    <p class="text-gray-600 dark:text-gray-400 text-sm">Solicitação criada por {{ solicitacao.solicitante_nome }}</p>
-                                </div>
-                            </div>
 
-                            <!-- Item 2: Aprovação/Reprovação -->
-                            <div class="relative flex items-start gap-4 mb-8">
-                                <div class="relative z-10">
-                                    <div class="w-16 h-16 rounded-full 
-                                        {% if solicitacao.status == 'APROVADA' %}bg-green-100 dark:bg-green-900/30
-                                        {% elif solicitacao.status == 'REPROVADA' %}bg-red-100 dark:bg-red-900/30
-                                        {% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
-                                        <i class="fa-solid 
-                                            {% if solicitacao.status == 'APROVADA' %}fa-check text-green-600 dark:text-green-400
-                                            {% elif solicitacao.status == 'REPROVADA' %}fa-xmark text-red-600
-                                            {% elif solicitacao.status == 'CANCELADA' %}fa-ban text-red-600
-                                            {% elif solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' %}fa-check text-green-600 dark:text-green-400
-                                            {% else %}fa-clock text-gray-400{% endif %} text-lg"></i>
+                                <!-- Aprovação/Reprovação -->
+                                <div class="relative flex gap-3">
+                                    <div class="flex-shrink-0 z-10">
+                                        <div class="w-8 h-8 rounded-full 
+                                            {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}bg-green-500 shadow-md
+                                            {% elif solicitacao.status == 'REPROVADA' %}bg-red-500 shadow-md
+                                            {% elif solicitacao.status == 'CANCELADA' %}bg-gray-500 shadow-md
+                                            {% else %}bg-gray-400 dark:bg-gray-600 shadow{% endif %} flex items-center justify-center">
+                                            <i class="fa-solid 
+                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}fa-check
+                                                {% elif solicitacao.status == 'REPROVADA' %}fa-xmark
+                                                {% elif solicitacao.status == 'CANCELADA' %}fa-ban
+                                                {% else %}fa-clock{% endif %} text-white text-xs"></i>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex-1 pt-1">
-                                    <div class="flex items-center justify-between mb-1">    
-                                        <h3 class="font-bold text-gray-900 dark:text-white">
-                                            {% if solicitacao.status == 'APROVADA' %}Solicitação Aprovada
-                                            {% elif solicitacao.status == 'EM_TRANSITO' %}Solicitação Aprovada
-                                            {% elif solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' %}Solicitação Aprovada
-                                            {% elif solicitacao.status == 'REPROVADA' %}Solicitação Reprovada
-                                            {% elif solicitacao.status == 'CANCELADA' %}Solicitação Cancelada
-                                            {% else %}Aguardando Aprovação{% endif %}
-                                        </h3>
-                                        {% if solicitacao.data_aprovacao or solicitacao.data_reprovacao %}
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ solicitacao.data_aprovacao|date:"d/m/Y • H:i"|default:solicitacao.data_reprovacao|date:"d/m/Y • H:i" }}
-                                        </span>
+                                    <div class="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-0.5">
+                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white">
+                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}
+                                                    Solicitação Aprovada
+                                                {% elif solicitacao.status == 'REPROVADA' %}
+                                                    Solicitação Reprovada
+                                                {% elif solicitacao.status == 'CANCELADA' %}
+                                                    Solicitação Cancelada
+                                                {% else %}
+                                                    Aguardando Aprovação
+                                                {% endif %}
+                                            </h3>
+                                            {% if solicitacao.data_aprovacao or solicitacao.data_reprovacao %}
+                                            <span class="text-[10px] text-gray-500">
+                                                {{ solicitacao.data_aprovacao|date:"d/m/Y • H:i"|default:solicitacao.data_reprovacao|date:"d/m/Y • H:i" }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if solicitacao.gestor_responsavel_nome %}
+                                        <p class="text-[10px] text-gray-600 dark:text-gray-400">Por <span class="font-medium">{{ solicitacao.gestor_responsavel_nome }}</span></p>
+                                        {% elif solicitacao.gestor_reprovador_nome %}
+                                        <p class="text-[10px] text-gray-600 dark:text-gray-400">Por <span class="font-medium">{{ solicitacao.gestor_reprovador_nome }}</span></p>
+                                        {% endif %}
+
+
+                                        
+                                        {% if solicitacao.observacao_aprovacao %}
+                                        <div class="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                            <i class="fa-regular fa-message text-green-600 dark:text-green-400 text-[9px] mr-1"></i>
+                                            <span class="text-[10px] text-green-700 dark:text-green-300">{{ solicitacao.observacao_aprovacao }}</span>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if solicitacao.motivo_reprovacao %}
+                                        <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                            <i class="fa-solid fa-triangle-exclamation text-red-600 dark:text-red-400 text-[9px] mr-1"></i>
+                                            <span class="text-[10px] text-red-700 dark:text-red-300">{{ solicitacao.motivo_reprovacao }}</span>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if solicitacao.motivo_cancelamento %}
+                                            <div class="mt-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 rounded-r-lg">
+                                                <p class="text-xs text-red-700 dark:text-red-300 mb-1 font-semibold">
+                                                    <i class="fa-solid fa-pen mr-1"></i> Motivo do cancelamento:
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    {{ solicitacao.motivo_cancelamento}}
+                                                </p>
+                                            </div>
                                         {% endif %}
                                     </div>
-                                        {% if solicitacao.status == 'CANCELADA' and solicitacao.motivo_cancelamento %}
-                                        <div class="mt-4 p-4 bg-red-50 dark:bg-amber-900/20 rounded-lg">
-                                            <p class="text-sm text-amber-800 dark:text-amber-500">
-                                            {{ solicitacao.motivo_cancelamento.upper }}
-                                            </p>
+                                </div>
 
-                                            {% if solicitacao.cancelado_por_nome %}
-                                            <p class="text-sm mt-2 text-gray-500">
-                                                Cancelado por: {{ solicitacao.cancelado_por_nome }}
-                                            </p>
+                                <!-- Saída -->
+                                {% if solicitacao.km_saida %}
+                                <div class="relative flex gap-3">
+                                    <div class="flex-shrink-0 z-10">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 shadow-md flex items-center justify-center">
+                                            <i class="fa-solid fa-play text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-0.5">
+                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white">Saída Registrada</h3>
+                                            <span class="text-[10px] text-gray-500">{{ solicitacao.data_saida|date:"d/m/Y • H:i"|default:solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px]">
+                                                <i class="fa-solid fa-gauge-high text-[9px]"></i>
+                                                KM Saída: {{ solicitacao.km_saida|floatformat:0 }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Retorno -->
+                                {% if solicitacao.data_retorno %}
+                                <div class="relative flex gap-3">
+                                    <div class="flex-shrink-0 z-10">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-500 shadow-md flex items-center justify-center">
+                                            <i class="fa-solid fa-flag-checkered text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-0.5">
+                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white">Retorno Registrado</h3>
+                                            <span class="text-[10px] text-gray-500">{{ solicitacao.data_retorno|date:"d/m/Y • H:i" }}</span>
+                                        </div>
+                                        {% if solicitacao.km_retorno %}
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px]">
+                                                <i class="fa-solid fa-gauge-high text-[9px]"></i>
+                                                KM Retorno: {{ solicitacao.km_retorno|floatformat:0 }}
+                                            </span>
+                                            {% if solicitacao.distancia_percorrida %}
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px]">
+                                                <i class="fa-solid fa-road text-[9px]"></i>
+                                                Total: {{ solicitacao.distancia_percorrida|floatformat:0 }}
+                                            </span>
                                             {% endif %}
                                         </div>
                                         {% endif %}
-
-                                    {% if solicitacao.gestor_responsavel_nome %}
-                                    <p class="text-gray-600 dark:text-gray-400 text-sm">Por {{ solicitacao.gestor_responsavel_nome }}</p>
-                                    {% elif solicitacao.gestor_reprovador_nome %}
-                                    <p class="text-gray-600 dark:text-gray-400 text-sm">Por {{ solicitacao.gestor_reprovador_nome }}</p>
-                                    {% endif %}
-                                    
-                                    {% if solicitacao.observacao_aprovacao %}
-                                    <div class="mt-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                        <p class="text-sm text-green-800 dark:text-green-300">{{ solicitacao.observacao_aprovacao }}</p>
                                     </div>
-                                    {% endif %}
-                                    
-                                    {% if solicitacao.motivo_reprovacao %}
-                                    <div class="mt-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                                        <p class="text-sm text-red-800 dark:text-red-300">{{ solicitacao.motivo_reprovacao }}</p>
-                                    </div>
-                                    {% endif %}
                                 </div>
+                                {% endif %}
                             </div>
-
-                            <!-- Item 3: Saída -->
-                            {% if solicitacao.km_saida %}
-                            <div class="relative flex items-start gap-4 mb-8">
-                                <div class="relative z-10">
-                                    <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                        <i class="fa-solid fa-play text-blue-600 dark:text-blue-400 text-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-1 pt-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h3 class="font-bold text-gray-900 dark:text-white">Saída Registrada</h3>
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-gauge-high text-blue-500"></i>
-                                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ solicitacao.km_saida }} km</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            <!-- Item 4: Retorno -->
-                            {% if solicitacao.data_retorno %}
-                            <div class="relative flex items-start gap-4">
-                                <div class="relative z-10">
-                                    <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                        <i class="fa-solid fa-flag-checkered text-green-600 dark:text-green-400 text-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-1 pt-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h3 class="font-bold text-gray-900 dark:text-white">Retorno Registrado</h3>
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ solicitacao.data_retorno|date:"d/m/Y • H:i" }}</span>
-                                    </div>
-                                    {% if solicitacao.km_retorno %}
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-gauge-high text-green-500"></i>
-                                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ solicitacao.km_retorno }} km</span>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- COLUNA DIREITA -->
-            <div class="space-y-6">
+            <!-- COLUNA DIREITA (INFORMAÇÕES) -->
+            <div class="space-y-5">
                 <!-- CARD SOLICITANTE -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="bg-gradient-to-r from-[#00594C] to-[#0A7C6C] px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="px-5 py-3 bg-gradient-to-r from-[#00594C] to-[#0A7C6C]">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fa-solid fa-user-tie text-white text-sm"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-white">Solicitante</h2>
-                                <p class="text-white/90 text-sm">{{ solicitacao.solicitante_nome }}</p>
+                                <h2 class="text-sm font-bold text-white">Solicitante</h2>
+                                <p class="text-white/70 text-[10px]">Quem realizou a solicitação</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 space-y-2.5">
+                        <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Nome</span>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{{ solicitacao.solicitante_nome }}</p>
+                        </div>
                         {% if solicitacao.solicitante.matricula %}
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Matrícula</p>
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.solicitante.matricula }}</p>
+                        <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Matrícula</span>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white mt-0.5 font-mono">{{ solicitacao.solicitante.matricula }}</p>
                         </div>
                         {% endif %}
-                        
-                        {% if solicitacao.solicitante.cargo %}
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Cargo</p>
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.solicitante.cargo }}</p>
-                        </div>
-                        {% endif %}
-                        
                         {% if solicitacao.solicitante.email %}
                         <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">E-mail</p>
-                            <a href="mailto:{{ solicitacao.solicitante.email }}" 
-                               class="font-semibold text-[#00594C] dark:text-[#0A7C6C] hover:underline">
-                                {{ solicitacao.solicitante.email }}
-                            </a>
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">E-mail</span>
+                            <a href="mailto:{{ solicitacao.solicitante.email }}" class="text-xs font-semibold text-[#00594C] dark:text-[#0A7C6C] hover:underline block mt-0.5 break-all">{{ solicitacao.solicitante.email }}</a>
                         </div>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- CARD VEÍCULO -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                                 <i class="fa-solid fa-car text-blue-600 dark:text-blue-400 text-sm"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Veículo</h2>
-                                <p class="text-gray-600 dark:text-gray-400 text-sm">{{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }}</p>
+                                <h2 class="text-sm font-bold text-gray-900 dark:text-white">Veículo</h2>
+                                <p class="text-[10px] text-gray-500">Dados do veículo utilizado</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="p-6 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 space-y-2.5">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tag Interna</p>
-                                <p class="font-bold text-lg text-gray-900 dark:text-white font-mono">{{ solicitacao.veiculo.tag_interna }}</p>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Tag</span>
+                                <p class="text-sm font-bold font-mono text-gray-900 dark:text-white mt-0.5">{{ solicitacao.veiculo.tag_interna|default:"-" }}</p>
                             </div>
-                            
-                            {% if solicitacao.veiculo.placa %}
                             <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Placa</p>
-                                <p class="font-bold text-lg text-blue-600 dark:text-blue-400">{{ solicitacao.veiculo.placa }}</p>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Placa</span>
+                                <p class="text-sm font-bold text-blue-600 dark:text-blue-400 mt-0.5">{{ solicitacao.veiculo.placa }}</p>
                             </div>
-                            {% endif %}
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Marca</p>
-                                <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.veiculo.marca }}</p>
-                            </div>
-                            
-                            <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Modelo</p>
-                                <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.veiculo.modelo }}</p>
-                            </div>
+                        <div>
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Modelo</span>
+                            <p class="text-xs font-semibold text-gray-900 dark:text-white mt-0.5">{{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo }}</p>
+                        </div>
+                        <div class="pt-1">
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">KM Atual</span>
+                            <p class="text-xs font-semibold text-gray-900 dark:text-white mt-0.5">{{ solicitacao.veiculo.km_atual|default:"0"|floatformat:0 }} km</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- CARD MOTORISTA -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                                 <i class="fa-solid fa-id-card text-amber-600 dark:text-amber-400 text-sm"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Motorista</h2>
-                                <p class="text-gray-600 dark:text-gray-400 text-sm">{{ solicitacao.motorista.nome }}</p>
+                                <h2 class="text-sm font-bold text-gray-900 dark:text-white">Motorista</h2>
+                                <p class="text-[10px] text-gray-500">Responsável pela condução</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="p-6 space-y-4">
-                        {% if solicitacao.motorista.cpf %}
+                    <div class="p-4 space-y-2.5">
                         <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">CPF</p>
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.motorista.cpf }}</p>
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Nome</span>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{{ solicitacao.motorista.nome }}</p>
                         </div>
-                        {% endif %}
-                        
-                        {% if solicitacao.motorista.cnh_numero %}
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">CNH</p>
-                                <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.motorista.cnh_numero }}</p>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">CPF</span>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5 font-mono">{{ solicitacao.motorista.cpf|default:"-" }}</p>
                             </div>
-                            
-                            {% if solicitacao.motorista.cnh_categoria %}
                             <div>
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Categoria</p>
-                                <p class="font-bold text-amber-600 dark:text-amber-400">{{ solicitacao.motorista.cnh_categoria }}</p>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">CNH</span>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ solicitacao.motorista.cnh_numero|default:"-" }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Categoria</span>
+                                <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-0.5">{{ solicitacao.motorista.cnh_categoria|default:"-" }}</p>
+                            </div>
+                            {% if solicitacao.motorista.cnh_vencimento %}
+                            <div>
+                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Vencimento</span>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ solicitacao.motorista.cnh_vencimento|date:"d/m/Y" }}</p>
                             </div>
                             {% endif %}
                         </div>
-                        {% endif %}
-                        
-                        {% if solicitacao.motorista.cnh_vencimento %}
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Vencimento da CNH</p>
-                            <div class="flex items-center gap-2">
-                                <p class="font-semibold text-gray-900 dark:text-white">{{ solicitacao.motorista.cnh_vencimento|date:"d/m/Y" }}</p>
-                                {% if solicitacao.motorista.cnh_vencimento|timeuntil < "30 days" %}
-                                <span class="px-2 py-0.5 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full">
-                                    <i class="fa-solid fa-exclamation-triangle mr-1"></i> Próximo
-                                </span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        
                         {% if solicitacao.motorista.telefone %}
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Telefone</p>
-                            <a href="tel:{{ solicitacao.motorista.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" 
-                               class="font-semibold text-[#00594C] dark:text-[#0A7C6C] hover:underline">
-                                {{ solicitacao.motorista.telefone }}
-                            </a>
+                        <div class="pt-1">
+                            <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Telefone</span>
+                            <a href="tel:{{ solicitacao.motorista.telefone }}" class="text-xs font-semibold text-[#00594C] dark:text-[#0A7C6C] hover:underline block mt-0.5">{{ solicitacao.motorista.telefone }}</a>
                         </div>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- METADADOS -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Informações do Sistema</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fa-solid fa-info-circle text-gray-500 text-sm"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-gray-900 dark:text-white">Informações</h2>
+                                <p class="text-[10px] text-gray-500">Dados do sistema</p>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="p-6 space-y-3">
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Criado em</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
+                            <span class="text-[10px] text-gray-500">Criado em</span>
+                            <span class="text-[10px] font-medium text-gray-900 dark:text-white">{{ solicitacao.data_criacao|date:"d/m/Y • H:i" }}</span>
                         </div>
-                        
                         {% if solicitacao.atualizado_em %}
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Última atualização</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ solicitacao.atualizado_em|date:"d/m/Y • H:i" }}</span>
+                        <div class="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
+                            <span class="text-[10px] text-gray-500">Última atualização</span>
+                            <span class="text-[10px] font-medium text-gray-900 dark:text-white">{{ solicitacao.atualizado_em|date:"d/m/Y • H:i" }}</span>
                         </div>
                         {% endif %}
-                        
-                        {% if solicitacao.previsao_retorno %}
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Previsão de retorno</span>
-                            <span class="font-medium text-blue-600 dark:text-blue-400">{{ solicitacao.previsao_retorno|date:"d/m/Y • H:i" }}</span>
+                        <div class="flex justify-between items-center py-1.5">
+                            <span class="text-[10px] text-gray-500">Contrato</span>
+                            <span class="text-[10px] font-medium text-gray-900 dark:text-white">{{ solicitacao.contrato.nome|default:"Não informado"|truncatechars:20 }}</span>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -472,39 +482,18 @@
     </div>
 </div>
 
-<style>
-    /* Animações suaves */
-    .transition-all {
-        transition-property: all;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        transition-duration: 200ms;
-    }
-
-    /* Hover effects consistentes */
-    .hover\:shadow {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    /* Estilo para gradiente consistente */
-    .bg-gradient-to-r {
-        background-size: 200% 200%;
-    }
-</style>
-
 <script>
-    // Adicionar classes de animação para timeline
+    // Animação suave para os cards
     document.addEventListener('DOMContentLoaded', function() {
-        // Animar timeline items
-        const timelineItems = document.querySelectorAll('.relative.flex.items-start');
-        timelineItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateX(-20px)';
-            
+        const cards = document.querySelectorAll('.rounded-2xl');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(15px)';
             setTimeout(() => {
-                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                item.style.opacity = '1';
-                item.style.transform = 'translateX(0)';
-            }, index * 200);
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 80);
         });
     });
 </script>

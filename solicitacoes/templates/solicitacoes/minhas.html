@@ -4,187 +4,334 @@
 
 {% block extra_css %}
 <style>
+    /* Animações e transições */
     .card-hover {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .card-hover:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 24px -10px rgba(0, 89, 76, 0.15);
-    }
-    
-    .status-pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        box-shadow: 0 12px 24px -10px rgba(0, 89, 76, 0.2);
     }
     
     @keyframes pulse {
         0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
+        50% { opacity: 0.6; }
     }
     
-    .fade-in {
-        animation: fadeIn 0.5s ease-out;
+    .status-pulse {
+        animation: pulse 2s ease-in-out infinite;
     }
     
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .animate-modal-fadein {
+        animation: modalFadeIn 0.2s ease-out;
+    }
+    
+    /* Ajustes específicos para iOS */
+    input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+        min-width: 0;
+    }
+    
+    @supports (-webkit-touch-callout: none) {
+        input[type="date"] {
+            font-size: 16px !important;
+        }
+        .relative input[type="date"] {
+            padding-left: 32px !important;
+        }
+    }
+    
+    .relative .fa-calendar {
+        pointer-events: none;
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+    
+    .dark ::-webkit-scrollbar-track {
+        background: #1f2937;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb {
+        background: #4b5563;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- HEADER PRINCIPAL -->
-    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    
+    <!-- HEADER COM GRADIENTE MODERNO -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-[#00594C] via-[#0a7c6c] to-[#007462] shadow-xl">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="flex-1">
                     <!-- Breadcrumb -->
-                    <nav class="flex items-center space-x-2 text-sm mb-4">
+                    <nav class="hidden sm:flex items-center gap-2 text-sm mb-4">
                         <a href="{% url 'dashboard_solicitante' %}" 
-                        class="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-[#00594C] dark:hover:text-green-400 transition-colors">
+                           class="flex items-center gap-1 text-white/80 hover:text-white transition-colors">
                             <i class="fa-solid fa-home text-xs"></i>
-                            <span class="hidden sm:inline">Dashboard</span>
+                            <span>Dashboard</span>
                         </a>
-                        <i class="fa-solid fa-chevron-right text-xs text-gray-300 dark:text-gray-600"></i>
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Solicitações</span>
+                        <i class="fa-solid fa-chevron-right text-white/50 text-xs"></i>
+                        <span class="font-medium text-white">Solicitações</span>
                     </nav>
                     
-                    <!-- Título e Subtítulo -->
-                    <div class="flex items-start gap-4">
-                        <div class="p-3 bg-gradient-to-br from-[#00594C]/10 to-[#007462]/10 dark:from-[#00594C]/20 dark:to-[#007462]/20 rounded-xl">
-                            <i class="fa-solid fa-file-lines text-2xl text-[#00594C] dark:text-green-400"></i>
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                            <i class="fa-solid fa-file-lines text-2xl text-white"></i>
                         </div>
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-                                Minhas Solicitações
-                            </h1>
-                            <p class="text-gray-500 dark:text-gray-400 mt-1">
-                                Gerencie e acompanhe todas as suas solicitações de veículos
-                            </p>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-white">Minhas Solicitações</h1>
+                            <p class="text-white/80 text-sm mt-1">Gerencie e acompanhe suas solicitações de veículos</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="inline-flex items-center gap-1 text-white/70 text-xs">
+                                    <i class="fa-solid fa-chart-line text-[10px]"></i>
+                                    {{ solicitacoes.paginator.count }} solicitação(ões)
+                                </span>
+                                <span class="w-1 h-1 bg-white/40 rounded-full"></span>
+                                <span class="inline-flex items-center gap-1 text-white/70 text-xs">
+                                    <i class="fa-regular fa-clock text-[10px]"></i>
+                                    {% now "d/m/Y H:i" %}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Botão Nova Solicitação -->
-                <a href="{% url 'lista_veiculos' %}"
-                    class="group relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl
-                        bg-gradient-to-r from-[#00594C] to-[#007462] hover:from-[#004238] hover:to-[#00594C]
-                        text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300
-                        overflow-hidden min-w-[180px]">
-                    <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                    <i class="fa-solid fa-plus relative z-10"></i>
-                    <span class="relative z-10">Nova Solicitação</span>
-                </a>
+                <!-- Botões de Ação -->
+                <div class="flex gap-3">
+                    <a href="{% url 'exportar_minhas_solicitacoes' %}?{% if status_atual and status_atual != 'todos' %}status={{ status_atual }}&{% endif %}{% if search_atual %}search={{ search_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}&{% endif %}{% if request.GET.data_inicio %}data_inicio={{ request.GET.data_inicio }}&{% endif %}{% if request.GET.data_fim %}data_fim={{ request.GET.data_fim }}{% endif %}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold text-sm transition-all duration-300">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Exportar</span>
+                    </a>
+                    
+                    <a href="{% url 'lista_veiculos' %}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-300">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nova Solicitação</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <!-- BARRA DE CONTROLES COM FILTROS -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6 shadow-sm fade-in">
+        
+        <!-- BARRA DE FILTROS -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-5 mb-8 fade-in-up">
             <form method="GET" action="{% url 'minhas_solicitacoes' %}" id="filterForm">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <!-- Pesquisa -->
-                    <div class="flex-1 max-w-md">
-                        <div class="relative">
-                            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" 
-                                name="search"
-                                value="{{ search_atual }}"
-                                placeholder="Buscar por: Tag, Motorista e ID da solicitação..." 
-                                class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
-                                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                                        focus:border-[#00594C] dark:focus:border-green-400 focus:ring-2 focus:ring-[#00594C]/20 dark:focus:ring-green-400/20
-                                        transition-all duration-200">
-                        </div>
-                    </div>
-                    
-                    <!-- Filtros -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <!-- Status -->
-                        <div class="relative">
-                            <select name="status" 
-                                    class="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 
-                                        rounded-lg px-4 py-2.5 pr-10 text-sm text-gray-700 dark:text-gray-300
-                                        focus:border-[#00594C] dark:focus:border-green-400 focus:outline-none focus:ring-2 
-                                        focus:ring-[#00594C]/20 dark:focus:ring-green-400/20 cursor-pointer"
-                                    onchange="this.form.submit()">
-                                <option value="todos" {% if status_atual == 'todos' or not status_atual %}selected{% endif %}>Todos os status</option>
-                                 <option value="PENDENTE" {% if status_atual == 'PENDENTE' %}selected{% endif %}>Pendentes</option>
-                                <option value="REPROVADA" {% if status_atual == 'REPROVADA' %}selected{% endif %}>Reprovadas</option>
-                                <option value="CANCELADA" {% if status_atual == 'CANCELADA' %}selected{% endif %}>Canceladas</option>
-                                <option value="FINALIZADA" {% if status_atual == 'FINALIZADA' %}selected{% endif %}>Finalizadas</option>
-                                <option value="EM_TRANSITO" {% if status_atual == 'EM_TRANSITO' %}selected{% endif %}>Em Trânsito</option>
-                                <option value="AGUARDANDO_SAIDA_PORTARIA" {% if status_atual == 'AGUARDANDO_SAIDA_PORTARIA' %}selected{% endif %}>Aguardando Saída</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                        </div>
-                        
-                        <!-- Ordenação -->
-                        <div class="relative">
-                            <select name="sort"
-                                    class="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 
-                                        rounded-lg px-4 py-2.5 pr-10 text-sm text-gray-700 dark:text-gray-300
-                                        focus:border-[#00594C] dark:focus:border-green-400 focus:outline-none focus:ring-2 
-                                        focus:ring-[#00594C]/20 dark:focus:ring-green-400/20 cursor-pointer"
-                                    onchange="this.form.submit()">
-                                <option value="recentes" {% if sort_atual == 'recentes' or not sort_atual %}selected{% endif %}>Mais recentes</option>
-                                <option value="antigas" {% if sort_atual == 'antigas' %}selected{% endif %}>Mais antigas</option>
-                            </select>
-                            <i class="fa-solid fa-sort absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                        </div>
-                        
-                        <!-- Limpar Filtros -->
-                        <a href="{% url 'minhas_solicitacoes' %}"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
-                                bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600
-                                text-gray-700 dark:text-gray-300 font-medium
-                                transition-all duration-200">
-                            <i class="fa-solid fa-eraser"></i>
-                            <span class="hidden sm:inline">Limpar</span>
-                        </a>
-                        
-                        <!-- Contador -->
-                        <span class="text-sm font-medium text-[#00594C] dark:text-green-400 px-2">
-                            {{ solicitacoes.paginator.count }} resultado{{ solicitacoes.paginator.count|pluralize }}
-                        </span>
+                <!-- Busca -->
+                <div class="mb-5">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" 
+                               name="search"
+                               value="{{ search_atual }}"
+                               placeholder="Buscar por tag, motorista, ID ou destino..." 
+                               class="w-full pl-11 pr-4 py-3 text-sm rounded-xl border border-gray-200 dark:border-gray-700
+                                      bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white
+                                      focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20 transition-all">
                     </div>
                 </div>
                 
-                <!-- Input hidden para página -->
-                <input type="hidden" name="page" value="1" id="pageInput">
+                <!-- Filtros em linha -->
+                <div class="flex flex-wrap items-end gap-3">
+                    <!-- Status -->
+                    <div class="flex-1 min-w-[140px]">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Status</label>
+                        <select name="status" 
+                                class="w-full appearance-none bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 
+                                       rounded-xl px-4 py-2.5 pr-10 text-sm text-gray-900 dark:text-white
+                                       focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20 cursor-pointer">
+                            <option value="todos" {% if status_atual == 'todos' or not status_atual %}selected{% endif %}>📋 Todos</option>
+                            <option value="PENDENTE" {% if status_atual == 'PENDENTE' %}selected{% endif %}>⏳ Pendentes</option>
+                            <option value="AGUARDANDO_SAIDA_PORTARIA" {% if status_atual == 'AGUARDANDO_SAIDA_PORTARIA' %}selected{% endif %}>🚪 Aguard. Saída</option>
+                            <option value="EM_TRANSITO" {% if status_atual == 'EM_TRANSITO' %}selected{% endif %}>🚚 Em Trânsito</option>
+                            <option value="FINALIZADA" {% if status_atual == 'FINALIZADA' %}selected{% endif %}>🏁 Finalizadas</option>
+                            <option value="REPROVADA" {% if status_atual == 'REPROVADA' %}selected{% endif %}>❌ Reprovadas</option>
+                            <option value="CANCELADA" {% if status_atual == 'CANCELADA' %}selected{% endif %}>⛔ Canceladas</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                    </div>
+                    
+                    <!-- Ordenação -->
+                    <div class="flex-1 min-w-[130px]">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Ordenar</label>
+                        <select name="sort"
+                                class="w-full appearance-none bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 
+                                       rounded-xl px-4 py-2.5 pr-10 text-sm text-gray-900 dark:text-white
+                                       focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20 cursor-pointer">
+                            <option value="recentes" {% if sort_atual == 'recentes' or not sort_atual %}selected{% endif %}>🔄 Recentes</option>
+                            <option value="antigas" {% if sort_atual == 'antigas' %}selected{% endif %}>⏪ Antigas</option>
+                        </select>
+                        <i class="fa-solid fa-sort absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                    </div>
+                    
+                    <!-- Data Início -->
+                    <div class="flex-1 min-w-[140px]">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                            <i class="fa-regular fa-calendar mr-1"></i>Data inicial
+                        </label>
+                        <div class="relative">
+                            <input type="date" 
+                                   name="data_inicio"
+                                   id="data_inicio"
+                                   value="{{ request.GET.data_inicio|default:'' }}"
+                                   class="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00594C] focus:border-transparent"
+                                   style="min-height: 42px;">
+                            <i class="fa-regular fa-calendar absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
+                            {% if request.GET.data_inicio %}
+                            <button type="button" onclick="limparData('data_inicio')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Data Fim -->
+                    <div class="flex-1 min-w-[140px]">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                            <i class="fa-regular fa-calendar mr-1"></i>Data final
+                        </label>
+                        <div class="relative">
+                            <input type="date" 
+                                   name="data_fim"
+                                   id="data_fim"
+                                   value="{{ request.GET.data_fim|default:'' }}"
+                                   class="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00594C] focus:border-transparent"
+                                   style="min-height: 42px;">
+                            <i class="fa-regular fa-calendar absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
+                            {% if request.GET.data_fim %}
+                            <button type="button" onclick="limparData('data_fim')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Botões -->
+                    <div class="flex gap-2">
+                        <button type="submit" class="px-5 py-2.5 bg-[#00594C] hover:bg-[#004238] !text-white rounded-xl text-sm font-medium transition-all shadow-sm">
+                            <i class="fa-solid fa-filter mr-1.5 !text-white"></i>Filtrar
+                        </button>
+                        
+                        {% if status_atual and status_atual != 'todos' or search_atual or request.GET.data_inicio or request.GET.data_fim %}
+                        <a href="{% url 'minhas_solicitacoes' %}" 
+                           class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium transition-all">
+                            <i class="fa-solid fa-eraser mr-1.5"></i>Limpar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Contador de resultados (mobile) -->
+                <div class="mt-4 sm:hidden flex justify-center">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+                        <i class="fa-solid fa-chart-simple text-[#00594C] dark:text-green-400 text-xs"></i>
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ solicitacoes.paginator.count }}</span>
+                        <span class="text-xs text-gray-500">resultado{{ solicitacoes.paginator.count|pluralize }}</span>
+                    </div>
+                </div>
             </form>
-
-            <!-- Dentro da barra de controles, após o campo de busca -->
-            <div class="text-xs text-gray-400 dark:text-gray-500 mt-1 ml-2">
-                <i class="fa-solid fa-lightbulb mr-1"></i>
-                Dica: você pode buscar por tag (Ex: VA-950), motorista, ID da Solicitação ou destino
+            
+            <!-- Dica rápida -->
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex items-center gap-2 text-xs text-gray-400">
+                    <i class="fa-solid fa-lightbulb text-yellow-500"></i>
+                    <span>Busque por <strong class="text-gray-600 dark:text-gray-300">tag</strong> (VA-950), <strong class="text-gray-600 dark:text-gray-300">motorista</strong>, <strong class="text-gray-600 dark:text-gray-300">ID</strong>, <strong class="text-gray-600 dark:text-gray-300">destino</strong> ou <strong class="text-gray-600 dark:text-gray-300">período</strong></span>
+                </div>
             </div>
-
+            
             <!-- Filtros ativos -->
-            {% if status_atual and status_atual != 'todos' or search_atual %}
-            <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <span class="text-xs text-gray-500 dark:text-gray-400">Filtros ativos:</span>
-                <div class="flex flex-wrap gap-2">
+            {% if status_atual and status_atual != 'todos' or search_atual or request.GET.data_inicio or request.GET.data_fim %}
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs text-gray-500">📌 Filtros ativos:</span>
                     {% if status_atual and status_atual != 'todos' %}
-                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-[#00594C]/10 text-[#00594C] dark:bg-green-900/20 dark:text-green-400 rounded text-xs">
-                        <i class="fa-solid fa-tag"></i>
-                        Status: {{ status_atual|title }}
-                        <a href="?{% if search_atual %}search={{ search_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}" class="ml-1 hover:text-red-500">
-                            <i class="fa-solid fa-circle-xmark"></i>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#00594C]/10 text-[#00594C] dark:bg-green-900/20 dark:text-green-400 rounded-full text-xs">
+                        <i class="fa-solid {% if status_atual == 'PENDENTE' %}fa-clock{% elif status_atual == 'AGUARDANDO_SAIDA_PORTARIA' %}fa-door-open{% elif status_atual == 'EM_TRANSITO' %}fa-truck-fast{% elif status_atual == 'FINALIZADA' %}fa-flag-checkered{% elif status_atual == 'REPROVADA' %}fa-ban{% elif status_atual == 'CANCELADA' %}fa-circle-xmark{% endif %} text-[10px]"></i>
+                        <span>{% if status_atual == 'PENDENTE' %}Pendente{% elif status_atual == 'AGUARDANDO_SAIDA_PORTARIA' %}Aguardando Saída{% elif status_atual == 'EM_TRANSITO' %}Em Trânsito{% elif status_atual == 'FINALIZADA' %}Finalizada{% elif status_atual == 'REPROVADA' %}Reprovada{% elif status_atual == 'CANCELADA' %}Cancelada{% endif %}</span>
+                        <a href="?{% if search_atual %}search={{ search_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}" class="hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
                         </a>
                     </span>
                     {% endif %}
-                    
                     {% if search_atual %}
-                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-[#00594C]/10 text-[#00594C] dark:bg-green-900/20 dark:text-green-400 rounded text-xs">
-                        <i class="fa-solid fa-search"></i>
-                        Busca: "{{ search_atual }}"
-                        <a href="?{% if status_atual and status_atual != 'todos' %}status={{ status_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}" class="ml-1 hover:text-red-500">
-                            <i class="fa-solid fa-circle-xmark"></i>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#00594C]/10 text-[#00594C] dark:bg-green-900/20 dark:text-green-400 rounded-full text-xs">
+                        <i class="fa-solid fa-search text-[10px]"></i>
+                        <span>"{{ search_atual|truncatechars:12 }}"</span>
+                        <a href="?{% if status_atual and status_atual != 'todos' %}status={{ status_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}" class="hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                        </a>
+                    </span>
+                    {% endif %}
+                    {% if request.GET.data_inicio %}
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                        <i class="fa-regular fa-calendar text-[10px]"></i>
+                        De: {{ request.GET.data_inicio }}
+                        <a href="?{% if status_atual and status_atual != 'todos' %}status={{ status_atual }}&{% endif %}{% if search_atual %}search={{ search_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}" class="hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                        </a>
+                    </span>
+                    {% endif %}
+                    {% if request.GET.data_fim %}
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                        <i class="fa-regular fa-calendar text-[10px]"></i>
+                        Até: {{ request.GET.data_fim }}
+                        <a href="?{% if status_atual and status_atual != 'todos' %}status={{ status_atual }}&{% endif %}{% if search_atual %}search={{ search_atual }}&{% endif %}{% if sort_atual %}sort={{ sort_atual }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}" class="hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
                         </a>
                     </span>
                     {% endif %}
@@ -195,193 +342,143 @@
 
         <!-- LISTA DE SOLICITAÇÕES -->
         {% if solicitacoes %}
-        <div id="solicitacoesContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {% for s in solicitacoes %}
-            <div class="solicitacao-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700
-                        p-5 card-hover overflow-hidden relative group">
-                <!-- Indicador de urgência -->
-                {% if s.prioridade == 'ALTA' %}
-                <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full mr-4 mt-4 status-pulse"></div>
-                {% endif %}
-                
-                <!-- CABEÇALHO -->
-                <div class="flex items-start justify-between gap-4 mb-5">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <i class="fa-solid fa-car text-gray-600 dark:text-gray-400"></i>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <!-- Header do Card -->
+                <div class="p-5 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-800">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <!-- Tag -->
+                            <div class="mb-2">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-900 dark:bg-green-900 border border-[#00594C]/20 dark:border-green-800/50">
+                                    <i class="fa-solid fa-tag !text-white dark:text-green-400 text-xs"></i>
+                                    <span class="!text-white dark:text-green-400 font-mono font-bold text-sm">{{ s.veiculo.tag_interna|default:"SEM TAG" }}</span>
+                                </span>
                             </div>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-900 dark:text-white text-lg truncate">
-                                {{ s.veiculo.tag_interna}} -  {{ s.veiculo.marca }} {{ s.veiculo.modelo }} 
-                                </h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 
-                                            text-gray-600 dark:text-gray-400 text-xs rounded">
-                                        <i class="fa-solid fa-hashtag text-xs mr-1"></i>
-                                        #{{ s.id|stringformat:"04d" }}
-                                    </span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                                        <i class="fa-solid fa-calendar mr-1"></i>
-                                        {{ s.data_criacao|date:"d/m/Y H:i" }}
-                                    </span>
-                                </div>
+                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">{{ s.veiculo.marca }} {{ s.veiculo.modelo }}</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-gray-500 font-mono">#{{ s.id|stringformat:"04d" }}</span>
+                                <span class="text-gray-300">•</span>
+                                <span class="text-xs text-gray-500">{{ s.data_criacao|date:"d/m/Y H:i" }}</span>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- STATUS -->
-                    <div class="shrink-0">
-                        {% if s.status == 'PENDENTE' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                                bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300
-                                border border-yellow-200 dark:border-yellow-800/50">
-                            <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% elif s.status == 'APROVADA' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                                bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300
-                                border border-green-200 dark:border-green-800/50">
-                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% elif s.status == 'EM_TRANSITO' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                                bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300
-                                border border-blue-200 dark:border-blue-800/50">
-                            <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                                bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300
-                                border border-purple-200 dark:border-purple-800/50">
-                            <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>                        
-                        {% elif s.status == 'REPROVADA' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                            bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300
-                            border border-red-200 dark:border-red-800/50">
-                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% elif s.status == 'CANCELADA' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                            bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300
-                            border border-gray-200 dark:border-gray-700">
-                            <span class="w-1.5 h-1.5 bg-gray-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% elif s.status == 'FINALIZADA' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                                bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300
-                                border border-teal-200 dark:border-teal-800/50">
-                            <span class="w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
-                            {{ s.get_status_display|upper }}
-                        </span>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- INFORMAÇÕES -->
-                <div class="space-y-4 mb-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Destino
-                            </p>
-                            <p class="font-medium text-gray-900 dark:text-white truncate">
-                                <i class="fa-solid fa-location-dot text-[#00594C] dark:text-green-400 mr-2"></i>
-                                {{ s.destino }}
-                            </p>
                         </div>
                         
-                        {% if s.previsao_retorno %}
-                        <div class="space-y-1">
-                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Previsão de Retorno
-                            </p>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                                <i class="fa-solid fa-clock text-[#00594C] dark:text-green-400 mr-2"></i>
-                                {{ s.previsao_retorno|date:"d/m/Y H:i" }}
-                            </p>
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Progresso -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                            <span>Solicitado</span>
-                            <span>Cancelado/Reprovado</span>
-                            <span>Aprovado</span>
-                            <span>Em uso</span>
-                            <span>Finalizado</span>
-                        </div>
-                        <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            {% if  s.status == 'REPROVADA' %}
-                                <!-- Barra vermelha para cancelado/reprovado -->
-                                <div class="h-full bg-gradient-to-r from-red-500 to-red-400" 
-                                    style="width: {% if s.status == 'REPROVADA' %}30{% endif %}%">
-                                </div>
-                            {% elif  s.status == 'CANCELADA' %}  
-                                    <div class="h-full bg-gradient-to-r from-gray-500 to-gray-400" 
-                                    style="width: {% if s.status == 'CANCELADA' %}30{% endif %}%">
-                                </div>
-                            {% elif  s.status == 'PENDENTE' %}  
-                                    <div class="h-full bg-gradient-to-r from-green-500 to-green-600" 
-                                    style="width: {% if s.status == 'PENDENTE' %}10{% endif %}%">
-                                </div>   
-                             {% elif  s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}  
-                                    <div class="h-full bg-gradient-to-r from-green-500 to-green-600" 
-                                    style="width: {% if s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}60{% endif %}%">
-                                </div>      
-                            {% else %}
-                                <!-- Barra verde para os demais status -->
-                                <div class="h-full bg-gradient-to-r from-[#00594C] to-green-500" 
-                                    style="width: {% if s.status == 'FINALIZADA' %}100{% elif s.status == 'APROVADA' %}66{% elif s.status == 'EM_TRANSITO' %}75{% else %}25{% endif %}%">
-                                </div>
+                        <!-- Status Badge -->
+                        <div>
+                            {% if s.status == 'PENDENTE' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
+                                <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></span>
+                                PENDENTE
+                            </span>
+                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300">
+                                <i class="fa-solid fa-door-open text-[10px]"></i>
+                                SAÍDA
+                            </span>
+                            {% elif s.status == 'EM_TRANSITO' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                                <i class="fa-solid fa-truck-fast text-[10px]"></i>
+                                TRÂNSITO
+                            </span>
+                            {% elif s.status == 'FINALIZADA' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+                                <i class="fa-solid fa-check-circle text-[10px]"></i>
+                                FINALIZADA
+                            </span>
+                            {% elif s.status == 'REPROVADA' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                                <i class="fa-solid fa-ban text-[10px]"></i>
+                                REPROVADA
+                            </span>
+                            {% elif s.status == 'CANCELADA' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                <i class="fa-solid fa-circle-xmark text-[10px]"></i>
+                                CANCELADA
+                            </span>
                             {% endif %}
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 
-                <!-- AÇÕES -->
-                <div class="pt-5 border-t border-gray-100 dark:border-gray-700">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex flex-wrap gap-2">
-                            <!-- DETALHES -->
-                            <a href="{% url 'solicitacao_detalhe' s.id %}"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg
-                                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
-                                    text-gray-700 dark:text-gray-300 text-sm font-medium transition-all duration-200">
-                                <i class="fa-solid fa-eye"></i>
-                                <span>Detalhes</span>
-                            </a>
-                            
-                            {% if s.status == "PENDENTE" %}
-                            <!-- EDITAR -->
-                            <a href="{% url 'editar_solicitacao' s.id %}"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg
-                                    bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30
-                                    text-blue-600 dark:text-blue-400 text-sm font-medium transition-all duration-200">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                <span>Editar</span>
-                            </a>
-
-                            <!-- CANCELAR -->
-                            <button onclick="openCancelarModal({{ s.id }}, '{{ s.veiculo.marca }} {{ s.veiculo.modelo }}')"
-                                    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg
-                                        bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30
-                                        text-red-600 dark:text-red-400 text-sm font-medium transition-all duration-200">
-                                <i class="fa-solid fa-xmark"></i>
-                                <span>Cancelar</span>
-                            </button>
-                            {% endif %}
+                <!-- Corpo do Card -->
+                <div class="p-5 space-y-4">
+                    <!-- Destino -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-location-dot text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Destino</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ s.destino }}</p>
                         </div>
                     </div>
+                    
+                    <!-- Motorista -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-user text-blue-600 dark:text-blue-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Motorista</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                {{ s.motorista.nome }}
+                                <span class="text-xs text-gray-500 ml-1">({{ s.motorista.matricula }})</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Previsão de Retorno (destaque) -->
+                    {% if s.previsao_retorno %}
+                    <div class="flex items-start gap-3 p-3 -mx-1 rounded-xl bg-amber-50/50 dark:bg-amber-900/10 border-l-2 border-amber-400">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-regular fa-calendar-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Previsão de Retorno</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                {{ s.previsao_retorno|date:"d/m/Y" }}
+                                <span class="text-amber-600 dark:text-amber-400 ml-1">{{ s.previsao_retorno|date:"H:i" }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Barra de Progresso -->
+                <div class="px-5 pb-3">
+                    <div class="flex justify-between text-[9px] text-gray-400 mb-1.5">
+                        <span><i class="fa-regular fa-file-lines mr-1"></i>Sol.</span>
+                        <span><i class="fa-solid fa-ban mr-1"></i>Cancel/Reprov</span>
+                        <span><i class="fa-solid fa-check-circle mr-1"></i>Aprov.</span>
+                        <span><i class="fa-solid fa-car mr-1"></i>Uso</span>
+                        <span><i class="fa-solid fa-flag-checkered mr-1"></i>Final</span>
+                    </div>
+                    <div class="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        {% if s.status == 'PENDENTE' %}
+                        <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full" style="width: 10%"></div>
+                        {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
+                        <div class="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style="width: 50%"></div>
+                        {% elif s.status == 'CANCELADA' %}
+                           <div class="h-full bg-gradient-to-r from-gray-900 to-gray-400 rounded-full" style="width: 25%"></div>
+                        {% elif s.status == 'REPROVADA' %}
+                        <div class="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full" style="width: 25%"></div>
+                        {% elif s.status == 'EM_TRANSITO' %}
+                        <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" style="width: 75%"></div>
+                        {% elif s.status == 'FINALIZADA' %}
+                        <div class="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full" style="width: 100%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Ações -->
+                <div class="px-5 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+                    <a href="{% url 'solicitacao_detalhe' s.id %}" 
+                       class="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-[#00594C] hover:text-[#004238] transition-colors group">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>Ver Detalhes</span>
+                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                    </a>
                 </div>
             </div>
             {% endfor %}
@@ -389,57 +486,88 @@
 
         <!-- PAGINAÇÃO -->
         {% if solicitacoes.has_other_pages %}
-        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 fade-in">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <!-- Mobile -->
+            <div class="sm:hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs text-gray-500">
+                        <i class="fa-regular fa-file-lines mr-1"></i>
+                        {{ solicitacoes.start_index }} - {{ solicitacoes.end_index }} de {{ solicitacoes.paginator.count }}
+                    </span>
+                    <div class="flex gap-2">
+                        {% if solicitacoes.has_previous %}
+                        <a href="?page={{ solicitacoes.previous_page_number }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
+                           class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-200 transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i> Anterior
+                        </a>
+                        {% endif %}
+                        {% if solicitacoes.has_next %}
+                        <a href="?page={{ solicitacoes.next_page_number }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
+                           class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-200 transition-colors">
+                            Próxima <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="overflow-x-auto pb-2">
+                    <div class="flex items-center justify-center gap-1 min-w-max">
+                        {% if solicitacoes.has_previous %}
+                        <a href="?page=1{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
+                           class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200">
+                            <i class="fa-solid fa-angles-left text-xs"></i>
+                        </a>
+                        {% endif %}
+                        {% for num in solicitacoes.paginator.page_range %}
+                            {% if solicitacoes.number == num %}
+                            <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#00594C] text-white font-semibold shadow-sm">{{ num }}</span>
+                            {% elif num > solicitacoes.number|add:'-4' and num < solicitacoes.number|add:'4' %}
+                            <a href="?page={{ num }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
+                               class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if solicitacoes.has_next %}
+                        <a href="?page={{ solicitacoes.paginator.num_pages }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
+                           class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm hover:bg-gray-200">
+                            <i class="fa-solid fa-angles-right text-xs"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desktop -->
+            <div class="hidden sm:flex sm:flex-col items-center gap-4">
                 <div class="text-sm text-gray-600 dark:text-gray-400">
                     Mostrando <span class="font-semibold text-gray-900 dark:text-white">{{ solicitacoes.start_index }}</span>
                     a <span class="font-semibold text-gray-900 dark:text-white">{{ solicitacoes.end_index }}</span>
-                    de <span class="font-semibold text-gray-900 dark:text-white">{{ solicitacoes.paginator.count }}</span>
-                    solicitações
+                    de <span class="font-semibold text-gray-900 dark:text-white">{{ solicitacoes.paginator.count }}</span> solicitações
                 </div>
-                
                 <div class="flex items-center gap-1">
                     {% if solicitacoes.has_previous %}
                     <a href="?page=1{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
-                        class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                            hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400
-                            transition-colors duration-200">
+                       class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
                         <i class="fa-solid fa-angles-left"></i>
                     </a>
                     <a href="?page={{ solicitacoes.previous_page_number }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
-                        class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                            hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400
-                            transition-colors duration-200">
+                       class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
                         <i class="fa-solid fa-chevron-left"></i>
                     </a>
                     {% endif %}
-                    
                     {% for num in solicitacoes.paginator.page_range %}
                         {% if solicitacoes.number == num %}
-                        <span class="px-3 py-2 rounded-lg bg-[#00594C] text-white font-semibold shadow-sm">
-                            {{ num }}
-                        </span>
+                        <span class="px-3 py-2 rounded-lg bg-[#00594C] text-white font-semibold shadow-sm">{{ num }}</span>
                         {% elif num > solicitacoes.number|add:'-3' and num < solicitacoes.number|add:'3' %}
                         <a href="?page={{ num }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
-                            class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                                hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400
-                                transition-colors duration-200">
-                            {{ n }}
-                        </a>
+                           class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">{{ num }}</a>
                         {% endif %}
                     {% endfor %}
-                    
                     {% if solicitacoes.has_next %}
                     <a href="?page={{ solicitacoes.next_page_number }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
-                        class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                            hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400
-                            transition-colors duration-200">
+                       class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <a href="?page={{ solicitacoes.paginator.num_pages }}{% if status_atual and status_atual != 'todos' %}&status={{ status_atual }}{% endif %}{% if search_atual %}&search={{ search_atual }}{% endif %}{% if sort_atual %}&sort={{ sort_atual }}{% endif %}"
-                        class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                        hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400
-                        transition-colors duration-200">
+                       class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
                         <i class="fa-solid fa-angles-right"></i>
                     </a>
                     {% endif %}
@@ -449,61 +577,31 @@
         {% endif %}
 
         {% else %}
-        <!-- ESTADO VAZIO -->
-        <div class="max-w-2xl mx-auto py-12 sm:py-20 px-4 text-center fade-in">
-            <div class="relative inline-block mb-6">
-                <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br 
-                            from-[#00594C]/10 to-[#007462]/10 dark:from-[#00594C]/20 dark:to-[#007462]/20
-                            flex items-center justify-center">
-                    <i class="fa-solid fa-file-lines text-[#00594C] dark:text-green-400 text-4xl"></i>
-                </div>
-                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-500 
-                            rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-plus text-white"></i>
-                </div>
+        <!-- Estado Vazio -->
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#00594C]/10 to-[#007462]/10 dark:from-[#00594C]/20 dark:to-[#007462]/20 mb-4">
+                <i class="fa-solid fa-file-lines text-4xl text-[#00594C] dark:text-green-400"></i>
             </div>
-            
-            <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-                Nenhuma solicitação encontrada
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nenhuma solicitação encontrada</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
                 {% if search_atual or status_atual and status_atual != 'todos' %}
                     Nenhuma solicitação corresponde aos filtros aplicados.
                 {% else %}
                     Você ainda não possui solicitações de veículos.
                 {% endif %}
             </p>
-            
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <div class="flex flex-wrap gap-3 justify-center">
                 {% if search_atual or status_atual and status_atual != 'todos' %}
-                <a href="{% url 'minhas_solicitacoes' %}"
-                   class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                          bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600
-                          text-gray-700 dark:text-gray-300 font-semibold
-                          transition-all duration-300">
-                    <i class="fa-solid fa-eraser"></i>
-                    <span>Limpar Filtros</span>
+                <a href="{% url 'minhas_solicitacoes' %}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl text-sm font-medium transition-colors">
+                    <i class="fa-solid fa-eraser"></i>Limpar Filtros
                 </a>
                 {% else %}
-                <a href="{% url 'lista_veiculos' %}"
-                   class="group relative inline-flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl
-                          bg-gradient-to-r from-[#00594C] to-[#007462] hover:from-[#004238] hover:to-[#00594C]
-                          text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300
-                          overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent -translate-x-full 
-                               group-hover:translate-x-full transition-transform duration-700"></div>
-                    <i class="fa-solid fa-plus relative z-10"></i>
-                    <span class="relative z-10">Criar Primeira Solicitação</span>
+                <a href="{% url 'lista_veiculos' %}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00594C] to-[#007462] hover:from-[#004238] hover:to-[#00594C] text-white rounded-xl text-sm font-medium shadow-md transition-all">
+                    <i class="fa-solid fa-plus"></i>Criar Primeira Solicitação
                 </a>
                 {% endif %}
-                
-                <a href="{% url 'dashboard_solicitante' %}"
-                   class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl
-                          border-2 border-gray-300 dark:border-gray-600 hover:border-[#00594C] dark:hover:border-green-400
-                          text-gray-700 dark:text-gray-300 font-semibold hover:text-[#00594C] dark:hover:text-green-400
-                          transition-all duration-300">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Voltar ao Dashboard</span>
+                <a href="{% url 'dashboard_solicitante' %}" class="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-gray-300 dark:border-gray-600 hover:border-[#00594C] dark:hover:border-green-400 rounded-xl text-sm font-medium transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>Voltar ao Dashboard
                 </a>
             </div>
         </div>
@@ -512,86 +610,95 @@
 </div>
 
 <!-- MODAL DE CANCELAMENTO -->
-<div id="modalCancelar"
-     class="fixed inset-0 hidden z-50 items-center justify-center bg-black/50 px-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md p-6 shadow-xl">
-        <h3 class="text-lg font-bold text-red-600 mb-2">
-            Cancelar solicitação
-        </h3>
-        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            Você está prestes a cancelar a solicitação do veículo:
-            <strong id="cancelarVeiculo"></strong>
-        </p>
-        <form method="POST" id="formCancelar" class="space-y-4">
-            {% csrf_token %}
-            <textarea name="motivo_cancelamento"
-                      required
-                      rows="3"
-                      placeholder="Informe o motivo do cancelamento"
-                      class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-sm
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2
-                             focus:ring-red-500/30 focus:border-red-500"></textarea>
-            <div class="flex gap-2">
-                <button type="button"
-                        onclick="closeCancelarModal()"
-                        class="flex-1 bg-gray-200 dark:bg-gray-700 py-2 rounded-lg text-sm">
-                    Voltar
-                </button>
-                <button type="submit"
-                        id="btnConfirmarCancelamento"
-                        class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-semibold">
-                    Confirmar cancelamento
+<div id="modalCancelar" class="fixed inset-0 hidden z-[9999] items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl animate-modal-fadein">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <i class="fa-solid fa-exclamation-triangle text-red-600 dark:text-red-400 text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Cancelar Solicitação</h3>
+                </div>
+                <button onclick="fecharModalCancelar()" class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                    <i class="fa-solid fa-xmark text-gray-500 text-xl"></i>
                 </button>
             </div>
-        </form>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Você está prestes a cancelar a solicitação do veículo:</p>
+            <p class="text-base font-semibold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg mb-4" id="cancelarVeiculoNome">Carregando...</p>
+            <form method="POST" id="formCancelarSolicitacao" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="motivo_cancelamento_input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Motivo do cancelamento <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="motivo_cancelamento_input" name="motivo_cancelamento" required rows="3"
+                              placeholder="Descreva o motivo do cancelamento..."
+                              class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 resize-none"></textarea>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Este motivo será registrado para fins de auditoria.</p>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="fecharModalCancelar()" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 py-2.5 rounded-lg text-sm font-medium">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg text-sm font-semibold">Confirmar Cancelamento</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-// Funções para o modal de cancelamento
-function openCancelarModal(id, veiculo) {
+function limparData(campoId) {
+    document.getElementById(campoId).value = '';
+    document.getElementById('filterForm').submit();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const dataInicio = document.getElementById('data_inicio');
+    const dataFim = document.getElementById('data_fim');
+    if (dataInicio) dataInicio.max = hoje;
+    if (dataFim) dataFim.max = hoje;
+    if (dataInicio && dataFim) {
+        dataInicio.addEventListener('change', function() { if (this.value) dataFim.min = this.value; });
+        dataFim.addEventListener('change', function() { if (this.value) dataInicio.max = this.value; });
+    }
+});
+
+let solicitaIdAtual = null;
+
+function abrirModalCancelar(id, veiculoInfo) {
+    solicitaIdAtual = id;
+    const veiculoSpan = document.getElementById('cancelarVeiculoNome');
+    if (veiculoSpan) veiculoSpan.textContent = veiculoInfo;
+    const textarea = document.getElementById('motivo_cancelamento_input');
+    if (textarea) textarea.value = '';
+    const form = document.getElementById('formCancelarSolicitacao');
+    if (form) form.action = `/solicitacoes/cancelar/${id}/`;
     const modal = document.getElementById('modalCancelar');
-    const form = document.getElementById('formCancelar');
-    const veiculoSpan = document.getElementById('cancelarVeiculo');
-    
-    if (modal && form && veiculoSpan) {
-        form.action = `/solicitacoes/cancelar/${id}/`;
-        veiculoSpan.textContent = veiculo;
+    if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.style.overflow = 'hidden';
+        setTimeout(() => { if (textarea) textarea.focus(); }, 100);
     }
 }
 
-function closeCancelarModal() {
+function fecharModalCancelar() {
     const modal = document.getElementById('modalCancelar');
     if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         document.body.style.overflow = 'auto';
     }
+    const form = document.getElementById('formCancelarSolicitacao');
+    if (form) form.reset();
+    solicitaIdAtual = null;
 }
 
-// Eventos do modal
 document.addEventListener('DOMContentLoaded', function() {
-    // Fechar com ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeCancelarModal();
-        }
-    });
-    
-    // Fechar clicando fora
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharModalCancelar(); });
     const modal = document.getElementById('modalCancelar');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeCancelarModal();
-            }
-        });
-    }
+    if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) fecharModalCancelar(); });
 });
 </script>
 {% endblock %}

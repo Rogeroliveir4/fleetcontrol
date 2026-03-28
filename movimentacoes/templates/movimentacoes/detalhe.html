@@ -91,19 +91,19 @@
             <!-- COLUNA ESQUERDA (2/3) -->
             <div class="lg:col-span-2 space-y-4">
                 <!-- SEÇÃO: SAÍDA DO PÁTIO -->
-                <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow">
+                <div class="bg-white dark:bg-gray-900  rounded-lg border border-gray-200 dark:border-gray-800 shadow">
                     <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-t-lg">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
+                                  <i class="fa-solid fa-arrow-right !text-white"></i>
                                 <div>
-                                    <h2 class="text-lg font-bold">Saída do Pátio</h2>
-                                    <p class="text-sm opacity-90">{{ mov.data_saida|date:'d/m/Y H:i' }}</p>
+                                    <h2 class="text-lg font-bold !text-white">Saída do Pátio</h2>
+                                    <p class="text-sm opacity-90 !text-white">{{ mov.data_saida|date:'d/m/Y H:i' }}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs opacity-90">Registrado por</p>
-                                <p class="text-sm font-semibold">{{ mov.porteiro_saida_nome }}</p>
+                                <p class="text-xs opacity-90 !text-white">Registrado por</p>
+                                <p class="text-sm font-semibold !text-white">{{ mov.porteiro_saida_nome }}</p>
                             </div>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                         <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                                    <i class="fa-solid fa-gauge-high text-white text-sm"></i>
+                                    <i class="fa-solid fa-gauge-high text-white text-sm !text-white"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs text-blue-600 dark:text-blue-400">Quilometragem na Saída</p>
@@ -221,20 +221,20 @@
                 </div>
                 
                 <!-- SEÇÃO: RETORNO AO PÁTIO -->
-                {% if mov.data_retorno %}
-                    <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow">
-                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-3 rounded-t-lg">
+                {% if mov.data_retorno %} 
+                    <div class="bg-white dark:bg-gray-900 rounded-lg !text-white border border-gray-200 dark:border-gray-800 shadow">
+                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 !text-white p-3 rounded-t-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-arrow-right-to-bracket text-lg"></i>
+                                    <i class="fa-solid fa-arrow-left !text-white"></i>
                                     <div>
-                                        <h2 class="text-lg font-bold">Retorno ao Pátio</h2>
-                                        <p class="text-sm opacity-90">{{ mov.data_retorno|date:'d/m/Y H:i' }}</p>
+                                        <h2 class="text-lg !text-white font-bold">Retorno ao Pátio</h2>
+                                        <p class="text-sm opacity-90 !text-white">{{ mov.data_retorno|date:'d/m/Y H:i' }}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-xs opacity-90">Registrado por</p>
-                                    <p class="text-sm font-semibold">{{ mov.porteiro_retorno_nome }}</p>
+                                    <p class="text-xs opacity-90 !text-white">Registrado por</p>
+                                    <p class="text-sm font-semibold !text-white">{{ mov.porteiro_retorno_nome }}</p>
                                 </div>
                             </div>
                         </div>

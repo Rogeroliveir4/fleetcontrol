@@ -12,6 +12,7 @@ from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 import openpyxl
 from django.db.models import Sum, Count, Q
+from calendar import monthrange
 
 
 @login_required
@@ -30,12 +31,26 @@ def dashboard(request):
 
 # DASHBOARD DO GESTOR (COM DADOS REAIS DE SOLICITAÇÕES E MOVIMENTAÇÕES)
 @login_required
+def dashboard(request):
+    perfil = request.user.perfilusuario
+    
+    # Redireciona conforme o nível do usuário
+    if perfil.nivel == "basico":
+        return redirect("dashboard_motorista")
+    elif perfil.nivel in ["gestor", "adm"]:
+        return redirect("dashboard_gestor")
+    else:
+        # Nível desconhecido - redireciona para login ou página inicial
+        return redirect("login")
+
+
+# DASHBOARD DO GESTOR (COM DADOS REAIS DE SOLICITAÇÕES E MOVIMENTAÇÕES)
+@login_required
 def dashboard_gestor(request):
-    """Dashboard do Gestor - Versão integrada com as mesmas estatísticas da tela de aprovações"""
     
     perfil = request.user.perfilusuario
     
-    # ========== SOLICITAÇÕES DATA (MESMA LÓGICA DA TELA DE APROVAÇÕES) ==========
+    # ========== SOLICITAÇÕES DATA ==========
     if perfil.nivel == "adm":
         solicitacoes = SolicitacaoVeiculo.objects.select_related(
             "motorista", 
@@ -63,7 +78,7 @@ def dashboard_gestor(request):
     canceladas_count = solicitacoes.filter(status="CANCELADA").count()
     aguardando_saida_count = solicitacoes.filter(status="AGUARDANDO_SAIDA_PORTARIA").count()
     
-    # Solicitações recentes (para lista)
+    # Solicitações recentes
     solicitacoes_recentes = solicitacoes.order_by("-data_criacao")[:5]
     
     # Calcular hoje e esta semana para solicitações
@@ -73,7 +88,7 @@ def dashboard_gestor(request):
     inicio_semana = hoje_data - timedelta(days=hoje_data.weekday())
     semana_solicitacoes = solicitacoes.filter(data_criacao__date__gte=inicio_semana).count()
     
-    # ========== MOVIMENTAÇÕES DATA (dados reais de saída) ==========
+    # ========== MOVIMENTAÇÕES DATA ==========
     if perfil.nivel == "adm":
         movimentacoes = Movimentacao.objects.select_related(
             "veiculo", "motorista", "solicitacao"
@@ -91,20 +106,126 @@ def dashboard_gestor(request):
     mov_finalizadas = movimentacoes.filter(data_retorno__isnull=False).count()
     total_movimentacoes = movimentacoes.count()
     
+    # Calcular hoje e esta semana para movimentações
+    mov_hoje = movimentacoes.filter(data_saida__date=hoje_data).count()
+    mov_semana = movimentacoes.filter(data_saida__date__gte=inicio_semana).count()
+    
     # Movimentações finalizadas hoje
     mov_finalizadas_hoje = movimentacoes.filter(data_retorno__date=hoje_data).count()
     
-    # Movimentações no mês
+    # ========== MÊS ATUAL ==========
+    from calendar import monthrange
     primeiro_dia_mes = hoje_data.replace(day=1)
-    mov_total_mes = movimentacoes.filter(data_saida__date__gte=primeiro_dia_mes).count()
+    ultimo_dia_mes = hoje_data.replace(
+        day=monthrange(hoje_data.year, hoje_data.month)[1]
+    )
     
-    # KM total no mês
+    # Movimentações no mês (com data de saída)
+    mov_total_mes = movimentacoes.filter(
+        data_saida__date__gte=primeiro_dia_mes,
+        data_saida__date__lte=ultimo_dia_mes
+    ).count()
+    
+    # KM total no mês (com data de retorno)
     km_total_mes = movimentacoes.filter(
         data_retorno__date__gte=primeiro_dia_mes,
+        data_retorno__date__lte=ultimo_dia_mes,
         data_retorno__isnull=False
     ).aggregate(total_km=Sum('distancia_percorrida'))['total_km'] or 0
     
-    # Movimentações recentes (em andamento)
+    # ========== SEPARANDO VIAGENS CURTAS E LONGAS ==========
+    LIMITE_VIAGEM_LONGA = 600
+    
+    # Viagens finalizadas no mês
+    viagens_mes = movimentacoes.filter(
+        data_retorno__date__gte=primeiro_dia_mes,
+        data_retorno__date__lte=ultimo_dia_mes,
+        data_retorno__isnull=False
+    ).select_related('veiculo', 'motorista')
+    
+    # Separar por tipo
+    viagens_curtas = [v for v in viagens_mes if v.distancia_percorrida and v.distancia_percorrida < LIMITE_VIAGEM_LONGA]
+    viagens_longas = [v for v in viagens_mes if v.distancia_percorrida and v.distancia_percorrida >= LIMITE_VIAGEM_LONGA]
+    
+    # ========== ESTATÍSTICAS VIAGENS CURTAS ==========
+    total_viagens_curtas = len(viagens_curtas)
+    km_viagens_curtas = sum(v.distancia_percorrida for v in viagens_curtas)
+    media_viagens_curtas = km_viagens_curtas / total_viagens_curtas if total_viagens_curtas > 0 else 0
+    
+    # Mediana das viagens curtas
+    if total_viagens_curtas > 0:
+        distancias_curtas = sorted([v.distancia_percorrida for v in viagens_curtas])
+        n_curtas = len(distancias_curtas)
+        if n_curtas % 2 == 0:
+            mediana_curtas = (distancias_curtas[n_curtas//2 - 1] + distancias_curtas[n_curtas//2]) / 2
+        else:
+            mediana_curtas = distancias_curtas[n_curtas//2]
+    else:
+        mediana_curtas = 0
+    
+    # ========== ESTATÍSTICAS VIAGENS LONGAS ==========
+    total_viagens_longas = len(viagens_longas)
+    km_viagens_longas = sum(v.distancia_percorrida for v in viagens_longas)
+    media_viagens_longas = km_viagens_longas / total_viagens_longas if total_viagens_longas > 0 else 0
+    
+    # Mediana das viagens longas
+    if total_viagens_longas > 0:
+        distancias_longas = sorted([v.distancia_percorrida for v in viagens_longas])
+        n_longas = len(distancias_longas)
+        if n_longas % 2 == 0:
+            mediana_longas = (distancias_longas[n_longas//2 - 1] + distancias_longas[n_longas//2]) / 2
+        else:
+            mediana_longas = distancias_longas[n_longas//2]
+    else:
+        mediana_longas = 0
+    
+    # ========== ESTATÍSTICAS GERAIS ==========
+    percentual_viagens_longas = (total_viagens_longas / viagens_mes.count() * 100) if viagens_mes.count() > 0 else 0
+    percentual_km_longas = (km_viagens_longas / km_total_mes * 100) if km_total_mes > 0 else 0
+    
+    # Médias gerais
+    if mov_finalizadas > 0:
+        km_medio_por_corrida = km_total_mes / mov_finalizadas
+    else:
+        km_medio_por_corrida = 0
+    
+    if mov_total_mes > 0:
+        km_medio_mes = km_total_mes / mov_total_mes
+    else:
+        km_medio_mes = 0
+    
+    # ========== TOPs VIAGENS LONGAS ==========
+    # Top veículos em viagens longas
+    veiculos_longas_dict = {}
+    for v in viagens_longas:
+        veiculo_key = v.veiculo.id
+        if veiculo_key not in veiculos_longas_dict:
+            veiculos_longas_dict[veiculo_key] = {
+                'veiculo': v.veiculo,
+                'total_viagens': 0,
+                'total_km': 0
+            }
+        veiculos_longas_dict[veiculo_key]['total_viagens'] += 1
+        veiculos_longas_dict[veiculo_key]['total_km'] += v.distancia_percorrida
+    
+    top_veiculos_longas = sorted(veiculos_longas_dict.values(), key=lambda x: x['total_viagens'], reverse=True)[:3]
+    
+    # Top motoristas em viagens longas
+    motoristas_longas_dict = {}
+    for v in viagens_longas:
+        motorista_key = v.motorista.id
+        if motorista_key not in motoristas_longas_dict:
+            motoristas_longas_dict[motorista_key] = {
+                'motorista': v.motorista,
+                'total_viagens': 0,
+                'total_km': 0
+            }
+        motoristas_longas_dict[motorista_key]['total_viagens'] += 1
+        motoristas_longas_dict[motorista_key]['total_km'] += v.distancia_percorrida
+    
+    top_motoristas_longas = sorted(motoristas_longas_dict.values(), key=lambda x: x['total_viagens'], reverse=True)[:3]
+    
+    # ========== MOVIMENTAÇÕES RECENTES ==========
     movimentacoes_recentes = movimentacoes.filter(
         data_retorno__isnull=True
     ).order_by("-data_saida")[:5]
@@ -114,7 +235,8 @@ def dashboard_gestor(request):
         'veiculo__id',
         'veiculo__placa',
         'veiculo__modelo',
-        'veiculo__marca'
+        'veiculo__marca',
+        'veiculo__tag_interna',
     ).annotate(
         total_viagens=Count('id'),
         total_km=Sum('distancia_percorrida')
@@ -123,7 +245,9 @@ def dashboard_gestor(request):
     motoristas_top = movimentacoes.values(
         'motorista__id',
         'motorista__nome',
-        'motorista__cpf'
+        'motorista__cpf',
+        'motorista__cnh_numero',             
+        'motorista__cnh_categoria',
     ).annotate(
         total_viagens=Count('id'),
         total_km=Sum('distancia_percorrida')
@@ -133,7 +257,7 @@ def dashboard_gestor(request):
     contrato_nome = perfil.contrato.nome if perfil.contrato and hasattr(perfil.contrato, 'nome') else None
     
     context = {
-        # Solicitações data (mesmas estatísticas da tela de aprovações)
+        # Solicitações data
         "total_solicitacoes": total_solicitacoes,
         "pendentes": pendentes_count,
         "aprovadas": aprovadas_count,
@@ -150,10 +274,31 @@ def dashboard_gestor(request):
         "mov_transito": mov_transito,
         "mov_finalizadas": mov_finalizadas,
         "total_movimentacoes": total_movimentacoes,
+        "mov_hoje": mov_hoje,
+        "mov_semana": mov_semana,
         "mov_finalizadas_hoje": mov_finalizadas_hoje,
         "mov_total_mes": mov_total_mes,
         "km_total_mes": km_total_mes,
+        "km_medio_por_corrida": round(km_medio_por_corrida, 1),
+        "km_medio_mes": round(km_medio_mes, 1),
         "movimentacoes_recentes": movimentacoes_recentes,
+        
+        # Estatísticas de viagens curtas
+        "total_viagens_curtas": total_viagens_curtas,
+        "km_viagens_curtas": round(km_viagens_curtas, 0),
+        "media_viagens_curtas": round(media_viagens_curtas, 1),
+        "mediana_viagens_curtas": round(mediana_curtas, 1),
+        
+        # Estatísticas de viagens longas
+        "total_viagens_longas": total_viagens_longas,
+        "km_viagens_longas": round(km_viagens_longas, 0),
+        "media_viagens_longas": round(media_viagens_longas, 1),
+        "mediana_viagens_longas": round(mediana_longas, 1),
+        "percentual_viagens_longas": round(percentual_viagens_longas, 1),
+        "percentual_km_longas": round(percentual_km_longas, 1),
+        "top_veiculos_longas": top_veiculos_longas,
+        "top_motoristas_longas": top_motoristas_longas,
+        "limite_viagem_longa": LIMITE_VIAGEM_LONGA,
         
         # TOPs
         "veiculos_top": veiculos_top,
