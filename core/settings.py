@@ -8,13 +8,14 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-if not SECRET_KEY:
-    raise Exception("SECRET_KEY não definida!")
+
 
 if DEBUG:
     print(" DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise Exception("SECRET_KEY não definida!")
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['54.242.113.40', 'seu-dominio.com']
 LOGIN_REDIRECT_URL = '/pos-login/'
