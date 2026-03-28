@@ -2,21 +2,21 @@ from pathlib import Path
 import os
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+if not SECRET_KEY:
+    raise Exception("SECRET_KEY não definida!")
+
+if DEBUG:
+    print("⚠️ DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-if DEBUG:
-    print(" DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    raise Exception("SECRET_KEY não definida!")
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['54.242.113.40', 'seu-dominio.com']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
