@@ -12,7 +12,6 @@ from django.contrib import messages
 from .models import Movimentacao, ChecklistSaida, ChecklistRetorno, RetornoPortaria
 from solicitacoes.models import SolicitacaoVeiculo
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
 from .models import MovimentacaoTerceiro
 from contratos.models import Contrato
 from django.utils.timezone import localtime
@@ -205,7 +204,7 @@ def filtrar_movimentacoes(request):
     # Query base
     movs = Movimentacao.objects.select_related("veiculo", "motorista").order_by("-data_saida")
 
-    #  FILTRO CORRETO DE CONTRATO
+    #  FILTRO  DE CONTRATO
     perfil = getattr(request.user, "perfilusuario", None)
     
     # se for gestor, filtrar por contrato (tanto no campo direto quanto na solicitação relacionada)
@@ -353,6 +352,7 @@ def criar_movimentacao(request):
         id__in=list(motoristas_mov_em_uso) + list(motoristas_sol_em_uso)
     )
 
+    # Restrição por contrato (gestor)
     if perfil and perfil.nivel != "adm":
         motoristas = motoristas.filter(contrato=perfil.contrato)
 
@@ -361,6 +361,7 @@ def criar_movimentacao(request):
     solicitacao_id = request.GET.get("solicitacao_id") or request.POST.get("solicitacao_id")
     solicitacao = None
 
+# Se for edição manual, não deve vir solicitacao_id. Se for criação a partir de solicitação, deve vir e preencher os campos automaticamente.
     if solicitacao_id:
         solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=int(solicitacao_id))
 
