@@ -41,7 +41,7 @@
     <!-- Botão Baixar Modelo -->
     <div class="mb-6">
         <a href="{% url 'baixar_modelo_veiculos' %}" 
-           class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+           class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
             <i class="fa-solid fa-download"></i>
             Baixar modelo de planilha
         </a>
@@ -84,12 +84,12 @@
             <div class="flex gap-3 mt-6">
                 <button type="submit" 
                         id="btn-importar"
-                        class="px-6 py-2 bg-[#00594C] hover:bg-[#004d41] text-white rounded-lg transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-upload"></i>
+                        class="px-6 py-2 bg-[#00594C] hover:bg-[#004d41] !text-white rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-upload !text-white"></i>
                     Importar
                 </button>
                 <a href="{% url 'lista_veiculos' %}" 
-                   class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                   class="px-6 py-2 bg-gray-500 hover:bg-gray-600 !text-white rounded-lg transition-colors">
                     Cancelar
                 </a>
             </div>

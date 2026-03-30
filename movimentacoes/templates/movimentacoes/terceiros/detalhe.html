@@ -129,7 +129,7 @@
                 <div class="mb-2">
                     <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Motivo da Entrada</label>
                     <div class="mt-1 p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
-                        <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.motivo_entrada }}</p>
+                        <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.motivo_entrada|default:"-" }}</p>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
                 {% endif %}
             </div>
 
-            <!-- GALERIA DE FOTOS COMPACTA -->
+            <!-- GALERIA DE FOTOS COMPACTA - CORRIGIDA -->
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
                         hover:shadow transition-shadow duration-300">
                 <div class="p-3 border-b border-gray-200 dark:border-gray-700">
@@ -183,13 +183,26 @@
                 </div>
 
                 <div class="p-3">
+                    {% with tem_fotos=False %}
+                        {% if mov.foto_placa and mov.foto_placa.url %}
+                            {% with tem_fotos=True %}{% endwith %}
+                        {% endif %}
+                        {% if mov.foto_veiculo and mov.foto_veiculo.url %}
+                            {% with tem_fotos=True %}{% endwith %}
+                        {% endif %}
+                        {% if mov.foto_motorista and mov.foto_motorista.url %}
+                            {% with tem_fotos=True %}{% endwith %}
+                        {% endif %}
+                    {% endwith %}
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        {% if mov.foto_placa %}
-                        <div class="group relative overflow-hidden rounded cursor-pointer"
-                             onclick="openLightbox('{{ mov.foto_placa.url }}')">
+                        {% if mov.foto_placa and mov.foto_placa.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_placa.url }}', 'Foto da Placa')">
                             <img src="{{ mov.foto_placa.url }}" 
-                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto da Placa">
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto da Placa"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Placa';">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
                                         group-hover:opacity-100 transition-opacity duration-300">
                                 <div class="absolute bottom-1.5 left-1.5 text-white">
@@ -200,12 +213,13 @@
                         </div>
                         {% endif %}
 
-                        {% if mov.foto_veiculo %}
-                        <div class="group relative overflow-hidden rounded cursor-pointer"
-                             onclick="openLightbox('{{ mov.foto_veiculo.url }}')">
+                        {% if mov.foto_veiculo and mov.foto_veiculo.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_veiculo.url }}', 'Foto do Veículo')">
                             <img src="{{ mov.foto_veiculo.url }}" 
-                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto do Veículo">
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto do Veículo"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Veículo';">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
                                         group-hover:opacity-100 transition-opacity duration-300">
                                 <div class="absolute bottom-1.5 left-1.5 text-white">
@@ -216,12 +230,13 @@
                         </div>
                         {% endif %}
 
-                        {% if mov.foto_motorista %}
-                        <div class="group relative overflow-hidden rounded cursor-pointer"
-                             onclick="openLightbox('{{ mov.foto_motorista.url }}')">
+                        {% if mov.foto_motorista and mov.foto_motorista.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_motorista.url }}', 'Foto do Motorista')">
                             <img src="{{ mov.foto_motorista.url }}" 
-                                 class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto do Motorista">
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto do Motorista"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Motorista';">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
                                         group-hover:opacity-100 transition-opacity duration-300">
                                 <div class="absolute bottom-1.5 left-1.5 text-white">
@@ -234,11 +249,19 @@
                     </div>
                     
                     {% if not mov.foto_placa and not mov.foto_veiculo and not mov.foto_motorista %}
-                    <div class="text-center py-4">
-                        <div class="mx-auto w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1.5">
-                            <i class="fa-solid fa-camera text-gray-400 text-xs"></i>
+                    <div class="text-center py-6">
+                        <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa-solid fa-camera text-gray-400 text-xl"></i>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma foto</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">As fotos não foram anexadas no momento da entrada</p>
+                    </div>
+                    {% else %}
+                    <div class="mt-3 pt-2 text-center border-t border-gray-100 dark:border-gray-800">
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500">
+                            <i class="fa-solid fa-info-circle mr-1"></i>
+                            Clique na imagem para ampliar
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -267,7 +290,7 @@
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Entrada</h3>
                         <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-calendar text-[9px]"></i>
-                            {{ mov.data_entrada|date:"d/m H:i" }}
+                            {{ mov.data_entrada|date:"d/m/Y H:i" }}
                         </div>
                     </div>
 
@@ -282,6 +305,7 @@
                     </div>
 
                     <!-- 🔹 MOTIVO NA TIMELINE -->
+                    {% if mov.motivo_entrada %}
                     <div class="mt-2">
                         <label class="text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
                             Motivo
@@ -290,6 +314,7 @@
                             <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.motivo_entrada|truncatechars:80 }}</p>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
 
                 <!-- SAÍDA COMPACTA -->
@@ -309,12 +334,12 @@
                         {% if mov.data_saida %}
                             <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                 <i class="fa-solid fa-calendar-check text-[9px]"></i>
-                                {{ mov.data_saida|date:"d/m H:i" }}
+                                {{ mov.data_saida|date:"d/m/Y H:i" }}
                             </div>
                         {% else %}
                             <div class="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs">
                                 <i class="fa-solid fa-clock text-[9px]"></i>
-                                <span>Aguardando</span>
+                                <span>Aguardando saída</span>
                             </div>
                         {% endif %}
                     </div>
@@ -327,7 +352,7 @@
                             </div>
                             <div>
                                 <p class="text-[9px] text-gray-500 dark:text-gray-400">Porteiro</p>
-                                <p class="text-xs font-medium text-gray-900 dark:text-white">{{ mov.porteiro_saida_nome }}</p>
+                                <p class="text-xs font-medium text-gray-900 dark:text-white">{{ mov.porteiro_saida_nome|default:"-" }}</p>
                             </div>
                         </div>
 
@@ -363,7 +388,7 @@
                                    {% else %}
                                        bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
                                    {% endif %}">
-                            {{ mov.status }}
+                            {{ mov.get_status_display|default:mov.status }}
                         </span>
                     </div>
                     
@@ -408,7 +433,7 @@
             <div class="space-y-2">
                 <div>
                     <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Motivo</label>
-                    <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ mov.motivo_entrada }}</p>
+                    <p class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{{ mov.motivo_entrada|default:"-" }}</p>
                 </div>
                 
                 {% if mov.observacoes_entrada %}
@@ -463,7 +488,7 @@
                     <div class="pt-2 border-t border-blue-100 dark:border-blue-800/30">
                         <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-user-check text-[8px]"></i>
-                            Porteiro: <span class="font-medium">{{ mov.porteiro_saida_nome }}</span>
+                            Porteiro: <span class="font-medium">{{ mov.porteiro_saida_nome|default:"-" }}</span>
                         </div>
                         <div class="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
                             <i class="fa-solid fa-clock text-[8px]"></i>
@@ -494,26 +519,34 @@
 </div>
 
 <!-- MODAL LIGHTBOX COMPACTO -->
-<div id="lightbox-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 bg-black/90 backdrop-blur-sm">
-    <div class="relative w-full max-w-lg max-h-[80vh]">
+<div id="lightbox-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm">
+    <div class="relative w-full max-w-4xl max-h-[90vh] mx-4">
         <!-- Botão fechar -->
         <button onclick="closeLightbox()" 
-                class="absolute -top-6 right-0 z-10 p-1 text-white hover:text-gray-300 transition-colors">
-            <i class="fa-solid fa-times text-base"></i>
+                class="absolute -top-10 right-0 z-10 p-2 text-white hover:text-gray-300 transition-colors">
+            <i class="fa-solid fa-times text-2xl"></i>
         </button>
         
         <!-- Imagem -->
-        <div class="relative rounded overflow-hidden bg-black">
+        <div class="relative rounded-lg overflow-hidden bg-black">
             <img id="lightbox-image" 
-                 class="w-full h-auto max-h-[50vh] object-contain"
+                 class="w-full h-auto max-h-[80vh] object-contain"
                  alt="Imagem ampliada">
             
             <!-- Título -->
             <div id="lightbox-title" 
-                 class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent 
-                        text-white text-xs font-semibold">
+                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent 
+                        text-white text-sm font-semibold">
             </div>
         </div>
+        
+        <!-- Botões de navegação (opcional) -->
+        <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all">
+            <i class="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+        <button id="lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all">
+            <i class="fa-solid fa-chevron-right text-xl"></i>
+        </button>
     </div>
 </div>
 
@@ -529,25 +562,82 @@
 </style>
 
 <script>
-// Função simplificada para abrir o lightbox
-function openLightbox(imageUrl) {
-    document.getElementById('lightbox-image').src = imageUrl;
-    document.getElementById('lightbox-modal').classList.remove('hidden');
-    document.getElementById('lightbox-modal').classList.add('flex');
+// Array para armazenar as imagens do lightbox
+let lightboxImages = [];
+let currentImageIndex = 0;
+
+// Função para abrir o lightbox
+function openLightbox(imageUrl, title = 'Imagem') {
+    // Coletar todas as imagens disponíveis
+    lightboxImages = [];
+    document.querySelectorAll('[onclick^="openLightbox"]').forEach(el => {
+        const match = el.getAttribute('onclick').match(/openLightbox\('([^']+)',\s*'([^']+)'\)/);
+        if (match) {
+            lightboxImages.push({ url: match[1], title: match[2] });
+        }
+    });
+    
+    // Encontrar o índice da imagem atual
+    currentImageIndex = lightboxImages.findIndex(img => img.url === imageUrl);
+    if (currentImageIndex === -1) {
+        lightboxImages = [{ url: imageUrl, title: title }];
+        currentImageIndex = 0;
+    }
+    
+    updateLightboxImage();
+    
+    const modal = document.getElementById('lightbox-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
+}
+
+// Atualizar a imagem exibida
+function updateLightboxImage() {
+    const img = lightboxImages[currentImageIndex];
+    document.getElementById('lightbox-image').src = img.url;
+    document.getElementById('lightbox-title').textContent = img.title;
+    
+    // Mostrar/esconder botões de navegação
+    const prevBtn = document.getElementById('lightbox-prev');
+    const nextBtn = document.getElementById('lightbox-next');
+    if (prevBtn) prevBtn.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
 }
 
 // Função para fechar o lightbox
 function closeLightbox() {
-    document.getElementById('lightbox-modal').classList.add('hidden');
-    document.getElementById('lightbox-modal').classList.remove('flex');
+    const modal = document.getElementById('lightbox-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
     document.body.style.overflow = 'auto';
+}
+
+// Navegação
+function nextImage() {
+    if (currentImageIndex < lightboxImages.length - 1) {
+        currentImageIndex++;
+        updateLightboxImage();
+    }
+}
+
+function prevImage() {
+    if (currentImageIndex > 0) {
+        currentImageIndex--;
+        updateLightboxImage();
+    }
 }
 
 // Event listeners para teclado
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeLightbox();
+    if (document.getElementById('lightbox-modal').classList.contains('flex')) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        } else if (e.key === 'ArrowRight') {
+            nextImage();
+        } else if (e.key === 'ArrowLeft') {
+            prevImage();
+        }
     }
 });
 
@@ -557,5 +647,9 @@ document.getElementById('lightbox-modal').addEventListener('click', (e) => {
         closeLightbox();
     }
 });
+
+// Botões de navegação
+document.getElementById('lightbox-prev')?.addEventListener('click', prevImage);
+document.getElementById('lightbox-next')?.addEventListener('click', nextImage);
 </script>
 {% endblock %}

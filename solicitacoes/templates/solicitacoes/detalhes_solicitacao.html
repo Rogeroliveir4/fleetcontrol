@@ -378,9 +378,11 @@
                     </div>
                     <div class="p-4 space-y-2.5">
                         <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Tag</span>
-                                <p class="text-sm font-bold font-mono text-gray-900 dark:text-white mt-0.5">{{ solicitacao.veiculo.tag_interna|default:"-" }}</p>
+                               <div class="mb-2">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-900 dark:bg-green-900 border border-[#00594C]/20 dark:border-green-800/50">
+                                    <i class="fa-solid fa-tag !text-white dark:text-green-400 text-xs"></i>
+                                    <span class="!text-white dark:text-green-400 font-mono font-bold text-sm">{{ s.veiculo.tag_interna|default:"SEM TAG" }}</span>
+                                </span>
                             </div>
                             <div>
                                 <span class="text-[9px] font-medium text-gray-500 uppercase tracking-wider">Placa</span>
