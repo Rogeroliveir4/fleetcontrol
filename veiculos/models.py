@@ -39,33 +39,54 @@ def validar_placa_modelo(valor):
 
 class Veiculo(models.Model):
     TIPO_VEICULO_CHOICES = [
-        ("Carro", "Carro"),
-        ("Moto", "Moto"),
-        ("Utilitario", "Utilitário"),
-        ("Caminhao", "Caminhão"),
+            ("Carro", "Carro"),
+            ("Caminhao", "Caminhão"),
+            ("Utilitario", "Utilitário"),
+            ("Equipamento", "Equipamento"),
+            ("Implemento", "Implemento"),
+            ("Veiculo", "Veículo"),  # Adicionado (singular)
+            ("Veiculos", "Veículos"),  # Adicionado (plural)
+            ("Van", "Van"),
+            ("Onibus", "Ônibus"),
+            ("Reboque", "Reboque"),
+            ("Caminhonete", "Caminhonete"),
     ]
 
     COMBUSTIVEL_CHOICES = [
-        ("Gasolina", "Gasolina"),
-        ("Etanol", "Etanol"),
-        ("Diesel", "Diesel"),
         ("Flex", "Flex"),
-        ("GNV", "GNV"),
-        ("Elétrico", "Elétrico"),
-        ("Híbrido", "Híbrido"),
+        ("Gasolina", "Gasolina"),
+        ("Diesel", "Diesel"),
+        ("Etanol", "Etanol"),
+        ("Eletrico", "Elétrico"),
+        ("N/A", "N/A"),  # Adicionado
+        ("Alcool/Gasolina", "Álcool/Gasolina"),  # Adicionado
     ]
 
     CATEGORIA_CHOICES = [
         ("Leve", "Leve"),
+        ("Medio", "Médio"),
         ("Pesado", "Pesado"),
-        ("Passageiro", "Passageiro"),
-        ("Carga", "Carga"),
-        ("Onibus", "Ônibus"),
+        ("Equipamento", "Equipamento"),
+        ("Implemento", "Implemento"),
+        ("VAN", "VAN"),  # Adicionado
+        ("Micro-Ônibus", "Micro-Ônibus"),  # Adicionado
+        ("Caminhão Basculante", "Caminhão Basculante"),
+        ("Caminhão de Transporte", "Caminhão de Transporte"),
+        ("Caminhão Pipa", "Caminhão Pipa"),
+        ("Caminhão Lubrificante", "Caminhão Lubrificante"),
+        ("Veículo de Apoio", "Veículo de Apoio"),
+        ("Grupo Gerador", "Grupo Gerador"),
+        ("Escavadeira Hidráulica", "Escavadeira Hidráulica"),
+        ("Pá Mecânica", "Pá Mecânica"),
+        ("Outros", "Outros"),
     ]
 
     TIPO_PROPRIEDADE_CHOICES = [
         ("Proprio", "Próprio"),
-        ("Locado", "Locado"),
+        ("Locado", "Locado"),  # Adicionado (com L maiúsculo)
+        ("Comodato", "Comodato"),
+        ("Arrendado", "Arrendado"),
+        ("LOCADO", "LOCADO"),  # Adicionado (maiúsculo)
     ]
 
     STATUS_CHOICES = [
@@ -119,15 +140,15 @@ class Veiculo(models.Model):
     tag_interna = models.CharField(max_length=50, blank=True, null=True, unique=True)
     tag_cliente = models.CharField(max_length=50, blank=True, null=True)
 
-    tipo = models.CharField(max_length=20, choices=TIPO_VEICULO_CHOICES)
-    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES)
-    combustivel = models.CharField(max_length=20, choices=COMBUSTIVEL_CHOICES)
+    tipo = models.CharField(max_length=50, choices=TIPO_VEICULO_CHOICES)
+    categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES)
+    combustivel = models.CharField(max_length=50, choices=COMBUSTIVEL_CHOICES)
 
     km_atual = models.PositiveIntegerField(default=0)
     km_anterior = models.PositiveIntegerField(default=0)
 
     tipo_propriedade = models.CharField(
-        max_length=20, choices=TIPO_PROPRIEDADE_CHOICES, default="Proprio"
+        max_length=40, choices=TIPO_PROPRIEDADE_CHOICES, default="Proprio"
     )
 
     status = models.CharField(
