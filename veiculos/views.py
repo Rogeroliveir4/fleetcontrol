@@ -33,7 +33,7 @@ from .utils import validar_placa, formatar_placa, obter_tipo_placa
 
 
 
-# ----------------------------------------------------------------------
+
 # LISTAGEM DE VEÍCULOS
 # ----------------------------------------------------------------------
 def lista_veiculos(request):
@@ -60,9 +60,7 @@ def lista_veiculos(request):
     if perfil.nivel == "basico":
         veiculos_list = veiculos_list.all()
 
-    # ---------------------------------------------------------------
     #  ANOTAR se o veículo possui solicitação pendente
-    # ---------------------------------------------------------------
     veiculos_list = veiculos_list.annotate(
         solicitacao_pendente=Exists(
             SolicitacaoVeiculo.objects.filter(
@@ -78,9 +76,7 @@ def lista_veiculos(request):
         )
     )
 
-    # ---------------------------------------------------------------
     #  Solicitação pendente DO USUÁRIO (motorista, gestor, adm)
-    # ---------------------------------------------------------------
     solicitacao_do_motorista = None
     solicitacao_ativa = False
 
@@ -101,10 +97,7 @@ def lista_veiculos(request):
         # Se existe solicitação ativa, bloquear solicitação em todos os perfis
         solicitacao_ativa = solicitacao_do_motorista is not None
 
-
-    # ---------------------------------------------------------------
     #  Filtragem por status
-    # ---------------------------------------------------------------
     if status_filter:
         mapa_status = {
             "disponivel": "Disponivel",
@@ -218,7 +211,7 @@ def lista_veiculos(request):
         "total_indisponivel": total_indisponivel,
     })
 
-
+# FUNÇÕES DE VALIDAÇÃO AJAX PARA CRIAÇÃO/EDIÇÃO DE VEÍCULOS
 @require_GET
 def check_placa(request):
     """Verifica se uma placa já existe"""
@@ -355,15 +348,20 @@ def criar_veiculo(request):
 
     # GET → carregar form com contratos
     return render(request, "veiculos/novo_veiculo.html", {
-        "contratos": Contrato.objects.all().order_by("id")
+        "contratos": Contrato.objects.all().order_by("id"),
+        # Adicionar as choices
+        "tipos_choices": Veiculo.TIPO_VEICULO_CHOICES,
+        "categorias_choices": Veiculo.CATEGORIA_CHOICES,
+        "combustiveis_choices": Veiculo.COMBUSTIVEL_CHOICES,
+        "tipo_propriedade_choices": Veiculo.TIPO_PROPRIEDADE_CHOICES,
+        "status_choices": Veiculo.STATUS_CHOICES,
     })
 
 
 
 
-# ----------------------------------------------------------------------
+
 # EDITAR VEÍCULO (com validações completas + AJAX)
-# ----------------------------------------------------------------------
 def editar_veiculo(request, id):
     veiculo = get_object_or_404(Veiculo, id=id)
 
@@ -387,6 +385,13 @@ def editar_veiculo(request, id):
         return render(request, "veiculos/editar.html", {
             "veiculo": veiculo,
             "contratos": Contrato.objects.all().order_by("id"),
+            # ========== ADICIONAR AS CHOICES DO MODELO ==========
+            "tipos_choices": Veiculo.TIPO_VEICULO_CHOICES,
+            "categorias_choices": Veiculo.CATEGORIA_CHOICES,
+            "combustiveis_choices": Veiculo.COMBUSTIVEL_CHOICES,
+            "tipo_propriedade_choices": Veiculo.TIPO_PROPRIEDADE_CHOICES,
+            "status_choices": Veiculo.STATUS_CHOICES,
+            
         })
 
     if request.method == "POST":

@@ -194,78 +194,72 @@
                       focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
           </div>
 
-          <!-- TIPO -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-car text-blue-500 text-xs"></i>
-              Tipo *
-            </p>
-            <select name="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="">Selecione</option>
-              <option value="Carro">Carro</option>
-              <option value="Moto">Moto</option>
-              <option value="Utilitario">Utilitário</option>
-              <option value="Caminhao">Caminhão</option>
-            </select>
-          </div>
+  <!-- TIPO -->
+<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+    <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+        <i class="fa-solid fa-car text-blue-500 text-xs"></i>
+        Tipo *
+    </p>
+    <select name="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+               rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+               focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+        <option value="">Selecione</option>
+        {% for value, label in tipos_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
 
-          <!-- CATEGORIA -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
-              Categoria *
-            </p>
-            <select name="categoria" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="">Selecione</option>
-              <option value="Leve">Leve</option>
-              <option value="Pesado">Pesado</option>
-              <option value="Passageiro">Passageiro</option>
-              <option value="Carga">Carga</option>
-              <option value="Onibus">Ônibus</option>
-            </select>
-          </div>
+  <!-- CATEGORIA -->
+<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+    <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+        <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
+        Categoria *
+    </p>
+    <select name="categoria" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+              focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+        <option value="">Selecione</option>
+        {% for value, label in categorias_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
 
-          <!-- COMBUSTÍVEL -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-gas-pump text-red-500 text-xs"></i>
-              Combustível *
-            </p>
-            <select name="combustivel" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="">Selecione</option>
-              <option value="Gasolina">Gasolina</option>
-              <option value="Etanol">Etanol</option>
-              <option value="Diesel">Diesel</option>
-              <option value="Flex">Flex</option>
-              <option value="GNV">GNV</option>
-              <option value="Elétrico">Elétrico</option>
-              <option value="Híbrido">Híbrido</option>
-            </select>
-          </div>
+<!-- COMBUSTÍVEL -->
+<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+    <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+        <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
+        Combustível *
+    </p>
+    <select name="combustivel" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+              focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+        <option value="">Selecione</option>
+        {% for value, label in combustiveis_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
+
         </div>
 
         <!-- LINHA 4: STATUS E PROPRIEDADE -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- STATUS -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-circle-check text-green-500 text-xs"></i>
-              Status *
-            </p>
-            <select name="status" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="Disponivel" selected>Disponível</option>
-              <option value="EmTransito">Em Trânsito</option>
-              <option value="Manutencao">Manutenção</option>
-              <option value="Reservado">Reservado</option>
-            </select>
+              <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                  <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
+                  Status *
+              </p>
+              <select name="status" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+                  <option value="">Selecione</option>
+                  {% for value, label in status_choices %}
+                      <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+              </select>
           </div>
 
           <!-- KM ATUAL -->
@@ -287,17 +281,19 @@
 
           <!-- TIPO PROPRIEDADE -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-house text-teal-500 text-xs"></i>
-              Propriedade *
-            </p>
-            <select name="tipo_propriedade" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="Proprio" selected>Próprio</option>
-              <option value="Locado">Locado</option>
-            </select>
-          </div>
+              <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                  <i class="fa-solid fa-house text-teal-500 text-xs"></i>
+                  Propriedade *
+              </p>
+              <select name="tipo_propriedade" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+                  <option value="">Selecione</option>
+                  {% for value, label in tipo_propriedade_choices %}
+                      <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+              </select>
+          </div>  
 
           <!-- POSSUI SEGURO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
@@ -306,8 +302,8 @@
               Possui Seguro?
             </p>
             <select name="seguro" id="seguroSelect" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                       rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+                      rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                      focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
               <option value="False" selected>Não</option>
               <option value="True">Sim</option>
             </select>
@@ -403,7 +399,7 @@
         <!-- BOTÕES -->
         <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button type="submit" id="submitBtn" class="inline-flex justify-center items-center gap-2 px-4 py-3 
-                    text-sm font-medium text-white custom-green hover:custom-green-light 
+                    text-sm font-medium !text-white custom-green hover:custom-green-light 
                     rounded-lg transition-colors min-h-[44px] flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed">
             <i class="fa-solid fa-check"></i>
             <span id="submitText">Salvar Veículo</span>

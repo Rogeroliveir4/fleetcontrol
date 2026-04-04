@@ -162,23 +162,23 @@
                           focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="100">
           </div>
 
-        <!-- ANO -->
+          <!-- ANO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-              <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-                  <i class="fa-solid fa-calendar text-emerald-500 text-xs"></i>
-                  Ano *
-              </p>
-              <input type="text" 
-                    name="ano" 
-                    id="anoField"
-                    required 
-                    value="{{ veiculo.ano }}" 
-                    placeholder="{% now 'Y' %}" 
-                    pattern="\d{4}"
-                    title="Digite o ano com 4 dígitos (ex: 2023)"
-                    class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                            focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <i class="fa-solid fa-calendar text-emerald-500 text-xs"></i>
+              Ano *
+            </p>
+            <input type="text" 
+                   name="ano" 
+                   id="anoField"
+                   required 
+                   value="{{ veiculo.ano }}" 
+                   placeholder="{% now 'Y' %}" 
+                   pattern="\d{4}"
+                   title="Digite o ano com 4 dígitos (ex: 2023)"
+                   class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                          rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                          focus:ring-2 focus:ring-[#00594C] focus:outline-none">
           </div>
         </div>
 
@@ -196,7 +196,7 @@
                           focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
           </div>
 
-          <!-- TIPO -->
+          <!-- TIPO - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-car text-blue-500 text-xs"></i>
@@ -207,14 +207,13 @@
                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
                            focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
               <option value="">Selecione</option>
-              <option value="Carro" {% if veiculo.tipo == "Carro" %}selected{% endif %}>Carro</option>
-              <option value="Moto" {% if veiculo.tipo == "Moto" %}selected{% endif %}>Moto</option>
-              <option value="Utilitario" {% if veiculo.tipo == "Utilitario" %}selected{% endif %}>Utilitário</option>
-              <option value="Caminhao" {% if veiculo.tipo == "Caminhao" %}selected{% endif %}>Caminhão</option>
+              {% for value, label in tipos_choices %}
+                <option value="{{ value }}" {% if veiculo.tipo == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
 
-          <!-- CATEGORIA -->
+          <!-- CATEGORIA - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-layer-group text-orange-500 text-xs"></i>
@@ -225,15 +224,13 @@
                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
                            focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
               <option value="">Selecione</option>
-              <option value="Leve" {% if veiculo.categoria == "Leve" %}selected{% endif %}>Leve</option>
-              <option value="Pesado" {% if veiculo.categoria == "Pesado" %}selected{% endif %}>Pesado</option>
-              <option value="Passageiro" {% if veiculo.categoria == "Passageiro" %}selected{% endif %}>Passageiro</option>
-              <option value="Carga" {% if veiculo.categoria == "Carga" %}selected{% endif %}>Carga</option>
-              <option value="Onibus" {% if veiculo.categoria == "Onibus" %}selected{% endif %}>Ônibus</option>
+              {% for value, label in categorias_choices %}
+                <option value="{{ value }}" {% if veiculo.categoria == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
 
-          <!-- COMBUSTÍVEL -->
+          <!-- COMBUSTÍVEL - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-gas-pump text-red-500 text-xs"></i>
@@ -244,20 +241,16 @@
                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
                            focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
               <option value="">Selecione</option>
-              <option value="Gasolina" {% if veiculo.combustivel == "Gasolina" %}selected{% endif %}>Gasolina</option>
-              <option value="Etanol" {% if veiculo.combustivel == "Etanol" %}selected{% endif %}>Etanol</option>
-              <option value="Diesel" {% if veiculo.combustivel == "Diesel" %}selected{% endif %}>Diesel</option>
-              <option value="Flex" {% if veiculo.combustivel == "Flex" %}selected{% endif %}>Flex</option>
-              <option value="GNV" {% if veiculo.combustivel == "GNV" %}selected{% endif %}>GNV</option>
-              <option value="Elétrico" {% if veiculo.combustivel == "Elétrico" %}selected{% endif %}>Elétrico</option>
-              <option value="Híbrido" {% if veiculo.combustivel == "Híbrido" %}selected{% endif %}>Híbrido</option>
+              {% for value, label in combustiveis_choices %}
+                <option value="{{ value }}" {% if veiculo.combustivel == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
 
         <!-- LINHA 4: STATUS E PROPRIEDADE -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- STATUS -->
+          <!-- STATUS - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-circle-check text-green-500 text-xs"></i>
@@ -267,10 +260,9 @@
                     class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
                            focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="Disponivel" {% if veiculo.status == "Disponivel" %}selected{% endif %}>Disponível</option>
-              <option value="EmTransito" {% if veiculo.status == "EmTransito" %}selected{% endif %}>Em Trânsito</option>
-              <option value="Manutencao" {% if veiculo.status == "Manutencao" %}selected{% endif %}>Manutenção</option>
-              <option value="Reservado" {% if veiculo.status == "Reservado" %}selected{% endif %}>Reservado</option>
+              {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if veiculo.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
 
@@ -291,7 +283,7 @@
                           focus:ring-2 focus:ring-[#00594C] focus:outline-none">
           </div>
 
-          <!-- TIPO PROPRIEDADE -->
+          <!-- TIPO PROPRIEDADE - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-house text-teal-500 text-xs"></i>
@@ -301,8 +293,10 @@
                     class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
                            rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
                            focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="Proprio" {% if veiculo.tipo_propriedade == "Proprio" %}selected{% endif %}>Próprio</option>
-              <option value="Locado" {% if veiculo.tipo_propriedade == "Locado" %}selected{% endif %}>Locado</option>
+              <option value="">Selecione</option>
+              {% for value, label in tipo_propriedade_choices %}
+                <option value="{{ value }}" {% if veiculo.tipo_propriedade == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
 
@@ -381,34 +375,28 @@
                    focus:ring-2 focus:ring-[#00594C] focus:outline-none resize-none">{{ veiculo.observacoes }}</textarea>
         </div>
 
-       <!-- CADASTRO ATIVO -->
+        <!-- CADASTRO ATIVO -->
         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-                <i class="fa-solid fa-power-off text-red-500 text-xs"></i>
-                Cadastro Ativo?
+          <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-power-off text-red-500 text-xs"></i>
+            Cadastro Ativo?
+          </p>
+          <select name="ativo" 
+                  class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                        rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                        focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+            <option value="True" {% if veiculo.ativo %}selected{% endif %}>✅ Ativo - Veículo disponível para uso</option>
+            <option value="False" {% if not veiculo.ativo %}selected{% endif %}>❌ Inativo - Veículo não disponível</option>
+          </select>
+          
+          {% if not veiculo.ativo %}
+          <div class="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+            <p class="text-xs text-yellow-700 dark:text-yellow-300">
+              <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+              Veículo INATIVO - Não aparecerá em solicitações
             </p>
-            <select name="ativo" 
-                    class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                          rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                          focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-                
-                {% if veiculo.ativo %}
-                    <option value="True" selected>✅ Ativo - Veículo disponível para uso</option>
-                    <option value="False">❌ Inativo - Veículo não disponível</option>
-                {% else %}
-                    <option value="True">✅ Ativo - Veículo disponível para uso</option>
-                    <option value="False" selected>❌ Inativo - Veículo não disponível</option>
-                {% endif %}
-            </select>
-            
-            {% if not veiculo.ativo %}
-            <div class="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                <p class="text-xs text-yellow-700 dark:text-yellow-300">
-                    <i class="fa-solid fa-exclamation-triangle mr-1"></i>
-                    Veículo INATIVO - Não aparecerá em solicitações
-                </p>
-            </div>
-            {% endif %}
+          </div>
+          {% endif %}
         </div>
 
         <!-- BOTÕES -->
@@ -439,7 +427,7 @@
   </div>
 </div>
 
-<!-- MODAL DE SUCESSO/ERRO (mesmo da criação) -->
+<!-- MODAL DE SUCESSO/ERRO -->
 <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 max-w-md w-full">
     <div class="flex items-center gap-4 mb-6">
@@ -471,6 +459,8 @@
     </div>
   </div>
 </div>
+
+
 
 <!--confirmação ao inativar Cadastro-->
 <script>

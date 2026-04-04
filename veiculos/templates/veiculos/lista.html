@@ -398,18 +398,18 @@
     <!-- BOTÕES DE AÇÃO MOBILE -->
     <div class="flex gap-2 mb-4">
         <!-- Botão Importar (mobile - apenas ADM) -->
-        {% if perfilusuario.nivel == 'adm' %}
+        {% if perfilusuario.nivel in 'adm gestor' %}
             <a href="{% url 'importar_veiculos' %}" 
                class="mobile-action-btn flex-1 bg-[#00594C] hover:bg-[#004d41] !text-white rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all active:scale-[0.98]">
-                <i class="fa-solid fa-upload text-xs"></i>
-                <span>Importar</span>
+                <i class="fa-solid fa-upload text-xs !text-white"></i>
+                <span class="!text-white">Importar</span>
             </a>
         {% endif %}
         
         <!-- Botão Novo Veículo (mobile) -->
         {% if perfilusuario.nivel != "basico" %}
             <a href="{% url 'criar_veiculo' %}" class="mobile-action-btn flex-1 bg-blue-600 hover:bg-blue-700 !text-white rounded-lg flex items-center justify-center gap-1.5 font-medium transition-all active:scale-[0.98]">
-                <i class="fa-solid fa-plus text-xs"></i>
+                <i class="fa-solid fa-plus text-xs !text-white"></i>
                 <span class="!text-white">Novo</span>
             </a>
         {% endif %}
@@ -456,8 +456,8 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Botão Importar (apenas ADM) -->
-                    {% if perfilusuario.nivel == 'adm' %}
+                    <!-- Botão Importar (apenas ADM e Gestor) -->
+                    {% if perfilusuario.nivel in 'adm gestor' %}
                     <a href="{% url 'importar_veiculos' %}" 
                        class="hidden lg:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 !text-white transition-all backdrop-blur-sm">
                         <i class="fa-solid fa-upload"></i> Importar
