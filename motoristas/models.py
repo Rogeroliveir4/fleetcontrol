@@ -14,15 +14,15 @@ class Motorista(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=255, blank=True, null=True)
-    cpf = models.CharField(max_length=14, blank=True, null=True, unique=True)  # 👈 UNIQUE
+    cpf = models.CharField(max_length=14, blank=True, null=True, unique=True)  #  UNIQUE
     telefone = models.CharField(max_length=20, blank=True, null=True)
     cnh_numero = models.CharField(max_length=20, blank=True, null=True)
     cnh_categoria = models.CharField(max_length=3, blank=True, null=True)
     cnh_vencimento = models.DateField(blank=True, null=True)
     email = models.CharField(max_length=20, blank=True, null=True)
-    matricula = models.CharField(max_length=50, unique=True)  # 👈 UNIQUE
     endereco = models.TextField(blank=True, null=True)
-    cidade = models.CharField(max_length=100)
+    matricula = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    cidade = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(max_length=100, null=True, blank=True)
     contrato = models.ForeignKey(Contrato, on_delete=models.SET_NULL, null=True, blank=True)
     ativo = models.BooleanField(default=True)
@@ -61,11 +61,9 @@ class Motorista(models.Model):
         # Validar matrícula (apenas números)
         if self.matricula:
             matricula_limpa = ''.join(filter(str.isdigit, self.matricula))
-            if not matricula_limpa:
-                raise ValidationError({'matricula': 'Matrícula deve conter apenas números.'})
-            if len(matricula_limpa) < 3:
+            if matricula_limpa and len(matricula_limpa) < 3:
                 raise ValidationError({'matricula': 'Matrícula deve ter pelo menos 3 dígitos.'})
-            self.matricula = matricula_limpa
+            self.matricula = matricula_limpa or None
         
         # Validar telefone (opcional)
         if self.telefone:

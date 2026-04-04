@@ -5,609 +5,761 @@
 
 {% block content %}
 
+<style>
+  /* Estilo das abas */
+  .tab-content {
+    display: none;
+  }
+  
+  #tab-veiculos:checked ~ .tab-container #content-veiculos,
+  #tab-solicitacoes:checked ~ .tab-container #content-solicitacoes,
+  #tab-movimentacoes:checked ~ .tab-container #content-movimentacoes {
+    display: block;
+  }
+  
+  .tab-label {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  #tab-veiculos:checked ~ .tab-header label[for="tab-veiculos"],
+  #tab-solicitacoes:checked ~ .tab-header label[for="tab-solicitacoes"],
+  #tab-movimentacoes:checked ~ .tab-header label[for="tab-movimentacoes"] {
+    @apply bg-white dark:bg-gray-800 text-[#00594C] dark:text-[#0A7C6C] border-b-2 border-[#00594C];
+  }
+  
+  /* Esconde os inputs radio */
+  input[type="radio"] {
+    display: none;
+  }
+</style>
+
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-7xl mx-auto px-4 py-6">
     
-    <div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- ========== HEADER ========== -->
+    <div class="w-full rounded-2xl p-5 mb-6 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] shadow-lg">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            Dashboard do Gestor
+          </h1>
+          <div class="flex items-center gap-3 mt-1">
+            <p class="text-white/80 text-xs">
+              <i class="fa-solid fa-building"></i> {{ contrato.nome|default:"Todos os Contratos" }}
+            </p>
+            <p class="text-white/60 text-xs">
+              <i class="fa-regular fa-clock"></i> {% now "d/m/Y H:i" %}
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <a href="{% url 'gestor_solicitacoes' %}" 
+             class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Solicitações</span>
+          </a>
+          <a href="{% url 'lista_movimentacoes' %}" 
+             class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
+            <i class="fa-solid fa-truck-moving"></i>
+            <span>Movimentações</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RADIO BUTTONS PARA ABAS ========== -->
+    <input type="radio" name="tab" id="tab-veiculos" checked>
+    <input type="radio" name="tab" id="tab-solicitacoes">
+    <input type="radio" name="tab" id="tab-movimentacoes">
+
+    <!-- ========== HEADER DAS ABAS ========== -->
+    <div class="tab-header flex flex-wrap gap-1 border-b border-gray-200 dark:border-gray-700 mb-6">
+      <label for="tab-veiculos" class="tab-label px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#00594C] dark:hover:text-[#0A7C6C] rounded-t-lg transition-all">
+        <i class="fa-solid fa-truck mr-2"></i> Frota de Veículos
+      </label>
+      <label for="tab-solicitacoes" class="tab-label px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#00594C] dark:hover:text-[#0A7C6C] rounded-t-lg transition-all">
+        <i class="fa-solid fa-file-alt mr-2"></i> Solicitações
+      </label>
+      <label for="tab-movimentacoes" class="tab-label px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#00594C] dark:hover:text-[#0A7C6C] rounded-t-lg transition-all">
+        <i class="fa-solid fa-truck-moving mr-2"></i> Movimentações
+      </label>
+    </div>
+
+    <!-- ========== CONTAINER DOS CONTEÚDOS ========== -->
+    <div class="tab-container">
+      
+      <!-- ========== ABA 1: VEÍCULOS ========== -->
+      <div id="content-veiculos" class="tab-content">
         
-        <!-- ========== HEADER ========== -->
-        <div class="w-full rounded-2xl p-5 mb-6 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] shadow-lg">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-chalkboard-user"></i>
-                        Dashboard do Gestor
-                    </h1>
-                    <div class="flex items-center gap-3 mt-1">
-                        <p class="text-white/80 text-xs">
-                            <i class="fa-solid fa-building"></i> {{ contrato.nome|default:"Todos os Contratos" }}
-                        </p>
-                        <p class="text-white/60 text-xs">
-                            <i class="fa-regular fa-clock"></i> {% now "d/m/Y H:i" %}
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <a href="{% url 'gestor_solicitacoes' %}" 
-                       class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>Solicitações</span>
-                    </a>
-                    <a href="{% url 'lista_movimentacoes' %}" 
-                       class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
-                        <i class="fa-solid fa-truck-moving"></i>
-                        <span>Movimentações</span>
-                    </a>
-                </div>
+        <!-- Cards de Resumo da Frota -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Total Frota</p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ total_veiculos|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-truck text-blue-600 text-sm"></i>
+              </div>
             </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Disponível</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-500">{{ veiculos_disponiveis|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-circle-check text-green-600 text-sm"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Em Trânsito</p>
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-500">{{ veiculos_transito|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-truck-fast text-purple-600 text-sm"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Manutenção</p>
+                <p class="text-2xl font-bold text-red-600 dark:text-red-500">{{ veiculos_manutencao|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-wrench text-red-600 text-sm"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Reservado</p>
+                <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-500">{{ veiculos_reservados|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-calendar-check text-yellow-600 text-sm"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-gray-500 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Inativo</p>
+                <p class="text-2xl font-bold text-gray-500 dark:text-gray-400">{{ veiculos_inativos|default:0 }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                <i class="fa-solid fa-circle-pause text-gray-500 text-sm"></i>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- ========== SEÇÃO 1: RESUMO DE SOLICITAÇÕES ========== -->
-        <div class="mb-8">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-1 h-6 bg-[#00594C] rounded-full"></div>
-                <i class="fa-solid fa-road text-green-600 text-sm"></i>
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Resumo de Solicitações</h2>
-                <span class="text-xs text-gray-400">(solicitações criadas)</span>
+        <!-- Distribuições -->
+<!-- Distribuições - Versão Melhorada com Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+  
+  <!-- Distribuição por Tipo -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-b border-blue-200 dark:border-blue-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+          <i class="fa-solid fa-chart-pie text-blue-600 dark:text-blue-400 text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Por Tipo de Veículo</h3>
+          <p class="text-[10px] text-blue-600 dark:text-blue-400">{{ distribuicao_tipos|length|default:0 }} tipos</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3 space-y-3 max-h-[300px] overflow-y-auto">
+      {% if distribuicao_tipos %}
+        {% for item in distribuicao_tipos %}
+        <div class="group">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-truck text-blue-600 dark:text-blue-400 text-[10px]"></i>
+              </div>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.tipo|default:"Não definido" }}</span>
             </div>
-            
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <!-- Pendentes -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Pendentes</p>
-                            <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-500">{{ pendentes|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-clock text-yellow-600 text-sm"></i>
-                        </div>
-                    </div>
-                    {% if pendentes > 0 %}
-                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" class="text-xs text-yellow-600 hover:underline mt-1 inline-block">Ver →</a>
-                    {% endif %}
-                </div>
-
-                <!-- Aprovadas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Em Trânsito</p>
-                            <p class="text-2xl font-bold text-green-600 dark:text-green-500">{{ em_transito|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-check-circle text-green-600 text-sm"></i>
-                        </div>
-                    </div>
-                   
-                </div>
-
-                <!-- Aguardando Saída -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-indigo-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Aguard. Saída</p>
-                            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-500">{{ aguardando_saida_count|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-door-open text-indigo-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Finalizadas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Finalizadas</p>
-                            <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-500">{{ finalizadas|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-flag-checkered text-emerald-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reprovadas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Reprovadas</p>
-                            <p class="text-2xl font-bold text-red-600 dark:text-red-500">{{ reprovadas|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-ban text-red-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Canceladas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-gray-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Canceladas</p>
-                            <p class="text-2xl font-bold text-gray-500 dark:text-gray-400">{{ canceladas|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                            <i class="fa-solid fa-circle-xmark text-gray-500 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="text-right">
+              <span class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ item.total }}</span>
+              <span class="text-xs text-gray-500 ml-1">veículos</span>
             </div>
-            
-            <div class="mt-3 text-right">
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                    <i class="fa-regular fa-calendar"></i> {{ hoje }} hoje • {{ semana }} esta semana
-                </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 ml-3">
-                    <i class="fa-solid fa-chart-line"></i> Total: {{ total_solicitacoes }}
-                </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="text-xs text-gray-500">{{ item.percentual }}% do total</div>
+            <div class="text-xs text-gray-400">{{ item.total }} / {{ total_veiculos|default:0 }}</div>
+          </div>
+        </div>
+        {% if not forloop.last %}
+        <div class="border-t border-gray-100 dark:border-gray-700"></div>
+        {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-6">
+          <i class="fa-solid fa-chart-simple text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <p class="text-sm text-gray-500">Nenhum dado disponível</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Distribuição por Categoria -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-b border-green-200 dark:border-green-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+          <i class="fa-solid fa-layer-group text-green-600 dark:text-green-400 text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Por Categoria</h3>
+          <p class="text-[10px] text-green-600 dark:text-green-400">{{ distribuicao_categorias|length|default:0 }} categorias</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3 space-y-3 max-h-[300px] overflow-y-auto">
+      {% if distribuicao_categorias %}
+        {% for item in distribuicao_categorias %}
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <i class="fa-solid fa-tag text-green-600 dark:text-green-400 text-[10px]"></i>
+              </div>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.categoria|default:"Não definido" }}</span>
             </div>
+            <div class="text-right">
+              <span class="text-lg font-bold text-green-600 dark:text-green-400">{{ item.total }}</span>
+              <span class="text-xs text-gray-500 ml-1">veículos</span>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="text-xs text-gray-500">{{ item.percentual }}% do total</div>
+            <div class="text-xs text-gray-400">{{ item.total }} / {{ total_veiculos|default:0 }}</div>
+          </div>
+        </div>
+        {% if not forloop.last %}
+        <div class="border-t border-gray-100 dark:border-gray-700"></div>
+        {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-6">
+          <i class="fa-solid fa-chart-simple text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <p class="text-sm text-gray-500">Nenhum dado disponível</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Distribuição por Combustível -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="px-4 py-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-b border-yellow-200 dark:border-yellow-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900/50 flex items-center justify-center">
+          <i class="fa-solid fa-gas-pump text-yellow-600 dark:text-yellow-400 text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Por Combustível</h3>
+          <p class="text-[10px] text-yellow-600 dark:text-yellow-400">{{ distribuicao_combustiveis|length|default:0 }} tipos</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3 space-y-3 max-h-[300px] overflow-y-auto">
+      {% if distribuicao_combustiveis %}
+        {% for item in distribuicao_combustiveis %}
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                {% if item.combustivel|lower == "gasolina" %}
+                  <i class="fa-solid fa-droplet text-yellow-600 text-[10px]"></i>
+                {% elif item.combustivel|lower == "etanol" %}
+                  <i class="fa-solid fa-leaf text-green-600 text-[10px]"></i>
+                {% elif item.combustivel|lower == "diesel" %}
+                  <i class="fa-solid fa-oil-can text-orange-600 text-[10px]"></i>
+                {% elif item.combustivel|lower == "flex" %}
+                  <i class="fa-solid fa-car-battery text-blue-600 text-[10px]"></i>
+                {% else %}
+                  <i class="fa-solid fa-gas-pump text-yellow-600 text-[10px]"></i>
+                {% endif %}
+              </div>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.combustivel|default:"Não definido" }}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-bold text-yellow-600 dark:text-yellow-400">{{ item.total }}</span>
+              <span class="text-xs text-gray-500 ml-1">veículos</span>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="text-xs text-gray-500">{{ item.percentual }}% do total</div>
+            <div class="text-xs text-gray-400">{{ item.total }} / {{ total_veiculos|default:0 }}</div>
+          </div>
+        </div>
+        {% if not forloop.last %}
+        <div class="border-t border-gray-100 dark:border-gray-700"></div>
+        {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-6">
+          <i class="fa-solid fa-chart-simple text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <p class="text-sm text-gray-500">Nenhum dado disponível</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+        <!-- Top Veículos e Manutenção -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-orange-600 text-sm"></i>
+                <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Veículos Mais Utilizados</h3>
+              </div>
+            </div>
+            <div class="p-3 space-y-2 max-h-[300px] overflow-y-auto">
+              {% if top_veiculos_uso %}
+                {% for item in top_veiculos_uso %}
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <div>
+                    <p class="text-xs font-medium text-gray-800 dark:text-white">{{ item.veiculo__modelo|default:"-" }}</p>
+                    <p class="text-[10px] text-gray-500">{{ item.veiculo__placa }}</p>
+                  </div>
+                  <span class="text-sm font-bold text-orange-600">{{ item.total_viagens }} viagens</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-center text-xs text-gray-500 py-3">Nenhuma movimentação</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-sm"></i>
+                <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Veículos em Manutenção</h3>
+              </div>
+            </div>
+            <div class="p-3 space-y-2 max-h-[300px] overflow-y-auto">
+              {% if veiculos_manutencao_lista %}
+                {% for veiculo in veiculos_manutencao_lista %}
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <div>
+                    <p class="text-xs font-medium text-gray-800 dark:text-white">{{ veiculo.modelo }}</p>
+                    <p class="text-[10px] text-gray-500">{{ veiculo.placa }}</p>
+                  </div>
+                  <span class="text-xs text-red-600">{{ veiculo.km_atual|default:0 }} km</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-center text-xs text-gray-500 py-3">Nenhum veículo em manutenção</p>
+              {% endif %}
+            </div>
+          </div>
         </div>
 
-        <!-- ========== SEÇÃO 2: RESUMO DE MOVIMENTAÇÕES ========== -->
-        <div class="mb-8">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-1 h-6 bg-purple-600 rounded-full"></div>
-                <i class="fa-solid fa-car text-red-600 text-sm"></i>
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Resumo de Movimentações</h2>
-                <span class="text-xs text-gray-400">(viagens realizadas)</span>
+<!-- Documentos Próximos do Vencimento - Versão Melhorada -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+  
+  <!-- IPVA Próximo Vencimento -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="px-4 py-3 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-b border-yellow-200 dark:border-yellow-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/50 flex items-center justify-center">
+          <i class="fa-solid fa-file-invoice-dollar text-yellow-600 dark:text-yellow-500 text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">IPVA</h3>
+          <p class="text-[10px] text-yellow-600 dark:text-yellow-500">próximos 30 dias</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3 divide-y divide-gray-100 dark:divide-gray-700">
+      {% if ipva_proximo_vencimento %}
+        {% for item in ipva_proximo_vencimento|slice:":5" %}
+        <div class="py-2 first:pt-0 last:pb-0">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-car text-gray-400 text-xs"></i>
+                <span class="text-sm font-medium text-gray-800 dark:text-white">{{ item.modelo }}</span>
+              </div>
+              <div class="flex items-center gap-3 mt-0.5">
+                <span class="text-[10px] text-gray-500">{{ item.placa }}</span>
+                {% if item.dias_restantes_ipva <= 7 %}
+                  <span class="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 text-[9px] font-medium">
+                    <i class="fa-solid fa-exclamation-triangle mr-0.5"></i>URGENTE
+                  </span>
+                {% elif item.dias_restantes_ipva <= 15 %}
+                  <span class="px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-[9px] font-medium">
+                    <i class="fa-solid fa-clock mr-0.5"></i>Em breve
+                  </span>
+                {% endif %}
+              </div>
             </div>
-            
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-
-                <!-- Total -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ total_movimentacoes|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-simple text-blue-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>    
-
-                <!-- Em Trânsito -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Em Trânsito</p>
-                            <p class="text-2xl font-bold text-purple-600 dark:text-purple-500">{{ mov_transito|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-truck-fast text-purple-600 text-sm"></i>
-                        </div>
-                    </div>
-                    {% if mov_transito > 0 %}
-                    <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600 hover:underline mt-1 inline-block">Ver →</a>
-                    {% endif %}
-                </div>
-
-                <!-- Finalizadas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Finalizadas</p>
-                            <p class="text-2xl font-bold text-green-600 dark:text-green-500">{{ mov_finalizadas|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-flag-checkered text-green-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1">{{ mov_finalizadas_hoje }} hoje</p>
-                </div>
-
-       
-
-                <!-- Este Mês -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-teal-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Este Mês</p>
-                            <p class="text-2xl font-bold text-teal-600 dark:text-teal-500">{{ mov_total_mes|default:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-calendar-check text-teal-600 text-sm"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="text-right">
+              <div class="text-sm font-bold {% if item.dias_restantes_ipva <= 7 %}text-red-600 dark:text-red-400{% elif item.dias_restantes_ipva <= 15 %}text-orange-600 dark:text-orange-400{% else %}text-yellow-600 dark:text-yellow-500{% endif %}">
+                {{ item.ipva_vencimento|date:"d/m/Y" }}
+              </div>
+              <div class="text-[9px] text-gray-400">{{ item.dias_restantes_ipva }} dias restantes</div>
             </div>
+          </div>
+          {% if item.dias_restantes_ipva <= 7 %}
+          <div class="mt-1.5 w-full bg-red-100 dark:bg-red-900/30 rounded-full h-1">
+            <div class="bg-red-500 h-1 rounded-full" style="width: {{ item.percentual_restante }}%"></div>
+          </div>
+          {% elif item.dias_restantes_ipva <= 15 %}
+          <div class="mt-1.5 w-full bg-orange-100 dark:bg-orange-900/30 rounded-full h-1">
+            <div class="bg-orange-500 h-1 rounded-full" style="width: {{ item.percentual_restante }}%"></div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="py-6 text-center">
+          <i class="fa-regular fa-calendar-check text-3xl text-green-300 dark:text-green-700 mb-1"></i>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Nenhum IPVA próximo do vencimento</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 
-            <!-- Cards de KM e Médias -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-                <!-- KM Mês -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">KM Mês</p>
-                            <p class="text-xl font-bold text-orange-600 dark:text-orange-500">{{ km_total_mes|default:0|floatformat:0 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-road text-orange-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1">total percorrido</p>
-                </div>
-
-                <!-- Média Geral -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Média Geral</p>
-                            <p class="text-xl font-bold text-emerald-600 dark:text-emerald-500">{{ km_medio_por_corrida|default:0|floatformat:1 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-line text-emerald-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1">por viagem ({{ mov_finalizadas }} viagens)</p>
-                </div>
-
-                <!-- Viagens Curtas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <i class="fa-solid fa-road text-red-600 text-sm"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400"> Curtas</p>
-                            <p class="text-xl font-bold text-green-600 dark:text-green-500">{{ media_viagens_curtas|default:0|floatformat:1 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-simple text-green-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1">média (< {{ limite_viagem_longa }} km) - {{ total_viagens_curtas }} viagens</p>
-                </div>
-
-                <!-- Viagens Longas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <i class="fa-solid fa-road text-red-600 text-sm"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400"> Longas</p>
-                            <p class="text-xl font-bold text-red-600 dark:text-red-500">{{ media_viagens_longas|default:0|floatformat:1 }}</p>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-line text-red-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1">média (≥ {{ limite_viagem_longa }} km) - {{ total_viagens_longas }} viagens</p>
-                </div>
+  <!-- Licenciamento Próximo Vencimento -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-200 dark:border-blue-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+          <i class="fa-solid fa-file-certificate text-blue-600 dark:text-blue-500 text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Licenciamento</h3>
+          <p class="text-[10px] text-blue-600 dark:text-blue-500">próximos 30 dias</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3 divide-y divide-gray-100 dark:divide-gray-700">
+      {% if licenciamento_proximo_vencimento %}
+        {% for item in licenciamento_proximo_vencimento|slice:":5" %}
+        <div class="py-2 first:pt-0 last:pb-0">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-car text-gray-400 text-xs"></i>
+                <span class="text-sm font-medium text-gray-800 dark:text-white">{{ item.modelo }} - {{ item.tag_interna }}</span>
+              </div>
+              <div class="flex items-center gap-3 mt-0.5">
+                <span class="text-[10px] text-gray-500">{{ item.placa }}</span>
+                {% if item.dias_restantes_licenciamento <= 7 %}
+                  <span class="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 text-[9px] font-medium">
+                    <i class="fa-solid fa-exclamation-triangle mr-0.5"></i>URGENTE
+                  </span>
+                {% elif item.dias_restantes_licenciamento <= 15 %}
+                  <span class="px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-[9px] font-medium">
+                    <i class="fa-solid fa-clock mr-0.5"></i>Em breve
+                  </span>
+                {% endif %}
+              </div>
             </div>
-            
-            <div class="mt-3 text-right">
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                    <i class="fa-regular fa-calendar"></i> {{ mov_hoje|default:0 }} hoje • {{ mov_semana|default:0 }} esta semana
-                </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 ml-3">
-                    <i class="fa-solid fa-chart-line"></i> Total: {{ total_movimentacoes|default:0 }}
-                </span>
+            <div class="text-right">
+              <div class="text-sm font-bold {% if item.dias_restantes_licenciamento <= 7 %}text-red-600 dark:text-red-400{% elif item.dias_restantes_licenciamento <= 15 %}text-orange-600 dark:text-orange-400{% else %}text-blue-600 dark:text-blue-500{% endif %}">
+                {{ item.licenciamento_vencimento|date:"d/m/Y" }}
+              </div>
+              <div class="text-[9px] text-gray-400">{{ item.dias_restantes_licenciamento }} dias restantes</div>
             </div>
+          </div>
+          {% if item.dias_restantes_licenciamento <= 7 %}
+          <div class="mt-1.5 w-full bg-red-100 dark:bg-red-900/30 rounded-full h-1">
+            <div class="bg-red-500 h-1 rounded-full" style="width: {{ item.percentual_restante }}%"></div>
+          </div>
+          {% elif item.dias_restantes_licenciamento <= 15 %}
+          <div class="mt-1.5 w-full bg-orange-100 dark:bg-orange-900/30 rounded-full h-1">
+            <div class="bg-orange-500 h-1 rounded-full" style="width: {{ item.percentual_restante }}%"></div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="py-6 text-center">
+          <i class="fa-regular fa-calendar-check text-3xl text-green-300 dark:text-green-700 mb-1"></i>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Nenhum licenciamento próximo do vencimento</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+        <!-- Ações da Frota -->
+        <div class="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-3 border border-blue-200">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-sm font-medium text-gray-800 dark:text-white">{{ total_veiculos|default:0 }} veículos no total</span>
+            <div class="flex gap-2">
+              <a href="{% url 'lista_veiculos' %}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-xs">Ver Todos</a>
+         <!--      <a href="{% url 'exportar_excel' %}?status=disponivel" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-white text-xs">Exportar Frota</a> -->
+            </div>
+          </div>
         </div>
 
-        <!-- ========== SEÇÃO 3: ANÁLISE DE VIAGENS LONGAS ========== -->
+      </div>
+
+      <!-- ========== ABA 2: SOLICITAÇÕES ========== -->
+      <div id="content-solicitacoes" class="tab-content">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-yellow-500">
+            <p class="text-xs text-gray-500">Pendentes</p>
+            <p class="text-2xl font-bold text-yellow-600">{{ pendentes|default:0 }}</p>
+            {% if pendentes > 0 %}
+            <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" class="text-xs text-yellow-600">Ver →</a>
+            {% endif %}
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500">
+            <p class="text-xs text-gray-500">Em Trânsito</p>
+            <p class="text-2xl font-bold text-green-600">{{ em_transito|default:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-indigo-500">
+            <p class="text-xs text-gray-500">Aguard. Saída</p>
+            <p class="text-2xl font-bold text-indigo-600">{{ aguardando_saida_count|default:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500">
+            <p class="text-xs text-gray-500">Finalizadas</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ finalizadas|default:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500">
+            <p class="text-xs text-gray-500">Reprovadas</p>
+            <p class="text-2xl font-bold text-red-600">{{ reprovadas|default:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-gray-500">
+            <p class="text-xs text-gray-500">Canceladas</p>
+            <p class="text-2xl font-bold text-gray-500">{{ canceladas|default:0 }}</p>
+          </div>
+        </div>
+
+        <div class="text-right mb-4 text-xs text-gray-500">
+          <i class="fa-regular fa-calendar"></i> {{ hoje }} hoje • {{ semana }} esta semana
+          <span class="ml-3">Total: {{ total_solicitacoes }}</span>
+        </div>
+
+        <!-- Solicitações Recentes -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <h3 class="font-semibold text-gray-800 dark:text-white">📋 Solicitações Recentes</h3>
+          </div>
+          <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-[500px] overflow-y-auto">
+            {% if recentes %}
+              {% for s in recentes %}
+              <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-medium text-gray-800 dark:text-white">{{ s.motorista.nome|default:"Motorista" }}</p>
+                    <p class="text-xs text-gray-500">{{ s.veiculo.placa }} • {{ s.destino|truncatechars:50 }}</p>
+                    <p class="text-[10px] text-gray-400">{{ s.data_criacao|date:"d/m/Y H:i" }}</p>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-medium
+                    {% if s.status == 'PENDENTE' %}bg-yellow-100 text-yellow-800
+                    {% elif s.status == 'EM_TRANSITO' %}bg-purple-100 text-purple-800
+                    {% elif s.status == 'FINALIZADA' %}bg-green-100 text-green-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ s.get_status_display|truncatechars:15 }}
+                  </span>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-center text-gray-500 py-6">Nenhuma solicitação recente</p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========== ABA 3: MOVIMENTAÇÕES ========== -->
+      <div id="content-movimentacoes" class="tab-content">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-blue-500">
+            <p class="text-xs text-gray-500">Total</p>
+            <p class="text-2xl font-bold text-blue-600">{{ total_movimentacoes|default:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-purple-500">
+            <p class="text-xs text-gray-500">Em Trânsito</p>
+            <p class="text-2xl font-bold text-purple-600">{{ mov_transito|default:0 }}</p>
+            {% if mov_transito > 0 %}
+            <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600">Ver →</a>
+            {% endif %}
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500">
+            <p class="text-xs text-gray-500">Finalizadas</p>
+            <p class="text-2xl font-bold text-green-600">{{ mov_finalizadas|default:0 }}</p>
+            <p class="text-[10px] text-gray-400">{{ mov_finalizadas_hoje }} hoje</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-teal-500">
+            <p class="text-xs text-gray-500">Este Mês</p>
+            <p class="text-2xl font-bold text-teal-600">{{ mov_total_mes|default:0 }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-orange-500">
+            <p class="text-xs text-gray-500">KM Mês</p>
+            <p class="text-xl font-bold text-orange-600">{{ km_total_mes|default:0|floatformat:0 }}</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-emerald-500">
+            <p class="text-xs text-gray-500">Média Geral</p>
+            <p class="text-xl font-bold text-emerald-600">{{ km_medio_por_corrida|default:0|floatformat:1 }} km</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-green-500">
+            <p class="text-xs text-gray-500">Média Curtas</p>
+            <p class="text-xl font-bold text-green-600">{{ media_viagens_curtas|default:0|floatformat:1 }} km</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-md border-l-4 border-red-500">
+            <p class="text-xs text-gray-500">Média Longas</p>
+            <p class="text-xl font-bold text-red-600">{{ media_viagens_longas|default:0|floatformat:1 }} km</p>
+          </div>
+        </div>
+
+        <div class="text-right mb-4 text-xs text-gray-500">
+          <i class="fa-regular fa-calendar"></i> {{ mov_hoje|default:0 }} hoje • {{ mov_semana|default:0 }} esta semana
+          <span class="ml-3">Total: {{ total_movimentacoes|default:0 }}</span>
+        </div>
+
+        <!-- Análise de Viagens Longas -->
         {% if total_viagens_longas > 0 %}
-        <div class="mb-8">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-1 h-6 bg-red-600 rounded-full"></div>
-                <i class="fa-solid fa-road text-red-600 text-sm"></i>
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white"> Análise de Viagens Longas</h2>
-                <span class="text-xs text-gray-400">(≥ {{ limite_viagem_longa }} km)</span>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <!-- Card Resumo -->
-                <div class="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
-                    <div class="flex items-center justify-between mb-3">
-                        <div>
-                            <p class="text-xs text-red-600 dark:text-red-400 font-medium">Total de Viagens Longas</p>
-                            <p class="text-2xl font-bold text-red-700 dark:text-red-400">{{ total_viagens_longas }}</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                            <i class="fa-solid fa-road text-red-600 text-lg"></i>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400">KM Total</p>
-                            <p class="font-semibold text-gray-800 dark:text-white">{{ km_viagens_longas|floatformat:0 }} km</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400">Média por viagem</p>
-                            <p class="font-semibold text-gray-800 dark:text-white">{{ media_viagens_longas|floatformat:0 }} km</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400">% do total viagens</p>
-                            <p class="font-semibold text-gray-800 dark:text-white">{{ percentual_viagens_longas }}%</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400">% do total KM</p>
-                            <p class="font-semibold text-gray-800 dark:text-white">{{ percentual_km_longas }}%</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Veículos em Viagens Longas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-truck text-red-600 text-sm"></i>
-                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Veículos em Longas Distâncias</h3>
-                        </div>
-                    </div>
-                    <div class="p-3 space-y-2">
-                        {% if top_veiculos_longas %}
-                            {% for item in top_veiculos_longas %}
-                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                        <i class="fa-solid fa-car text-red-600 text-xs"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-800 dark:text-white">
-                                            {{ item.veiculo.modelo }}
-                                        </p>
-                                        <p class="text-[10px] text-gray-500">{{ item.veiculo.tag_interna|default:item.veiculo.placa }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-sm font-bold text-red-600">{{ item.total_viagens }}</span>
-                                    <span class="text-[10px] text-gray-500"> viagens</span>
-                                    <p class="text-[9px] text-gray-400">{{ item.total_km|floatformat:0 }} km</p>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-center text-xs text-gray-500 py-3">Nenhum dado</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Top Motoristas em Viagens Longas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-user text-red-600 text-sm"></i>
-                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Motoristas em Longas Distâncias</h3>
-                        </div>
-                    </div>
-                    <div class="p-3 space-y-2">
-                        {% if top_motoristas_longas %}
-                            {% for item in top_motoristas_longas %}
-                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                        <i class="fa-solid fa-user text-red-600 text-xs"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-800 dark:text-white">
-                                            {{ item.motorista.nome|truncatechars:18 }}
-                                        </p>
-                                        <p class="text-[10px] text-gray-500">CNH: {{ item.motorista.cnh_categoria|default:"N/A" }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-sm font-bold text-red-600">{{ item.total_viagens }}</span>
-                                    <span class="text-[10px] text-gray-500"> viagens</span>
-                                    <p class="text-[9px] text-gray-400">{{ item.total_km|floatformat:0 }} km</p>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-center text-xs text-gray-500 py-3">Nenhum dado</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+        <div class="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-red-200 mb-6">
+          <h3 class="font-bold text-red-700 mb-3">📊 Análise de Viagens Longas (≥ {{ limite_viagem_longa }} km)</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div><p class="text-xs text-gray-500">Total Viagens</p><p class="text-xl font-bold text-red-600">{{ total_viagens_longas }}</p></div>
+            <div><p class="text-xs text-gray-500">KM Total</p><p class="text-xl font-bold text-red-600">{{ km_viagens_longas|floatformat:0 }}</p></div>
+            <div><p class="text-xs text-gray-500">% do Total</p><p class="text-xl font-bold text-red-600">{{ percentual_viagens_longas }}%</p></div>
+            <div><p class="text-xs text-gray-500">% do KM</p><p class="text-xl font-bold text-red-600">{{ percentual_km_longas }}%</p></div>
+          </div>
         </div>
         {% endif %}
 
-        <!-- ========== ATIVIDADES RECENTES ========== -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            
-            <!-- Solicitações Recentes -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-file-alt text-[#00594C] text-sm"></i>
-                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Solicitações Recentes</h3>
-                        </div>
-                        <a href="{% url 'gestor_solicitacoes' %}" class="text-xs text-[#00594C] hover:underline">Ver todas →</a>
-                    </div>
-                </div>
-                <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-[350px] overflow-y-auto">
-                    {% if recentes %}
-                        {% for s in recentes %}
-                        <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <div class="flex items-start gap-2">
-                                <div class="w-7 h-7 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <i class="fa-solid fa-user text-white text-xs"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="font-medium text-gray-800 dark:text-white text-xs truncate">
-                                            {{ s.motorista.nome|default:"Motorista" }}
-                                        </p>
-                                        <span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap
-                                            {% if s.status == 'PENDENTE' %}bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200
-                                            {% elif s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200
-                                            {% elif s.status == 'EM_TRANSITO' %}bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200
-                                            {% elif s.status == 'FINALIZADA' %}bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200
-                                            {% elif s.status == 'REPROVADA' %}bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200
-                                            {% elif s.status == 'CANCELADA' %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
-                                            {% endif %}">
-                                            {{ s.get_status_display|truncatechars:12 }}
-                                        </span>
-                                    </div>
-                                    <p class="text-[11px] text-gray-600 dark:text-gray-400">{{ s.veiculo.placa }} • {{ s.destino|truncatechars:30 }}</p>
-                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{{ s.data_criacao|date:"d/m H:i" }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="p-6 text-center">
-                            <i class="fa-solid fa-inbox text-2xl text-gray-300 dark:text-gray-600 mb-1"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma solicitação recente</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Movimentações em Andamento -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Movimentações em Andamento</h3>
-                        </div>
-                        <a href="{% url 'lista_movimentacoes' %}?status=transito" class="text-xs text-purple-600 hover:underline">Ver todas →</a>
-                    </div>
-                </div>
-                <div class="divide-y divide-gray-100 dark:divide-gray-700 max-h-[350px] overflow-y-auto">
-                    {% if movimentacoes_recentes %}
-                        {% for mov in movimentacoes_recentes %}
-                        <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <div class="flex items-start gap-2">
-                                <div class="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <i class="fa-solid fa-truck text-white text-xs"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="font-medium text-gray-800 dark:text-white text-xs truncate">
-                                            {{ mov.motorista.nome|default:"Motorista" }}
-                                        </p>
-                                        <span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200">
-                                            Em Trânsito
-                                        </span>
-                                    </div>
-                                    <p class="text-[11px] text-gray-600 dark:text-gray-400">{{ mov.veiculo.placa }} • {{ mov.destino|truncatechars:30|default:"Sem destino" }}</p>
-                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">Saída: {{ mov.data_saida|date:"d/m H:i" }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="p-6 text-center">
-                            <i class="fa-solid fa-check-circle text-2xl text-green-300 dark:text-green-700 mb-1"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Nenhuma movimentação em andamento</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== RANKINGS ========== -->
+        <!-- Rankings -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            
-            <!-- Top Veículos -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-trophy text-[#00594C] text-sm"></i>
-                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Top Veículos</h3>
-                        <span class="text-[10px] text-gray-400 ml-auto">movimentações reais</span>
-                    </div>
-                </div>
-                <div class="p-3 space-y-2">
-                    {% if veiculos_top %}
-                        {% for veiculo in veiculos_top %}
-                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center !text-white text-xs font-bold shadow-sm" style="color: #ffffff;">
-                                    {{ forloop.counter }}
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-800 dark:text-white">{{ veiculo.veiculo__modelo }}</p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ veiculo.veiculo__tag_interna|default:veiculo.veiculo__placa }}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-sm font-bold text-[#00594C] dark:text-[#0A7C6C]">{{ veiculo.total_viagens }}</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400"> viagens</span>
-                                {% if veiculo.total_km %}
-                                <p class="text-[9px] text-gray-400 dark:text-gray-500">{{ veiculo.total_km|floatformat:0 }} km</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fa-solid fa-chart-line text-2xl text-gray-300 dark:text-gray-600"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nenhuma movimentação</p>
-                        </div>
-                    {% endif %}
-                </div>
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200">
+            <div class="px-4 py-3 border-b bg-gray-50">
+              <h3 class="font-semibold">🏆 Top Veículos</h3>
             </div>
+            <div class="p-3 space-y-2">
+              {% for veiculo in veiculos_top|slice:":5" %}
+              <div class="flex justify-between text-sm">
+                <span>{{ veiculo.veiculo__tag_interna }} - {{ veiculo.veiculo__modelo }}</span>
+                <span class="font-bold text-[#00594C]">{{ veiculo.total_viagens }} viagens</span>
+              </div>
+              {% empty %}<p class="text-xs text-gray-500">Sem dados</p>{% endfor %}
+            </div>
+          </div>
 
-            <!-- Top Motoristas -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-medal text-orange-600 text-sm"></i>
-                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Top Motoristas</h3>
-                        <span class="text-[10px] text-gray-400 ml-auto">movimentações reais</span>
-                    </div>
-                </div>
-                <div class="p-3 space-y-2">
-                    {% if motoristas_top %}
-                        {% for motorista in motoristas_top %}
-                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center !text-white text-xs font-bold shadow-sm" style="color: #ffffff;">
-                                    {{ forloop.counter }}
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-800 dark:text-white">{{ motorista.motorista__nome|truncatechars:18 }}</p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">CNH: {{ motorista.motorista__cnh_categoria|default:"N/A" }}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-sm font-bold text-orange-600 dark:text-orange-500">{{ motorista.total_viagens }}</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400"> viagens</span>
-                                {% if motorista.total_km %}
-                                <p class="text-[9px] text-gray-400 dark:text-gray-500">{{ motorista.total_km|floatformat:0 }} km</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fa-solid fa-users-slash text-2xl text-gray-300 dark:text-gray-600"></i>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nenhum motorista</p>
-                        </div>
-                    {% endif %}
-                </div>
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200">
+            <div class="px-4 py-3 border-b bg-gray-50">
+              <h3 class="font-semibold">🥇 Top Motoristas</h3>
             </div>
+            <div class="p-3 space-y-2">
+              {% for motorista in motoristas_top|slice:":5" %}
+              <div class="flex justify-between text-sm">
+                <span>{{ motorista.motorista__nome|truncatechars:20 }}</span>
+                <span class="font-bold text-orange-600">{{ motorista.total_viagens }} viagens</span>
+              </div>
+              {% empty %}<p class="text-xs text-gray-500">Sem dados</p>{% endfor %}
+            </div>
+          </div>
         </div>
 
-        <!-- ========== AÇÕES RÁPIDAS ========== -->
-        <div class="bg-gradient-to-r from-[#00594C] to-[#0A7C6C] rounded-xl p-3">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-bolt text-white text-sm"></i>
-                    <span class="text-white text-sm font-medium">Ações Rápidas</span>
+        <!-- Movimentações em Andamento -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200">
+          <div class="px-4 py-3 border-b bg-gray-50">
+            <h3 class="font-semibold">🚚 Movimentações em Andamento</h3>
+          </div>
+          <div class="divide-y max-h-[400px] overflow-y-auto">
+            {% if movimentacoes_recentes %}
+              {% for mov in movimentacoes_recentes %}
+              <div class="p-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-medium">{{ mov.motorista.nome|default:"Motorista" }}</p>
+                    <p class="text-xs text-gray-500">{{ mov.veiculo.tag_interna }} • {{ mov.destino|truncatechars:40 }}</p>
+                    <p class="text-[10px] text-gray-400">Saída: {{ mov.data_saida|date:"d/m H:i" }}</p>
+                  </div>
+                  <span class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-[10px]">Em Trânsito</span>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" 
-                       class="flex items-center gap-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-white text-xs transition-all">
-                        <i class="fa-solid fa-clock"></i> Pendentes
-                    </a>
-                    <a href="{% url 'lista_movimentacoes' %}?status=transito" 
-                       class="flex items-center gap-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-white text-xs transition-all">
-                        <i class="fa-solid fa-truck-fast"></i> Em Trânsito
-                    </a>
-                    <a href="{% url 'exportar_excel_solicitacoes' %}" 
-                       class="flex items-center gap-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-white text-xs transition-all">
-                        <i class="fa-solid fa-file-excel"></i> Exportar
-                    </a>
-                </div>
-            </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-center text-gray-500 py-6">Nenhuma movimentação em andamento</p>
+            {% endif %}
+          </div>
         </div>
+
+      </div>
 
     </div>
+
+    <!-- ========== AÇÕES RÁPIDAS (fixas) ========== 
+    <div class="mt-6 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] rounded-xl p-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <span class="text-white text-sm font-medium"><i class="fa-solid fa-bolt mr-1"></i> Ações Rápidas</span>
+        <div class="flex flex-wrap gap-2">
+          <a href="{% url 'gestor_solicitacoes' %}?status=PENDENTE" class="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs">Pendentes</a>
+          <a href="{% url 'lista_movimentacoes' %}?status=transito" class="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs">Em Trânsito</a>
+          <a href="{% url 'exportar_excel_solicitacoes' %}" class="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs">Exportar</a>
+        </div>
+      </div>
+    </div>
+-->
+  </div>
 </div>
+
+<script>
+// Dados vindos do contexto
+const meses = {{ meses_ultimos_6|safe }};
+const viagensPorMes = {{ viagens_por_mes|safe }};
+
+new Chart(document.getElementById('movimentosChart'), {
+  type: 'line',
+  data: {
+    labels: meses,
+    datasets: [{
+      label: 'Viagens realizadas',
+      data: viagensPorMes,
+      borderColor: '#00594C',
+      backgroundColor: 'rgba(0,89,76,0.1)',
+      tension: 0.3,
+      fill: true
+    }]
+  }
+});
+</script>
+
 
 {% endblock %}

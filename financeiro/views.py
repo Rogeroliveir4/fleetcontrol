@@ -83,3 +83,7 @@ def lista_ipva(request):
     }
 
     return render(request, "financeiro/lista_ipva.html", context)
+
+
+def lista_licenciamento(request):
+    return render(request, "financeiro/lista_licenciamento.html")

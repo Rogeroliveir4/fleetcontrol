@@ -13,11 +13,11 @@ if not SECRET_KEY:
     raise Exception("SECRET_KEY não definida!")
 
 if DEBUG:
-    print("⚠️ DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
+    print(" DEBUG ATIVO - NÃO USE EM PRODUÇÃO")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ['54.242.113.40', 'seu-dominio.com']
+ALLOWED_HOSTS = ['54.242.113.40','127.0.0.1','192.168.0.6', 'seu-dominio.com']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     #'django_browser_reload',
+    'django_extensions',
     'motoristas.apps.MotoristasConfig',
     'movimentacoes',
     'veiculos',

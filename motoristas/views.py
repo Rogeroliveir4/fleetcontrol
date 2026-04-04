@@ -91,7 +91,7 @@ def lista_motoristas(request):
     })
 
 
-# ----------------------------------------------------------------------
+
 # CRIAR MOTORISTA (agora com combobox de contratos)
 # ----------------------------------------------------------------------
 def criar_motorista(request):
@@ -113,6 +113,7 @@ def criar_motorista(request):
             cnh_numero=request.POST["cnh_numero"],
             cnh_categoria=request.POST["cnh_categoria"],
             cnh_vencimento=request.POST["cnh_vencimento"],
+            matricula=request.POST["matricula"],       
             ativo=ativo,
             contrato=contrato_obj
         )
@@ -309,7 +310,7 @@ def buscar_motoristas_ajax(request):
 
     motoristas = Motorista.objects.all()
 
-    # 🔥 Filtro por contrato do usuário
+    #  Filtro por contrato do usuário
     if perfil.nivel != "adm" and perfil.contrato_id:
         motoristas = motoristas.filter(contrato_id=perfil.contrato_id)
 

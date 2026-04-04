@@ -13,20 +13,8 @@ from openpyxl.utils import get_column_letter
 import openpyxl
 from django.db.models import Sum, Count, Q
 from calendar import monthrange
+from dateutil.relativedelta import relativedelta
 
-
-@login_required
-def dashboard(request):
-    perfil = request.user.perfilusuario
-    
-    # Redireciona conforme o nível do usuário
-    if perfil.nivel == "basico":
-        return redirect("dashboard_motorista")
-    elif perfil.nivel in ["gestor", "adm"]:
-        return redirect("dashboard_gestor")
-    else:
-        # Nível desconhecido - redireciona para login ou página inicial
-        return redirect("login")
 
 
 # DASHBOARD DO GESTOR (COM DADOS REAIS DE SOLICITAÇÕES E MOVIMENTAÇÕES)
@@ -44,7 +32,7 @@ def dashboard(request):
         return redirect("login")
 
 
-# DASHBOARD DO GESTOR (COM DADOS REAIS DE SOLICITAÇÕES E MOVIMENTAÇÕES)
+# DASHBOARD DO GESTOR (COM DADOS REAIS DE SOLICITAÇÕES, MOVIMENTAÇÕES E VEÍCULOS)
 @login_required
 def dashboard_gestor(request):
     
@@ -253,9 +241,94 @@ def dashboard_gestor(request):
         total_km=Sum('distancia_percorrida')
     ).filter(total_viagens__gt=0).order_by('-total_viagens')[:5]
     
+    # ========== VEÍCULOS DATA (NOVA SEÇÃO) ==========
+    # Filtrar por contrato se não for admin
+    if perfil.nivel != "adm" and perfil.contrato_id:
+        veiculos_base = Veiculo.objects.filter(contrato_id=perfil.contrato_id)
+    else:
+        veiculos_base = Veiculo.objects.all()
+    
+    # Totais por status
+    total_veiculos = veiculos_base.count()
+    veiculos_disponiveis = veiculos_base.filter(status="Disponivel", ativo=True).count()
+    veiculos_transito = veiculos_base.filter(status="EmTransito", ativo=True).count()
+    veiculos_manutencao = veiculos_base.filter(status="Manutencao", ativo=True).count()
+    veiculos_reservados = veiculos_base.filter(status="Reservado", ativo=True).count()
+    veiculos_inativos = veiculos_base.filter(ativo=False).count()
+    
+    # Distribuição por Tipo
+    distribuicao_tipos = veiculos_base.filter(ativo=True).values('tipo').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    for item in distribuicao_tipos:
+        item['percentual'] = round((item['total'] / total_veiculos) * 100, 1) if total_veiculos > 0 else 0
+    
+    # Distribuição por Categoria
+    distribuicao_categorias = veiculos_base.filter(ativo=True).values('categoria').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    for item in distribuicao_categorias:
+        item['percentual'] = round((item['total'] / total_veiculos) * 100, 1) if total_veiculos > 0 else 0
+    
+    # Distribuição por Combustível
+    distribuicao_combustiveis = veiculos_base.filter(ativo=True).values('combustivel').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    for item in distribuicao_combustiveis:
+        item['percentual'] = round((item['total'] / total_veiculos) * 100, 1) if total_veiculos > 0 else 0
+    
+    # Top veículos mais utilizados (com base nas movimentações finalizadas)
+    top_veiculos_uso = movimentacoes.filter(
+        status='FINALIZADA'
+    ).values(
+        'veiculo__id', 
+        'veiculo__placa', 
+        'veiculo__modelo', 
+        'veiculo__tag_interna'
+    ).annotate(
+        total_viagens=Count('id'),
+        total_km=Sum('distancia_percorrida')
+    ).order_by('-total_viagens')[:5]
+    
+    # Veículos em manutenção (lista detalhada)
+    veiculos_manutencao_lista = veiculos_base.filter(
+        status="Manutencao", ativo=True
+    )[:5]
+    
+    # Documentos próximos do vencimento (próximos 30 dias)
+    hoje = timezone.now().date()
+    data_limite = hoje + timedelta(days=30)
+    
+    ipva_proximo_vencimento = veiculos_base.filter(
+        ativo=True,
+        ipva_vencimento__isnull=False,
+        ipva_vencimento__gte=hoje,
+        ipva_vencimento__lte=data_limite
+    ).order_by('ipva_vencimento')[:5]
+    
+    # Adicionar dias restantes
+    for item in ipva_proximo_vencimento:
+        item.dias_restantes_ipva = (item.ipva_vencimento - hoje).days
+    
+    licenciamento_proximo_vencimento = veiculos_base.filter(
+        ativo=True,
+        licenciamento_vencimento__isnull=False,
+        licenciamento_vencimento__gte=hoje,
+        licenciamento_vencimento__lte=data_limite
+    ).order_by('licenciamento_vencimento')[:5]
+    
+    for item in licenciamento_proximo_vencimento:
+        item.dias_restantes_licenciamento = (item.licenciamento_vencimento - hoje).days
+    
     # Nome do contrato
     contrato_nome = perfil.contrato.nome if perfil.contrato and hasattr(perfil.contrato, 'nome') else None
+
     
+    
+    # ========== CONTEXTO (INICIALIZADO CORRETAMENTE) ==========
     context = {
         # Solicitações data
         "total_solicitacoes": total_solicitacoes,
@@ -303,6 +376,21 @@ def dashboard_gestor(request):
         # TOPs
         "veiculos_top": veiculos_top,
         "motoristas_top": motoristas_top,
+        
+        # ========== VEÍCULOS DATA ==========
+        "total_veiculos": total_veiculos,
+        "veiculos_disponiveis": veiculos_disponiveis,
+        "veiculos_transito": veiculos_transito,
+        "veiculos_manutencao": veiculos_manutencao,
+        "veiculos_reservados": veiculos_reservados,
+        "veiculos_inativos": veiculos_inativos,
+        "distribuicao_tipos": distribuicao_tipos,
+        "distribuicao_categorias": distribuicao_categorias,
+        "distribuicao_combustiveis": distribuicao_combustiveis,
+        "top_veiculos_uso": top_veiculos_uso,
+        "veiculos_manutencao_lista": veiculos_manutencao_lista,
+        "ipva_proximo_vencimento": ipva_proximo_vencimento,
+        "licenciamento_proximo_vencimento": licenciamento_proximo_vencimento,
         
         # Other
         "contrato": {"nome": contrato_nome} if contrato_nome else None,
