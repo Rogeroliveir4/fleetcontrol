@@ -24,11 +24,11 @@ def atualizar_km_veiculo(veiculo, km_novo, origem="RETORNO_PORTARIA"):
     )
 
 
-# ALERTA DE  LICENCIAMENTO COM VENCIMENTO PRÓXIMO
+# ALERTA DE  LICENCIAMENTO COM VENCIMENTO PRÓXIMO 
 def enviar_alerta_licenciamento():
 
     hoje = timezone.now().date()
-    limite = hoje + timedelta(days=40)
+    limite = hoje + timedelta(days=30)
 
     veiculos = Veiculo.objects.filter(
         ativo=True,
