@@ -334,21 +334,19 @@
                 <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Veículos Mais Utilizados</h3>
               </div>
             </div>
-            <div class="p-3 space-y-2 max-h-[300px] overflow-y-auto">
-              {% if top_veiculos_uso %}
-                {% for item in top_veiculos_uso %}
-                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <div>
-                    <p class="text-xs font-medium text-gray-800 dark:text-white">{{ item.veiculo__modelo|default:"-" }}</p>
-                    <p class="text-[10px] text-gray-500">{{ item.veiculo__placa }}</p>
-                  </div>
-                  <span class="text-sm font-bold text-orange-600">{{ item.total_viagens }} viagens</span>
-                </div>
-                {% endfor %}
-              {% else %}
-                <p class="text-center text-xs text-gray-500 py-3">Nenhuma movimentação</p>
-              {% endif %}
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200">
+            <div class="px-4 py-3 border-b bg-gray-50">
+              <h3 class="font-semibold">🏆 Top Veículos</h3>
             </div>
+            <div class="p-3 space-y-2">
+              {% for veiculo in veiculos_top|slice:":5" %}
+              <div class="flex justify-between text-sm">
+                <span>{{ veiculo.veiculo__tag_interna }} - {{ veiculo.veiculo__modelo }}</span>
+                <span class="font-bold text-[#00594C]">{{ veiculo.total_viagens }} viagens</span>
+              </div>
+              {% empty %}<p class="text-xs text-gray-500">Sem dados</p>{% endfor %}
+            </div>
+          </div>
           </div>
 
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">

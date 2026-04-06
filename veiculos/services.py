@@ -129,7 +129,7 @@ def enviar_alerta_licenciamento():
         return
 
     email = EmailMultiAlternatives(
-        subject="🚨 Alerta de Licenciamento de Veículos",
+        subject=" Alerta de Licenciamento de Veículos",
         body="Existem veículos com vencimento próximo.",
         to=emails,
     )
