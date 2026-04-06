@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from contratos.models import Contrato
 from django.apps import apps
-
+from datetime import date
 
 # ========== FUNÇÃO DE VALIDAÇÃO DE PLACA (DEFINIR ANTES DA CLASSE) ==========
 def validar_placa_modelo(valor):
@@ -110,26 +110,26 @@ class Veiculo(models.Model):
         ("IMPORTACAO", "Importação por Planilha"),
     ]
 
-    # ------------------------------------------------
+    
     # DADOS PRINCIPAIS
-    # ------------------------------------------------
+    _importando = False
+
+    
     placa = models.CharField(
-        max_length=10, 
-        unique=True,
-        validators=[validar_placa_modelo]  # 👈 AGORA A FUNÇÃO EXISTE
+    max_length=50,  
+    null=True,
+    blank=True
     )
+    
     renavam = models.CharField(
-        max_length=20, 
-        blank=True, 
-        null=True, 
-        unique=True,
-        validators=[
-            RegexValidator(
-                regex=r'^\d+$',
-                message='Renavam deve conter apenas números'
-            )
-        ]
+        max_length=20,
+        null=True,
+        blank=True,
+        unique=False,
+        validators=[]
     )
+
+    identificador_externo = models.CharField(max_length=100, blank=True, null=True)
     marca = models.CharField(max_length=100)
     modelo = models.CharField(max_length=100)
     ano = models.IntegerField()
@@ -182,81 +182,119 @@ class Veiculo(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['placa'], name='unique_veiculo_placa'),
-            models.UniqueConstraint(fields=['renavam'], name='unique_veiculo_renavam'),
             models.UniqueConstraint(fields=['tag_interna'], name='unique_veiculo_tag_interna'),
         ]
         ordering = ['placa']
 
     def __str__(self):
-        return f"{self.placa} - {self.modelo}"
+        return f"{self.placa or 'SEM PLACA'} - {self.modelo}"
 
+
+    # Validações personalizadas
     def clean(self):
-        """Validações antes de salvar"""
-        from datetime import date
-        
-        # Validar placa (já validada pelo validator, mas reforça)
+
+        tipos_veiculo = [
+            "Carro", "Caminhao", "Utilitario", "Van",
+            "Onibus", "Caminhonete", "Veiculo", "Veiculos"
+        ]
+
+        # -------------------------
+        # NORMALIZAÇÃO INICIAL
+        # -------------------------
         if self.placa:
-            placa_limpa = self.placa.upper().strip()
-            placa_sem_hifen = placa_limpa.replace("-", "")
-            
-            padrao_antigo = re.compile(r'^[A-Z]{3}-\d{4}$')
-            padrao_mercosul = re.compile(r'^[A-Z]{3}\d[A-Z]\d{2}$')
-            
-            if not (padrao_antigo.match(placa_limpa) or padrao_mercosul.match(placa_sem_hifen)):
-                raise ValidationError({'placa': 'Placa inválida. Use formato ABC-1234 ou ABC1D23 (Mercosul)'})
-            
-            # Se for Mercosul, salvar sem hífen
-            if padrao_mercosul.match(placa_sem_hifen):
-                self.placa = placa_sem_hifen
-            else:
-                self.placa = placa_limpa
-        
-        # Validar renavam
+            self.placa = str(self.placa).strip()
+            if self.placa.lower() in ["nan", "none", "n/a", ""]:
+                self.placa = None
+
         if self.renavam:
-            renavam_limpo = ''.join(filter(str.isdigit, self.renavam))
-            if not renavam_limpo:
-                raise ValidationError({'renavam': 'Renavam deve conter apenas números'})
-            if len(renavam_limpo) not in [9, 11]:
-                raise ValidationError({'renavam': 'Renavam deve ter 9 ou 11 dígitos'})
-            self.renavam = renavam_limpo
-        
-        # Validar ano
+            self.renavam = ''.join(filter(str.isdigit, str(self.renavam)))
+
+        # -------------------------
+        # VALIDAÇÃO DE PLACA (CONDICIONAL)
+        # -------------------------
+        if self.tipo in tipos_veiculo:
+            if self.placa:
+                placa_limpa = self.placa.upper()
+                placa_sem_hifen = placa_limpa.replace("-", "")
+
+                padrao_antigo = re.compile(r'^[A-Z]{3}-\d{4}$')
+                padrao_mercosul = re.compile(r'^[A-Z]{3}\d[A-Z]\d{2}$')
+
+                if not (padrao_antigo.match(placa_limpa) or padrao_mercosul.match(placa_sem_hifen)):
+                    raise ValidationError({
+                        'placa': 'Placa inválida para veículo. Use ABC-1234 ou ABC1D23'
+                    })
+
+                # normalização padrão
+                if padrao_mercosul.match(placa_sem_hifen):
+                    self.placa = placa_sem_hifen
+                else:
+                    self.placa = placa_limpa
+        else:
+            # Equipamentos → aceita qualquer valor
+            if self.placa:
+                self.placa = str(self.placa).strip()
+
+        # -------------------------
+        # RENAVAM ÚNICO (SE EXISTIR)
+        # -------------------------
+        if self.renavam and not getattr(self, "_importando", False):
+            if Veiculo.objects.filter(renavam=self.renavam).exclude(id=self.id).exists():
+                raise ValidationError({'renavam': f'Já existe veículo com este renavam {self.renavam}'})
+
+        # -------------------------
+        # VALIDAÇÕES GERAIS
+        # -------------------------
         ano_atual = date.today().year
+
         if self.ano and (self.ano < 1900 or self.ano > ano_atual + 1):
             raise ValidationError({'ano': f'Ano deve estar entre 1900 e {ano_atual + 1}'})
-        
-        # Validar km
+
         if self.km_atual < 0:
             raise ValidationError({'km_atual': 'KM não pode ser negativo'})
 
+
     def save(self, *args, **kwargs):
-        """Salva o veículo com formatação automática"""
-        # Formatar placa
+        tipos_veiculo = [
+            "Carro", "Caminhao", "Utilitario", "Van",
+            "Onibus", "Caminhonete", "Veiculo", "Veiculos"
+        ]
+
+        # -------------------------
+        # NORMALIZAÇÃO SEGURA
+        # -------------------------
         if self.placa:
-            placa_limpa = self.placa.upper().strip()
-            placa_sem_hifen = placa_limpa.replace("-", "")
-            
-            # Se for Mercosul, salva sem hífen
-            if re.match(r'^[A-Z]{3}\d[A-Z]\d{2}$', placa_sem_hifen):
-                self.placa = placa_sem_hifen
-            # Se for antigo com hífen, mantém
-            elif re.match(r'^[A-Z]{3}-\d{4}$', placa_limpa):
-                self.placa = placa_limpa
-            # Se for antigo sem hífen, formata com hífen
-            elif re.match(r'^[A-Z]{3}\d{4}$', placa_limpa):
-                self.placa = f"{placa_limpa[:3]}-{placa_limpa[3:]}"
-        
-        # Limpar renavam
+            self.placa = str(self.placa).strip()
+            if self.placa.lower() in ["nan", "none", "n/a", ""]:
+                self.placa = None
+
         if self.renavam:
-            self.renavam = ''.join(filter(str.isdigit, self.renavam))
-        
-        # Limpar tag interna
+            self.renavam = ''.join(filter(str.isdigit, str(self.renavam)))
+
         if self.tag_interna:
             self.tag_interna = self.tag_interna.upper().strip().replace(" ", "")
-        
+
+        # -------------------------
+        # FORMATAÇÃO DE PLACA (SÓ VEÍCULO)
+        # -------------------------
+        if self.tipo in tipos_veiculo and self.placa:
+            placa_limpa = self.placa.upper()
+            placa_sem_hifen = placa_limpa.replace("-", "")
+
+            if re.match(r'^[A-Z]{3}\d[A-Z]\d{2}$', placa_sem_hifen):
+                self.placa = placa_sem_hifen
+            elif re.match(r'^[A-Z]{3}-\d{4}$', placa_limpa):
+                self.placa = placa_limpa
+            elif re.match(r'^[A-Z]{3}\d{4}$', placa_limpa):
+                self.placa = f"{placa_limpa[:3]}-{placa_limpa[3:]}"
+
+        # -------------------------
+        # VALIDAÇÃO FINAL
+        # -------------------------
         self.full_clean()
+
         super().save(*args, **kwargs)
+    
 
     @property
     def placa_formatada(self):

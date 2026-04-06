@@ -230,10 +230,10 @@
             </div>
             <div class="flex gap-3">
                 <button onclick="fecharModalEVoltar()" class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl transition-colors font-medium">
-                    <i class="fa-solid fa-arrow-left"></i> Continuar Importando
+                    <i class="fa-solid fa-arrow-left "></i> Continuar Importando
                 </button>
-                <button onclick="fecharModalEIrParaLista()" class="flex-1 px-4 py-3 bg-[#00594C] hover:bg-[#004d41] text-white rounded-xl transition-colors font-medium">
-                    <i class="fa-solid fa-list"></i> Ver Lista
+                <button onclick="fecharModalEIrParaLista()" class="flex-1 px-4 py-3 bg-[#00594C] hover:bg-[#004d41] !text-white rounded-xl transition-colors font-medium">
+                    <i class="fa-solid fa-list !text-white" ></i> Ver Lista
                 </button>
             </div>
         </div>
@@ -255,7 +255,7 @@
             <p class="text-gray-600 dark:text-gray-400 mb-6" id="mensagemErro"></p>
             <div id="listaErros" class="mt-4 space-y-2 max-h-64 overflow-y-auto"></div>
             <button onclick="fecharModalErro()" class="w-full mt-6 px-4 py-3 bg-[#00594C] hover:bg-[#004d41] text-white rounded-xl transition-colors font-medium">
-                <i class="fa-solid fa-check"></i> OK, Entendi
+                <i class="fa-solid fa-check !text-white"></i> OK, Entendi
             </button>
         </div>
     </div>
@@ -517,16 +517,20 @@
             console.log('🔍 Dados recebidos:', data); // 👈 ADICIONE ESTE LOG
             
             if (data.success) {
-                mostrarModalSucesso(data.criados, data.atualizados, data.total);
-            } else {
-                // 👈 SEMPRE MOSTRAR MODAL DE AVISO QUANDO HOUVER ERROS NA PLANILHA
+                // 🔥 Se teve erro, mostra aviso (mesmo com sucesso)
                 if (data.erros && data.erros.length > 0) {
-                    mostrarModalAviso(data.mensagem, data.erros);
-                } else if (data.mensagem && data.mensagem.includes('erro')) {
-                    // Tentar extrair o número de erros da mensagem
-                    const match = data.mensagem.match(/(\d+)\s*erro/);
-                    const totalErros = match ? match[1] : '?';
-                    mostrarModalAviso(data.mensagem, []);
+                    mostrarModalAviso(
+                        `Importação concluída com ${data.erros.length} erro(s).`,
+                        data.erros
+                    );
+                } else {
+                    mostrarModalSucesso(data.criados, data.atualizados, data.total);
+                }
+
+            } else {
+                // erro geral (ex: falha no arquivo)
+                if (data.erros && data.erros.length > 0) {
+                    mostrarModalAviso(data.mensagem || 'Erros na planilha', data.erros);
                 } else {
                     mostrarModalErro(data.mensagem || 'Erro na importação');
                 }

@@ -277,18 +277,14 @@ def criar_veiculo(request):
                 "contratos": Contrato.objects.all().order_by("id")
             })
 
-        # -----------------------
         #  1. Validar PLACA
-        # -----------------------
         if not placa:
             return render_form_com_erro("Placa é obrigatória!")
 
         if Veiculo.objects.filter(placa=placa).exists():
             return render_form_com_erro("Já existe outro veículo com essa placa!")
 
-        # -----------------------
         #  2. Validar TAG INTERNA
-        # -----------------------
         if tag_interna and Veiculo.objects.filter(tag_interna=tag_interna).exists():
             return render_form_com_erro("Já existe outro veículo com esta TAG interna!")
 
@@ -298,28 +294,22 @@ def criar_veiculo(request):
         #if tag_cliente and Veiculo.objects.filter(tag_cliente=tag_cliente).exists():
             #return render_form_com_erro("Já existe outro veículo com esta TAG do cliente!")
 
-        # -----------------------
         #  4. Validar RENAVAM
-        # -----------------------
         if renavam and Veiculo.objects.filter(renavam=renavam).exists():
             return render_form_com_erro("Já existe outro veículo com este Renavam!")
 
-        # -----------------------
         #  5. Validar APÓLICE
-        # -----------------------
         if apolice and Veiculo.objects.filter(apolice_numero=apolice).exists():
             return render_form_com_erro("Número de apólice já cadastrado para outro veículo!")
 
-        # -----------------------
         # CONTRATO
-        # -----------------------
         contrato_id = request.POST.get("id_contrato")
         contrato_obj = Contrato.objects.filter(id=contrato_id).first() if contrato_id else None
 
-        # -----------------------
+
         # Salvar veículo
         # -----------------------
-        veiculo = Veiculo.objects.create(
+        veiculo = Veiculo(
             contrato=contrato_obj,
             placa=placa,
             modelo=request.POST.get("modelo", "").strip(),
@@ -334,7 +324,6 @@ def criar_veiculo(request):
             combustivel=request.POST.get("combustivel"),
             tipo_propriedade=request.POST.get("tipo_propriedade"),
             tag_interna=tag_interna,
-            #tag_cliente=tag_cliente,
             licenciamento_vencimento=request.POST.get("licenciamento_vencimento") or None,
             seguro=request.POST.get("seguro") == "True",
             seguro_validade=request.POST.get("seguro_validade") or None,
@@ -342,6 +331,9 @@ def criar_veiculo(request):
             observacoes=request.POST.get("observacoes", "").strip(),
             ativo=True,
         )
+
+        
+        veiculo.save() # Salva o veículo antes de criar o histórico de KM
 
         messages.success(request, f"Veículo {placa} cadastrado com sucesso!")
         return redirect("detalhes_veiculo", id=veiculo.id)
@@ -502,6 +494,7 @@ def editar_veiculo(request, id):
             veiculo.apolice_numero = apolice
             veiculo.observacoes = request.POST.get("observacoes", "").strip()
             veiculo.ativo = ativo  # CORREÇÃO: usa o valor do formulário!
+            veiculo._importando = True
 
             veiculo.save()
 
@@ -977,6 +970,14 @@ def validar_importacao_veiculos(df, contrato):
 
 # ========== PROCESSAMENTO PRINCIPAL ==========
 
+def is_valor_vazio(valor):
+    if pd.isna(valor):
+        return True
+    
+    valor_str = str(valor).strip().upper()
+    
+    return valor_str in ["", "N/A", "NA", "NAN", "NULL", "-"]
+
 def processar_importacao_veiculos_validada(df, contrato, usuario):
     """Processa a importação - ACEITA QUALQUER VALOR e normaliza"""
     
@@ -993,7 +994,12 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
     for idx, row in df.iterrows():
         try:
             # ========== PLACA / IDENTIFICADOR ==========
-            placa_raw = str(row.get("placa", "")).upper().strip() if pd.notna(row.get("placa")) else ""
+            placa_raw = row.get("placa")
+
+            if is_valor_vazio(placa_raw):
+                placa = None
+            else:
+                placa = str(placa_raw).upper().strip()
             
             # Se não tem placa ou é NAN, gera um identificador único
             if not placa_raw or placa_raw in ["NAN", "N/A", "NAN/N/A", ""]:
@@ -1006,10 +1012,12 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
                 placa = placa_raw
             
             # ========== RENAVAM ==========
-            renavam = None
-            if pd.notna(row.get("renavam")) and str(row.get("renavam")).strip():
-                renavam_raw = str(row.get("renavam")).strip()
-                renavam = ''.join(filter(str.isdigit, renavam_raw)) if renavam_raw else None
+            renavam_raw = row.get("renavam")
+
+            if is_valor_vazio(renavam_raw):
+                renavam = None
+            else:
+                renavam = ''.join(filter(str.isdigit, str(renavam_raw)))
             
             # ========== TAG INTERNA ==========
             tag_interna = None
@@ -1094,7 +1102,19 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
             observacoes = str(row.get("observacoes")) if pd.notna(row.get("observacoes")) else ""
             
             # ========== VERIFICAR SE JÁ EXISTE ==========
-            veiculo_existente = Veiculo.objects.filter(placa=placa).first()
+            veiculo_existente = None
+
+            #  se tem tag interna, usa como principal critério de busca
+            if tag_interna:
+                veiculo_existente = Veiculo.objects.filter(tag_interna=tag_interna).first()
+
+            elif placa:
+                veiculo_existente = Veiculo.objects.filter(placa=placa).first()
+
+            if veiculo_existente:
+                #  Se renavam for diferente → NÃO atualiza
+                if renavam and veiculo_existente.renavam != renavam:
+                    veiculo_existente = None    
             
             if veiculo_existente:
                 # ATUALIZAR
@@ -1121,7 +1141,9 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
                 veiculo_existente.seguro_validade = seguro_validade
                 veiculo_existente.apolice_numero = apolice_numero
                 veiculo_existente.observacoes = observacoes
-                
+                veiculo_existente._importando = True  # FLAG PARA EVITAR REAÇÕES EM SINAIS
+
+                veiculo_existente._importando = True
                 veiculo_existente.save()
                 
                 # Registrar histórico de KM
@@ -1161,7 +1183,7 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
                     apolice_numero=apolice_numero,
                     observacoes=observacoes
                 )
-                
+                veiculo._importando = True
                 veiculo.save()
                 
                 # Registrar histórico de KM inicial
@@ -1178,7 +1200,11 @@ def processar_importacao_veiculos_validada(df, contrato, usuario):
             resultados["total"] += 1
                 
         except Exception as e:
-            resultados["erros"].append(f"Linha {idx+2}: {str(e)}")
+            resultados["erros"].append({
+                "linha": idx+2,
+                "placa": placa or "N/A",
+                "erros": [str(e)]
+            })
             import traceback
             traceback.print_exc()
     
@@ -1282,7 +1308,8 @@ def importar_veiculos(request):
                     'success': True,
                     'criados': resultados['criados'],
                     'atualizados': resultados['atualizados'],
-                    'total': resultados['total']
+                    'total': resultados['total'],
+                    'erros': resultados['erros']
                 })
             
             messages.success(request, f"✅ {resultados['criados']} criados, {resultados['atualizados']} atualizados. Total: {resultados['total']}")
