@@ -125,7 +125,7 @@
                     </div>
                 </div>
 
-                <!-- 🔹 MOTIVO DA ENTRADA -->
+                <!-- MOTIVO DA ENTRADA -->
                 <div class="mb-2">
                     <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Motivo da Entrada</label>
                     <div class="mt-1 p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
@@ -133,7 +133,7 @@
                     </div>
                 </div>
 
-                <!-- 🔹 OBSERVAÇÕES DA ENTRADA -->
+                <!-- OBSERVAÇÕES DA ENTRADA -->
                 {% if mov.observacoes_entrada %}
                 <div class="mb-2">
                     <label class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">
@@ -168,7 +168,7 @@
                 {% endif %}
             </div>
 
-            <!-- GALERIA DE FOTOS COMPACTA - CORRIGIDA -->
+            <!-- GALERIA DE FOTOS - ENTRADA -->
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
                         hover:shadow transition-shadow duration-300">
                 <div class="p-3 border-b border-gray-200 dark:border-gray-700">
@@ -177,28 +177,16 @@
                             <i class="fa-solid fa-camera text-white text-xs"></i>
                         </div>
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white">
-                            Registro Fotográfico
+                            Registro Fotográfico - Entrada
                         </h3>
                     </div>
                 </div>
 
                 <div class="p-3">
-                    {% with tem_fotos=False %}
-                        {% if mov.foto_placa and mov.foto_placa.url %}
-                            {% with tem_fotos=True %}{% endwith %}
-                        {% endif %}
-                        {% if mov.foto_veiculo and mov.foto_veiculo.url %}
-                            {% with tem_fotos=True %}{% endwith %}
-                        {% endif %}
-                        {% if mov.foto_motorista and mov.foto_motorista.url %}
-                            {% with tem_fotos=True %}{% endwith %}
-                        {% endif %}
-                    {% endwith %}
-
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                         {% if mov.foto_placa and mov.foto_placa.url %}
                         <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_placa.url }}', 'Foto da Placa')">
+                             onclick="openLightbox('{{ mov.foto_placa.url }}', 'Foto da Placa (Entrada)')">
                             <img src="{{ mov.foto_placa.url }}" 
                                  class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                                  alt="Foto da Placa"
@@ -215,7 +203,7 @@
 
                         {% if mov.foto_veiculo and mov.foto_veiculo.url %}
                         <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_veiculo.url }}', 'Foto do Veículo')">
+                             onclick="openLightbox('{{ mov.foto_veiculo.url }}', 'Foto do Veículo (Entrada)')">
                             <img src="{{ mov.foto_veiculo.url }}" 
                                  class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                                  alt="Foto do Veículo"
@@ -232,7 +220,7 @@
 
                         {% if mov.foto_motorista and mov.foto_motorista.url %}
                         <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_motorista.url }}', 'Foto do Motorista')">
+                             onclick="openLightbox('{{ mov.foto_motorista.url }}', 'Foto do Motorista (Entrada)')">
                             <img src="{{ mov.foto_motorista.url }}" 
                                  class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                                  alt="Foto do Motorista"
@@ -253,19 +241,104 @@
                         <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
                             <i class="fa-solid fa-camera text-gray-400 text-xl"></i>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada na entrada</p>
                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">As fotos não foram anexadas no momento da entrada</p>
-                    </div>
-                    {% else %}
-                    <div class="mt-3 pt-2 text-center border-t border-gray-100 dark:border-gray-800">
-                        <p class="text-[10px] text-gray-400 dark:text-gray-500">
-                            <i class="fa-solid fa-info-circle mr-1"></i>
-                            Clique na imagem para ampliar
-                        </p>
                     </div>
                     {% endif %}
                 </div>
             </div>
+
+            <!-- GALERIA DE FOTOS - SAÍDA (NOVO) -->
+            {% if mov.data_saida %}
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
+                        hover:shadow transition-shadow duration-300">
+                <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-1.5">
+                        <div class="p-1 rounded bg-gradient-to-r from-blue-500 to-cyan-400">
+                            <i class="fa-solid fa-camera-retro text-white text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+                            Registro Fotográfico - Saída
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {% if mov.foto_saida_veiculo and mov.foto_saida_veiculo.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_saida_veiculo.url }}', 'Foto do Veículo (Saída)')">
+                            <img src="{{ mov.foto_saida_veiculo.url }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto do Veículo na Saída"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Veículo+Saída';">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-truck text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Veículo (Saída)</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if mov.foto_saida_avaria and mov.foto_saida_avaria.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_saida_avaria.url }}', 'Foto de Avaria (Saída)')">
+                            <img src="{{ mov.foto_saida_avaria.url }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto de Avaria na Saída"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Avaria';">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-triangle-exclamation text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Avaria (Saída)</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if mov.foto_saida_extra and mov.foto_saida_extra.url %}
+                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                             onclick="openLightbox('{{ mov.foto_saida_extra.url }}', 'Foto Extra (Saída)')">
+                            <img src="{{ mov.foto_saida_extra.url }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                                 alt="Foto Extra na Saída"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Extra';">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                                        group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-1.5 left-1.5 text-white">
+                                    <i class="fa-solid fa-camera text-[9px]"></i>
+                                    <span class="text-[9px] font-medium ml-0.5">Extra (Saída)</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if not mov.foto_saida_veiculo and not mov.foto_saida_avaria and not mov.foto_saida_extra %}
+                    <div class="text-center py-6">
+                        <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa-solid fa-camera-slash text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada na saída</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">As fotos não foram anexadas no momento da saída</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- INDICADOR DE CLIQUE -->
+            {% if mov.foto_placa or mov.foto_veiculo or mov.foto_motorista or mov.foto_saida_veiculo %}
+            <div class="text-center">
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">
+                    <i class="fa-solid fa-info-circle mr-1"></i>
+                    Clique na imagem para ampliar
+                </p>
+            </div>
+            {% endif %}
         </div>
 
         <!-- COLUNA DIREITA - TIMELINE COMPACTA -->
@@ -304,7 +377,7 @@
                         </div>
                     </div>
 
-                    <!-- 🔹 MOTIVO NA TIMELINE -->
+                    <!-- MOTIVO NA TIMELINE -->
                     {% if mov.motivo_entrada %}
                     <div class="mt-2">
                         <label class="text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
@@ -356,14 +429,14 @@
                             </div>
                         </div>
 
-                        <!-- 🔹 OBSERVAÇÕES DA SAÍDA -->
+                        <!-- OBSERVAÇÕES DA SAÍDA -->
                         {% if mov.observacoes_saida %}
                         <div class="mt-1.5">
-                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                                Observações da Saída
+                            <label class="text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+                                Observações
                             </label>
-                            <div class="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800/30">
-                                <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.observacoes_saida }}</p>
+                            <div class="p-1.5 bg-blue-50/50 dark:bg-blue-900/10 rounded border border-blue-100 dark:border-blue-800/20">
+                                <p class="text-xs text-gray-700 dark:text-gray-300">{{ mov.observacoes_saida|truncatechars:80 }}</p>
                             </div>
                         </div>
                         {% endif %}
@@ -400,7 +473,7 @@
                     </div>
                     
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-600 dark:text-gray-400">Tempo</span>
+                        <span class="text-xs text-gray-600 dark:text-gray-400">Tempo no pátio</span>
                         {% if mov.data_saida %}
                             <span class="text-xs">
                                 {{ mov.data_entrada|timesince:mov.data_saida }}
@@ -416,7 +489,7 @@
         </div>
     </div>
 
-    <!-- 🔹 BLOCO DE OBSERVAÇÕES COMPLETO -->
+    <!-- BLOCO DE OBSERVAÇÕES COMPLETO -->
     <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <!-- OBSERVAÇÕES DA ENTRADA -->
         <div class="bg-gradient-to-br from-white to-emerald-50 dark:from-gray-900 dark:to-emerald-900/10 
@@ -540,7 +613,7 @@
             </div>
         </div>
         
-        <!-- Botões de navegação (opcional) -->
+        <!-- Botões de navegação -->
         <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all">
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </button>
@@ -568,7 +641,7 @@ let currentImageIndex = 0;
 
 // Função para abrir o lightbox
 function openLightbox(imageUrl, title = 'Imagem') {
-    // Coletar todas as imagens disponíveis
+    // Coletar todas as imagens disponíveis (entrada e saída)
     lightboxImages = [];
     document.querySelectorAll('[onclick^="openLightbox"]').forEach(el => {
         const match = el.getAttribute('onclick').match(/openLightbox\('([^']+)',\s*'([^']+)'\)/);

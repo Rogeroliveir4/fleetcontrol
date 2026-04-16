@@ -396,7 +396,7 @@
 
                 <div class="fc-row">
                     <span class="fc-label"><i class="fa-solid fa-industry"></i>Marca / Modelo</span>
-                    <span class="fc-value">{{ veiculo.marca }} {{ veiculo.modelo }}</span>
+                    <span class="fc-value">{{ veiculo.marca |upper}} {{ veiculo.modelo|upper }}</span>
                 </div>
 
                 <div class="fc-row">
@@ -413,12 +413,7 @@
                     <span class="fc-label"><i class="fa-solid fa-tag"></i>Categoria</span>
                     <span class="fc-value">
                         <span class="fc-value-badge bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                            <i class="fa-solid 
-                                {% if veiculo.categoria == 'Pesado' %}fa-truck
-                                {% elif veiculo.categoria == 'Picape' %}fa-truck-pickup
-                                {% elif veiculo.categoria == 'Onibus' %}fa-bus
-                                {% elif veiculo.categoria == 'Passageiro' %}fa-car
-                                {% else %}fa-car-side{% endif %}"></i>
+                            <i class="fa-solid fa-car-side"></i>
                             {{ veiculo.categoria }}
                         </span>
                     </span>
@@ -443,6 +438,20 @@
                             {% else %}bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300{% endif %}">
                             <i class="fa-solid fa-road"></i>
                             {{ veiculo.km_atual|brnum }} km
+                        </span>
+                    </span>
+                </div>
+
+                        <div class="fc-row">
+                    <span class="fc-label"><i class="fa-solid fa-gauge"></i>Horímetro</span>
+                    <span class="fc-value">
+                        <span class="fc-value-badge 
+                            {% if veiculo.horimetro_atual < 300 %}bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300
+                            {% elif veiculo.horimetro_atual < 700 %}bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300
+                            {% elif veiculo.horimetro_atual < 1200 %}bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300
+                            {% else %}bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300{% endif %}">
+                            <i class="fa-solid fa-road"></i>
+                            {{ veiculo.horimetro_atual|brnum }} h
                         </span>
                     </span>
                 </div>

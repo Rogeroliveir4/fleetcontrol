@@ -23,12 +23,15 @@ urlpatterns = [
 
 
     #  CHECKLIST MOTORISTA (CORRIGIDO)
-    path("solicitacao/<int:solicitacao_id>/checklist-saida/",views.checklist_saida_motorista, name="checklist_saida_motorista", ),
+    # path("solicitacao/<int:solicitacao_id>/checklist-saida/",views.checklist_saida_motorista, name="checklist_saida_motorista", ),
 
     path("portaria/saida/<int:movimentacao_id>/", views.portaria_registrar_saida, name="portaria_registrar_saida"),
 
     #  PORTARIA — RETORNO
     path("portaria/retorno/", views.portaria_retorno_list,name="portaria_retorno_list",),
+
+    # CONTADOR DE SOLICITAÇÕES PENDENTES PARA PORTARIA
+    path("portaria/contador/", views.contador_portaria, name="contador_portaria"),
 
     
 ]

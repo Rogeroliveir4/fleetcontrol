@@ -145,7 +145,7 @@
             </button>
             <a href="{% url 'listar_saidas_portaria' %}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
               <i class="fa-solid fa-broom text-xs text-white"></i>
-              <span>Limpar</span>
+              <span class="te">Limpar</span>
             </a>
             <!-- BOTÃO DE EXPORTAÇÃO 
             <button type="button" onclick="exportarDados()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
@@ -368,8 +368,8 @@
           <div class="mt-6">
             <a href="{% url 'listar_saidas_portaria' %}" 
                class="inline-flex items-center gap-2 px-5 py-2 bg-[#00594C] text-white rounded-lg text-sm hover:bg-[#004238] transition-colors shadow-sm">
-              <i class="fa-solid fa-broom"></i>
-              Limpar filtros
+              <i class="fa-solid fa-broom !text-white"></i>
+              <span class="!text-white">Limpar filtros</span>
             </a>
           </div>
           {% endif %}
@@ -411,65 +411,73 @@
 </style>
 
 <script>
-  // Função auxiliar para definir filtro de status
-  function setStatusFilter(status) {
-    const form = document.getElementById('filterForm')
-    const statusInput = document.getElementById('statusInput')
-  
-    if (statusInput) {
-      statusInput.value = status
-    }
-  
-    // Atualizar visual dos botões
-    const buttons = document.querySelectorAll('button[onclick^="setStatusFilter"]')
-    buttons.forEach((button) => {
-      const onclickText = button.getAttribute('onclick')
-      const match = onclickText.match(/setStatusFilter\('([^']*)'\)/)
-      if (match) {
-        const buttonStatus = match[1]
-  
-        button.classList.remove('bg-[#00594C]', 'text-white', 'bg-orange-500', 'bg-green-600')
-        button.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-  
-        if (buttonStatus === status) {
-          if (status === '') {
-            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-            button.classList.add('bg-[#00594C]', 'text-white')
-          } else if (status === 'pendentes') {
-            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-            button.classList.add('bg-orange-500', 'text-white')
-          } else if (status === 'finalizadas') {
-            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-            button.classList.add('bg-green-600', 'text-white')
-          }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Função auxiliar para definir filtro de status
+        function setStatusFilter(status) {
+            const form = document.getElementById('filterForm')
+            const statusInput = document.getElementById('statusInput')
+          
+            if (statusInput) {
+                statusInput.value = status
+            }
+          
+            // Atualizar visual dos botões
+            const buttons = document.querySelectorAll('button[onclick^="setStatusFilter"]')
+            buttons.forEach((button) => {
+                const onclickText = button.getAttribute('onclick')
+                const match = onclickText.match(/setStatusFilter\('([^']*)'\)/)
+                if (match) {
+                    const buttonStatus = match[1]
+          
+                    button.classList.remove('bg-[#00594C]', 'text-white', 'bg-orange-500', 'bg-green-600')
+                    button.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+          
+                    if (buttonStatus === status) {
+                        if (status === '') {
+                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+                            button.classList.add('bg-[#00594C]', 'text-white')
+                        } else if (status === 'pendentes') {
+                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+                            button.classList.add('bg-orange-500', 'text-white')
+                        } else if (status === 'finalizadas') {
+                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+                            button.classList.add('bg-green-600', 'text-white')
+                        }
+                    }
+                }
+            })
+          
+            form.submit()
         }
-      }
+        
+        // Função para exportar dados
+        function exportarDados() {
+            const currentUrl = new URL(window.location.href)
+            const params = new URLSearchParams(currentUrl.search)
+            params.delete('page')
+            const exportUrl = "{% url 'exportar_saidas_portaria_excel' %}?" + params.toString()
+            window.location.href = exportUrl
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('input[name="busca"]')
+          
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault()
+                        document.getElementById('filterForm').submit()
+                    }
+                })
+            }
+        })
+        
+        // Função para atualizar lista de cards (apenas para o contador)
+        function atualizarListaCards() {
+            // Apenas recarrega a página para mostrar os novos dados
+            location.reload()
+        }
     })
-  
-    form.submit()
-  }
-  
-  // Função para exportar dados
-  function exportarDados() {
-    const currentUrl = new URL(window.location.href)
-    const params = new URLSearchParams(currentUrl.search)
-    params.delete('page')
-    const exportUrl = "{% url 'exportar_saidas_portaria_excel' %}?" + params.toString()
-    window.location.href = exportUrl
-  }
-  
-document.addEventListener('DOMContentLoaded', function () {
-  const searchInput = document.querySelector('input[name="busca"]')
-
-  if (searchInput) {
-    searchInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        document.getElementById('filterForm').submit()
-      }
-    })
-  }
-})
-
 </script>
+
 {% endblock %}

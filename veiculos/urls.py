@@ -8,6 +8,7 @@ urlpatterns = [
     
     # CRUD
     path('novo/', views.criar_veiculo, name='criar_veiculo'),
+    #path('novo/', views.salvar_veiculo, name='salvar_veiculo'),
     path('<int:id>/', views.detalhes_veiculo, name='detalhes_veiculo'),
     path('<int:id>/editar/', views.editar_veiculo, name='editar_veiculo'),
     path('<int:id>/excluir/', views.excluir_veiculo, name='excluir_veiculo'),

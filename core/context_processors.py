@@ -1,5 +1,5 @@
 from movimentacoes.models import SolicitacaoVeiculo
-
+# Context processor para contar solicitações pendentes para o gestor
 def solicitacoes_sidebar(request):
     if not request.user.is_authenticated:
         return {}

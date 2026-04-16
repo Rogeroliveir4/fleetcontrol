@@ -8,7 +8,6 @@ from motoristas.models import Motorista
 from django.core.paginator import Paginator
 import pandas as pd
 from django.http import HttpResponse
-import pandas as pd
 import xlsxwriter
 from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
@@ -16,7 +15,6 @@ import openpyxl
 from io import BytesIO
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .models import SolicitacaoVeiculo
 from openpyxl.styles import Font, PatternFill, Alignment
 from contas.models import PerfilUsuario 
 from openpyxl import Workbook
@@ -26,7 +24,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.db import transaction
-
+from django.http import JsonResponse
 
 
 # FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
@@ -89,7 +87,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
 
 
-# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
+# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM) - AQUI É CRIA A SOLICITAÇÃPO, MAS SE FOR GESTOR/ADM JÁ APROVA AUTOMATICAMENTE
 @login_required
 def solicitar_veiculo(request, veiculo_id):
 
@@ -140,6 +138,7 @@ def solicitar_veiculo(request, veiculo_id):
             motorista_id = request.POST.get("motorista")
             destino = request.POST.get("destino")
             justificativa = request.POST.get("justificativa", "")
+            
 
             previsao_retorno_str = request.POST.get("previsao_retorno")
             previsao_retorno = None
@@ -176,6 +175,7 @@ def solicitar_veiculo(request, veiculo_id):
                 gestor_responsavel = None
                 gestor_responsavel_nome = None
 
+            # CRIA SOLICITAÇÃO
             solicitacao = SolicitacaoVeiculo.objects.create(
                 origem="SISTEMA",
                 veiculo=veiculo,
@@ -191,19 +191,21 @@ def solicitar_veiculo(request, veiculo_id):
                 gestor_responsavel_nome=gestor_responsavel_nome,
                 solicitante=request.user,
                 solicitante_nome=nome_solicitante,
-                data_criacao=timezone.now()
+                data_criacao=timezone.now(),
+                tag_interna=veiculo.tag_interna
             )
 
-            if perfil.nivel != "gestor":
-                notificar_gestores_nova_solicitacao(request, solicitacao)
+           # if perfil.nivel != "gestor":
+               # notificar_gestores_nova_solicitacao(request, solicitacao)
 
             Veiculo.objects.filter(id=veiculo.id).update(status="Reservado")
 
-            if perfil.nivel == "gestor":
+            if perfil.nivel == "gestor" or perfil.nivel == "adm":
                 messages.success(request, "Solicitação criada e aprovada automaticamente.")
             else:
                 messages.success(request, "Solicitação enviada ao gestor.")
-            
+        
+
             return redirect("lista_veiculos")
 
     # fora da transação (GET)
@@ -294,6 +296,26 @@ def cancelar_solicitacao(request, pk):
 
 
 
+
+@login_required
+def api_pendentes_aprovacao(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"total": 0, "ultima_id": None})
+
+    perfil = getattr(request.user, "perfilusuario", None)
+
+    qs = SolicitacaoVeiculo.objects.filter(status="PENDENTE")
+
+    if perfil and perfil.nivel == "gestor":
+        qs = qs.filter(veiculo__contrato_id=perfil.contrato_id)
+
+    ultima = qs.order_by("-id").first()
+
+    return JsonResponse({
+        "total": qs.count(),
+        "ultima_id": ultima.id if ultima else None
+    })
+
 # DASHBOARD GESTOR - LISTAGEM COM FILTROS COMPLETOS (TELA DE APROVAÇÕES DO GESTOR)
 def gestor_solicitacoes(request):
     perfil = request.user.perfilusuario
@@ -352,7 +374,7 @@ def gestor_solicitacoes(request):
                 veiculo__tag_interna__iexact=search
             )
 
-        # 🔍 PLACA (ABC-1234)
+        # PLACA (ABC-1234)
         elif "-" in search and len(search) >= 7:
             solicitacoes = solicitacoes.filter(
                 veiculo__placa__iexact=search
@@ -365,7 +387,7 @@ def gestor_solicitacoes(request):
         #  BUSCA GERAL
         else:
             solicitacoes = solicitacoes.filter(
-                Q(veiculo__tag_interna__icontains=search) |   # ✅ NOVO
+                Q(veiculo__tag_interna__icontains=search) |   
                 Q(motorista__nome__icontains=search) |
                 Q(destino__icontains=search) |
                 Q(veiculo__placa__icontains=search) |
@@ -520,9 +542,8 @@ def get_dashboard_stats(solicitacoes):
     
     return stats
 
-# ----------------------------------------------------------------------
-# APROVAR SOLICITAÇÃO  (NOVO FLUXO - SEM CHECKLIST DO MOTORISTA)
-# ----------------------------------------------------------------------
+
+# APROVAR SOLICITAÇÃO (APROVAÇÃO DO GESTOR/ADM)
 def aprovar_solicitacao(request, id):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=id)
     veiculo = solicitacao.veiculo
@@ -534,6 +555,7 @@ def aprovar_solicitacao(request, id):
 
     if request.method == "POST":
         observacao = request.POST.get("observacao_aprovacao", "").strip()
+        tag_interna = request.POST.get("tag_interna", "").strip().upper()
 
         solicitacao.status = "AGUARDANDO_SAIDA_PORTARIA"
         solicitacao.data_aprovacao = timezone.now()
@@ -592,7 +614,6 @@ def reprovar_solicitacao(request, id):
 
 
 
-# SOLICITAÇÕES DO USUÁRIO LOGADO () SOLICITANTE VÊ APENAS AS SUAS, GESTOR VÊ TODOS DO CONTRATO, ADM VÊ TODOS
 # SOLICITAÇÕES DO USUÁRIO LOGADO (SOLICITANTE VÊ APENAS AS SUAS, GESTOR VÊ TODOS DO CONTRATO, ADM VÊ TODOS)
 @login_required
 def minhas_solicitacoes(request):
@@ -865,8 +886,6 @@ def filtrar_saidas_portaria(request):
         )
 
     return qs
-
-
 
 
 

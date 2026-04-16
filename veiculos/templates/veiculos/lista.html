@@ -5,21 +5,7 @@
 
 {% block content %}
 
-<!-- ========== MENSAGENS DO SISTEMA (TOPO) ========== -->
-{% if messages %}
-<div class="container mx-auto px-4 py-3">
-    {% for message in messages %}
-    <div class="p-4 mb-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800{% elif message.tags == 'success' %}bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800{% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800{% else %}bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800{% endif %}">
-        <div class="flex items-start gap-3">
-            <i class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation text-red-600{% elif message.tags == 'success' %}fa-check-circle text-green-600{% elif message.tags == 'warning' %}fa-triangle-exclamation text-yellow-600{% else %}fa-info-circle text-blue-600{% endif %} text-lg"></i>
-            <p class="text-sm {% if message.tags == 'error' %}text-red-800 dark:text-red-300{% elif message.tags == 'success' %}text-green-800 dark:text-green-300{% elif message.tags == 'warning' %}text-yellow-800 dark:text-yellow-300{% else %}text-blue-800 dark:text-blue-300{% endif %}">
-                {{ message }}
-            </p>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+
 
 <!-- Custom styles para responsividade mobile -->
 <style>
@@ -977,5 +963,98 @@ function irParaPagina(page) {
 }
 </script>
 
+<script>
+// ATUALIZAÇÃO AUTOMÁTICA DO CONTADOR DE PENDENTES (POLLING)
+(function() {
+    'use strict';
+    
+    // Só executa se for gestor ou adm
+    const nivel = "{{ request.user.perfilusuario.nivel|lower }}".trim();
+    const isGestorOuAdm = nivel === "gestor" || nivel === "adm";
+    
+    if (!isGestorOuAdm) {
+        return;
+    }
+    
+    let ultimoValor = {{ pendentes_count|default:0 }};
+    let contadorAtivo = true;
+    let intervalo = null;
+    
+    function atualizarContadorPendentes() {
+        if (!contadorAtivo) return;
+        
+        fetch('/solicitacoes/gestor/contador-pendentes/')
+            .then(response => {
+                if (!response.ok) throw new Error('Erro na requisição');
+                return response.json();
+            })
+            .then(data => {
+                const atual = data.pendentes;
+                
+                // Atualiza o número no card de Pendentes
+                const pendentesCard = document.querySelector('a[href="?status=PENDENTE"] p:last-child');
+                if (pendentesCard) {
+                    pendentesCard.innerText = atual;
+                    
+                    // Efeito visual se mudou
+                    if (atual !== ultimoValor) {
+                        pendentesCard.classList.add('text-yellow-300');
+                        setTimeout(() => pendentesCard.classList.remove('text-yellow-300'), 1000);
+                    }
+                }
+                location.reload();
+                
+                // Atualiza também o badge do menu lateral se existir
+                const menuBadge = document.querySelector('[data-pendentes-badge]');
+                if (menuBadge) {
+                    menuBadge.innerText = atual;
+                    if (atual > 0) {
+                        menuBadge.classList.remove('hidden');
+                    } else {
+                        menuBadge.classList.add('hidden');
+                    }
+                }
+                
+                ultimoValor = atual;
+            })
+            .catch(error => {
+                console.log('Erro ao atualizar contador:', error);
+            });
+    }
+    
+    // Inicia polling a cada 5 segundos
+    function iniciarPolling() {
+        if (intervalo) clearInterval(intervalo);
+        intervalo = setInterval(atualizarContadorPendentes, 5000);
+    }
+    
+    // Para polling
+    function pararPolling() {
+        if (intervalo) {
+            clearInterval(intervalo);
+            intervalo = null;
+        }
+    }
+    
+    // Inicia quando a página carrega
+    document.addEventListener('DOMContentLoaded', iniciarPolling);
+    
+    // Pausa quando aba não está visível
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            contadorAtivo = false;
+            pararPolling();
+        } else {
+            contadorAtivo = true;
+            iniciarPolling();
+            atualizarContadorPendentes(); // Atualiza imediatamente ao voltar
+        }
+    });
+    
+    // Limpa ao sair
+    window.addEventListener('beforeunload', pararPolling);
+    
+})();
+</script>
 
 {% endblock %}

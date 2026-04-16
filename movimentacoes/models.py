@@ -510,6 +510,28 @@ class MovimentacaoTerceiro(models.Model):
     foto_veiculo = models.ImageField(upload_to="terceiros/veiculo/", blank=True, null=True)
     foto_motorista = models.ImageField(upload_to="terceiros/motorista/", blank=True, null=True)
 
+    # FOTOS DA SAÍDA
+    foto_saida_veiculo = models.ImageField(
+        upload_to='terceiros/saida/veiculo/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name="Foto do veículo (saída)"
+    )
+    
+    foto_saida_avaria = models.ImageField(
+        upload_to='terceiros/saida/avarias/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name="Foto de avaria (saída)"
+    )
+    
+    foto_saida_extra = models.ImageField(
+        upload_to='terceiros/saida/extra/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name="Foto extra (saída)"
+    )
+
     def __str__(self):
         return f"{self.placa} - {self.empresa} ({self.status})"
     

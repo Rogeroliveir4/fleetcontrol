@@ -196,22 +196,21 @@
                           focus:ring-2 focus:ring-[#00594C] focus:outline-none" maxlength="50">
           </div>
 
-          <!-- TIPO - USANDO CHOICES DO MODELO -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-car text-blue-500 text-xs"></i>
-              Tipo *
-            </p>
-            <select name="tipo" required 
-                    class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                           rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
-              <option value="">Selecione</option>
-              {% for value, label in tipos_choices %}
-                <option value="{{ value }}" {% if veiculo.tipo == value %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
-          </div>
+  <!-- TIPO -->
+<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+    <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+        <i class="fa-solid fa-car text-blue-500 text-xs"></i>
+        Tipo *
+    </p>
+    <select name="tipo" id="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+              focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+        <option value="">Selecione</option>
+        {% for value, label in tipos_choices %}
+            <option value="{{ veiculo.tipo }}" {% if veiculo.tipo == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
 
           <!-- CATEGORIA - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
@@ -266,22 +265,38 @@
             </select>
           </div>
 
-          <!-- KM ATUAL -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-            <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <i class="fa-solid fa-gauge-high text-yellow-500 text-xs"></i>
-              KM Atual *
-            </p>
-            <input type="text" 
-                   name="km_atual" 
-                   id="km_atual"
-                   required 
-                   value="{{ veiculo.km_atual|default:0 }}" 
-                   placeholder="0"
-                   class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-                          rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-                          focus:ring-2 focus:ring-[#00594C] focus:outline-none">
-          </div>
+                  <!-- KM ATUAL -->
+            <div id="campo-km" name="campo-km" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-gauge-high text-yellow-500 text-xs"></i>
+                    KM Atual *
+                </p>
+                <input type="text" 
+                      name="km_atual" 
+                      id="km_atual"
+                      required 
+                      placeholder="0" 
+                      value="{{ veiculo.km_atual }}"
+                      class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                              focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+            </div>
+
+            <!-- HORÍMETRO ATUAL -->
+            <div id="campo-horimetro" name="campo-horimetro" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 hidden">
+                <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-clock text-blue-500 text-xs"></i>
+                    Horímetro Atual *
+                </p>
+                <input type="text" 
+                      name="horimetro_atual" 
+                      id="horimetro_atual"
+                      placeholder="0" 
+                      value="{{ veiculo.horimetro_atual }}"
+                      class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                              focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+            </div>
 
           <!-- TIPO PROPRIEDADE - USANDO CHOICES DO MODELO -->
           <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
@@ -464,6 +479,32 @@
 
 <!--confirmação ao inativar Cadastro-->
 <script>
+
+  // LÓGICA PARA EXIBIR CAMPOS KM OU HORÍMETRO BASEADO NO TIPO SELECIONADO
+function atualizarCamposUso() {
+    const tipo = document.getElementById("tipo").value;
+
+    const equipamentos = ["Equipamento", "Implemento"];
+
+    const campoKM = document.getElementById("campo-km");
+    const campoHorimetro = document.getElementById("campo-horimetro");
+
+    if (equipamentos.includes(tipo)) {
+        campoKM.classList.add("hidden");
+        campoHorimetro.classList.remove("hidden");
+    } else {
+        campoKM.classList.remove("hidden");
+        campoHorimetro.classList.add("hidden");
+    }
+}
+
+// quando mudar o tipo
+document.getElementById("tipo").addEventListener("change", atualizarCamposUso);
+
+// ao carregar a página
+document.addEventListener("DOMContentLoaded", atualizarCamposUso);
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const ativoSelect = document.querySelector('select[name="ativo"]');
     const veiculoForm = document.getElementById('veiculoForm');

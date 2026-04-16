@@ -1,219 +1,274 @@
 {% load humanize %}
 
-<!-- CARDS APPLE MINIMALISTA - VERSÃO RESPONSIVA -->
+<!-- CARDS PROFISSIONAL - VERSÃO RESPONSIVA -->
 {% for veiculo in veiculos %}
 
 <div class="vehicle-card 
-            bg-[#F5F5F7] dark:bg-gray-900 
-            border border-gray-200/60 dark:border-gray-800 
+            bg-white dark:bg-gray-900 
+            border border-gray-200 dark:border-gray-800 
             rounded-xl 
-            shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-            hover:shadow-[0_4px_20px_rgba(0,0,0,0.1)]
+            shadow-sm hover:shadow-md
             transition-all duration-300 overflow-hidden
-            w-full max-w-sm mx-auto lg:max-w-md"> <!-- Largura maior no desktop -->
+            w-full max-w-sm mx-auto lg:max-w-md">
 
-    <!-- HEADER COMPACTO -->
-    <div class="bg-gradient-to-br from-[#00594C] to-[#0a7c6c] 
+    <!-- HEADER PROFISSIONAL -->
+    <div class="bg-gradient-to-r from-[#00594C] to-[#008070] 
                 dark:from-[#00382e] dark:to-[#00594C]
-                p-3 sm:p-4 flex justify-between items-center rounded-t-xl relative
-                shadow-inner">
+                px-4 py-3 flex justify-between items-center">
 
-        <!-- Ícone responsivo -->
-        <i class="fa-solid 
-            {% if veiculo.categoria == 'Pesado' %}fa-tractor
-            {% elif veiculo.categoria == 'Picape' %}fa-truck-pickup
-            {% elif veiculo.categoria == 'Leve' %}fa-car
-            {% elif veiculo.categoria == 'Onibus' %}fa-bus
-            {% elif veiculo.categoria == 'Passageiro' %}fa-car-side
-            {% else %}fa-car{% endif %}
-            text-2xl sm:text-2xl lg:text-2xl
-            !text-white dark:text-white/80
-            drop-shadow-sm">
-        </i>
+        <!-- CENTER: TAG INTERNA (Destaque) -->
+            <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+                <i class="fa-solid 
+                    {% if veiculo.tipo == 'Equipamento' %}fa-tractor
+                    {% elif veiculo.categoria == 'Pesado' %}fa-tractor
+                    {% elif veiculo.categoria == 'Onibus' %}fa-bus
+                    {% elif veiculo.categoria == 'Picape' %}fa-truck-pickup
+                    {% elif veiculo.categoria == 'Leve' %}fa-car
+                    {% else %}fa-car{% endif %}
+                    text-white text-sm">
+                </i>
+            </div>
+        <div class="bg-gray-900 backdrop-blur-sm
+                    px-4 py-1.5 rounded-lg 
+                    text-base font-bold tracking-wider 
+                    text-white shadow-sm">
+            {{ veiculo.tag_interna|default:"SEM TAG" }}
+        </div>
+        
 
-        <!-- TAG RESPONSIVA -->
-        <div class="bg-black dark:bg-gray-900
-                    px-3 sm:px-4 py-1.5 sm:py-2
-                    rounded-lg 
-                    text-base sm:text-lg font-bold tracking-wider 
-                    border-2 border-gray-700 dark:border-gray-700
-                    shadow-lg min-w-[90px] sm:min-w-[100px] text-center"
-                style="color: #ffffff !important;">
-            {{ veiculo.tag_interna }}
+        <!-- LEFT: Tipo + Categoria -->
+        <div class="flex items-center gap-2">
+
+            <div>
+                <p class="text-[10px] text-white/70 leading-tight">Tipo</p>
+                <p class="text-xs font-semibold text-white">{{ veiculo.tipo|default:"Veículo" }}</p>
+            </div>
         </div>
 
-                <!-- STATUS BADGE -->
-        <div class="absolute right-3 sm:right-4 bottom-[-10px]">
+        <!-- RIGHT: STATUS BADGE -->
+        <div>
             <span class="
-                px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full shadow-lg
-                border border-white/20
+                px-2.5 py-1 text-[10px] font-semibold rounded-full shadow-sm
                 {% if not veiculo.ativo %}
-                    bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700
+                    bg-red-500 text-white
                 {% elif veiculo.status == 'Disponivel' %}
-                    bg-green-500 dark:bg-green-600 text-white border-green-600 dark:border-green-700
+                    bg-emerald-500 text-white
                 {% elif veiculo.status == 'EmTransito' %}
-                    bg-orange-500 dark:bg-orange-600 text-white border-orange-600 dark:border-orange-700
+                    bg-amber-500 text-white
                 {% elif veiculo.status == 'Manutencao' %}
-                    bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700
+                    bg-rose-500 text-white
                 {% elif veiculo.status == 'Reservado' %}
-                    bg-purple-500 dark:bg-purple-600 text-white border-purple-600 dark:border-purple-700
-                {% endif %}  ">            
-            {% if not veiculo.ativo %}
-                Inativo
-            {% elif veiculo.solicitacao_ativa and veiculo.ativo %}
-                {% with s=veiculo.solicitacao_ativa.status %}
-                    {% if s == "PENDENTE" %}Aprovação
-                    {% elif s == "AGUARDANDO_SAIDA_PORTARIA" %}Portaria
-                    {% elif s == "EM_TRANSITO" %}Em Trânsito
-                    {% endif %}
-                {% endwith %}
-            {% else %}
-                {{ veiculo.get_status_display }}
-            {% endif %}
+                    bg-indigo-500 text-white
+                {% else %}
+                    bg-gray-500 text-white
+                {% endif %}">            
+                {% if not veiculo.ativo %}
+                    Inativo
+                {% elif veiculo.solicitacao_ativa and veiculo.ativo %}
+                    {% with s=veiculo.solicitacao_ativa.status %}
+                        {% if s == "PENDENTE" %}Aprovação
+                        {% elif s == "AGUARDANDO_SAIDA_PORTARIA" %}Portaria
+                        {% elif s == "EM_TRANSITO" %}Em Trânsito
+                        {% else %}Em Uso{% endif %}
+                    {% endwith %}
+                {% else %}
+                    {{ veiculo.get_status_display }}
+                {% endif %}
             </span>
         </div>
-
-        <!-- EFEITO DE BRILHO -->
-        <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/5 to-transparent rounded-t-xl pointer-events-none"></div>
     </div>
 
-    <!-- CORPO RESPONSIVO -->
-    <div class="p-3 sm:p-4 pt-5 sm:pt-6">
+    <!-- CORPO PRINCIPAL -->
+    <div class="p-4">
 
-        <!-- Modelo + Marca -->
-        <div class="flex justify-between items-start mb-2 sm:mb-3">
-            <div class="flex-1 pr-2 sm:pr-3">
-                <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
-                    {{ veiculo.modelo }}
+        <!-- LINHA 1: Modelo e Marca -->
+        <div class="flex justify-between items-start mb-3">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">
+                    {{ veiculo.modelo|default:"—" }}
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
-                    {{ veiculo.marca|default:"—" }}
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ veiculo.marca|default:"Marca não informada" }}
+                </p>
+            </div>
+            <!-- PLACA em destaque -->
+            {% if veiculo.placa %}
+            <div class="bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 text-center">Placa</p>
+                <p class="text-sm font-mono font-bold text-gray-900 dark:text-white tracking-wider">
+                    {{ veiculo.placa }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- LINHA 2: Informações principais em GRID 3 colunas -->
+        <div class="grid grid-cols-3 gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            
+            <!-- Categoria -->
+            <div class="text-center">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Categoria</p>
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    {{ veiculo.categoria|default:"—" }}
                 </p>
             </div>
 
-            <!-- Placa -->
-            {% if veiculo.placa %}
-            <div class="px-2 sm:px-3 py-1 bg-gray-900/90 dark:bg-gray-800/80 rounded-md text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap" style="color: #ffffff !important;">
-                {{ veiculo.placa }}
+            <!-- Contrato -->
+            <div class="text-center">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Contrato</p>
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate" title="{{ veiculo.contrato|default:'—' }}">
+                    {{ veiculo.contrato |default:'—' }}
+                </p>
             </div>
-            {% endif %}
+
+            <!-- Ano - Versão mais segura --> 
+            <div class="text-center">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ano</p>
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    {% if veiculo.ano and veiculo.ano > 0 %}
+                        {{ veiculo.ano|stringformat:"d" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+            </div>
+            
         </div>
 
-        <!-- CONTRATO -->
-        {% if veiculo.contrato %}
-        <div class="p-2 sm:p-3 mb-3 sm:mb-4 rounded-lg border border-blue-200/60 dark:border-blue-800/60 
-                    bg-blue-50/50 dark:bg-blue-900/20">
-            <div class="flex items-center gap-1.5 sm:gap-2">
-                <i class="fa-solid fa-file-contract text-blue-600 dark:text-blue-400 text-xs sm:text-sm"></i>
-                <div class="flex-1 min-w-0">
-                    <p class="text-[10px] sm:text-xs font-medium text-blue-700 dark:text-blue-300 truncate">Contrato</p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
-                        {{ veiculo.contrato }}
+        <!-- KM / Horímetro com correção - Versão compatível -->
+{% if veiculo.tipo == "Equipamento" or veiculo.categoria == "Equipamento" %}
+    {% with is_equipamento=True %}
+        <div class="mb-4">
+            <div class="flex justify-between items-end mb-1">
+                <div>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Horímetro</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white">
+                        {{ veiculo.horimetro_atual|default:0|intcomma }} <span class="text-sm font-normal text-gray-500">h</span>
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                        {% if veiculo.horimetro_atual < 500 %}Baixa uso
+                        {% elif veiculo.horimetro_atual < 1000 %}Uso moderado
+                        {% elif veiculo.horimetro_atual < 2000 %}Uso intenso
+                        {% else %}Alto uso{% endif %}
                     </p>
                 </div>
             </div>
-        </div>
-        {% endif %}
-
-        <!-- DETALHES - GRID 4 COLUNAS -->
-        <div class="grid grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-4">
-        
-            <!-- Ano -->
-                   <div class="text-center">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Ano</p>
-                <p class="text-base font-semibold text-gray-800 dark:text-white">
-                    {{ veiculo.ano|stringformat:"d" }}
-                </p>
-            </div>
-
-            <!-- KM -->
-                 <div class="text-center">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">KM</p>
-                <p class="text-base font-semibold text-gray-800 dark:text-white">{{ veiculo.km_atual|intcomma }}</p>
-                <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-300
-                        {% if veiculo.km_atual < 30000 %}bg-green-500
-                        {% elif veiculo.km_atual < 70000 %}bg-yellow-500
-                        {% elif veiculo.km_atual < 120000 %}bg-orange-500
-                        {% else %}bg-red-500{% endif %}"
-                        style="width:
-                            {% if veiculo.km_atual < 50000 %}25%
-                            {% elif veiculo.km_atual < 100000 %}50%
-                            {% elif veiculo.km_atual < 150000 %}75%
-                            {% else %}100%{% endif %}">
-                    </div>
+            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300
+                    {% if veiculo.horimetro_atual < 500 %}bg-emerald-500
+                    {% elif veiculo.horimetro_atual < 1000 %}bg-amber-500
+                    {% elif veiculo.horimetro_atual < 2000 %}bg-orange-500
+                    {% else %}bg-rose-500{% endif %}"
+                    style="width:
+                        {% if veiculo.horimetro_atual < 500 %}25%
+                        {% elif veiculo.horimetro_atual < 1000 %}50%
+                        {% elif veiculo.horimetro_atual < 2000 %}75%
+                        {% else %}100%{% endif %}">
                 </div>
             </div>
-
-            <!-- Cor -->
-           <div class="text-center">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Cor</p>
-                <p class="text-sm font-medium text-gray-800 dark:text-white truncate">
-                    {{ veiculo.cor|default:"—"|truncatechars:8 }}
+        </div>
+    {% endwith %}
+{% else %}
+    <div class="mb-4">
+        <div class="flex justify-between items-end mb-1">
+            <div>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Odômetro</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                    {{ veiculo.km_atual|default:0|intcomma }} <span class="text-sm font-normal text-gray-500">km</span>
                 </p>
             </div>
-
-            <!-- Categoria -->
-            <div class="text-center">
-                <p class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Categoria</p>
-                <p class="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300 truncate 
-                          bg-blue-50 dark:bg-blue-900/30 px-1 sm:px-2 py-0.5 sm:py-1 rounded-md
-                          border border-blue-200 dark:border-blue-800">
-                    {{ veiculo.categoria|default:"—"|truncatechars:6 }}
+            <div class="text-right">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                    {% if veiculo.km_atual < 30000 %}Baixa km
+                    {% elif veiculo.km_atual < 70000 %}Km moderado
+                    {% elif veiculo.km_atual < 120000 %}Km elevado
+                    {% else %}Alta km{% endif %}
                 </p>
             </div>
         </div>
+        <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-300
+                {% if veiculo.km_atual < 30000 %}bg-emerald-500
+                {% elif veiculo.km_atual < 70000 %}bg-amber-500
+                {% elif veiculo.km_atual < 120000 %}bg-orange-500
+                {% else %}bg-rose-500{% endif %}"
+                style="width:
+                    {% if veiculo.km_atual < 50000 %}25%
+                    {% elif veiculo.km_atual < 100000 %}50%
+                    {% elif veiculo.km_atual < 150000 %}75%
+                    {% else %}100%{% endif %}">
+            </div>
+        </div>
+    </div>
+{% endif %}
 
-        <!-- AÇÕES - BOTÕES RESPONSIVOS -->
-        <div class="flex items-center gap-1.5 sm:gap-2">
-
-            <!-- Ver detalhes -->
+        <!-- LINHA 4: AÇÕES - BOTÕES -->
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+            
+            <!-- Detalhes -->
             <a href="{% url 'detalhes_veiculo' veiculo.id %}"
-               class="flex-1 py-1.5 sm:py-2 lg:py-1.5 xl:py-2 bg-gray-900/90 hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 
+               class="flex-1 py-2 bg-gray-700 hover:bg-gray-800 
+                      dark:bg-gray-900 dark:hover:bg-gray-700
                       text-white text-center rounded-lg 
-                      text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1 sm:gap-1.5
-                      min-h-[36px] sm:min-h-[40px]" style="color: #ffffff !important;">
-                <i class="fa-solid fa-eye text-[10px] sm:text-xs"></i>
-                <span class="hidden xs:inline text-[10px] sm:text-xs">Detalhes</span>
+                      text-sm font-medium transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-eye text-xs !text-white"></i>
+                <span class="!text-white">Detalhes</span>
             </a>
 
-            <!-- Editar -->
+            <!-- Editar (Apenas ADM/Gestor) -->
             {% if perfilusuario.nivel == "adm" or perfilusuario.nivel == "gestor" %}
             <a href="{% url 'editar_veiculo' veiculo.id %}"
-               class="flex-1 py-1.5 sm:py-2 lg:py-1.5 xl:py-2 bg-gray-300/80 hover:bg-gray-400 dark:bg-gray-800/80 dark:hover:bg-gray-700 
-                      text-gray-900 dark:text-gray-200 text-center rounded-lg 
-                      text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1 sm:gap-1.5
-                      min-h-[36px] sm:min-h-[40px]">
-                <i class="fa-solid fa-pen text-[10px] sm:text-xs"></i>
-                <span class="hidden xs:inline text-[10px] sm:text-xs">Editar</span>
+               class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 
+                      dark:bg-gray-700 dark:hover:bg-gray-600
+                      text-gray-700 dark:text-gray-200 text-center rounded-lg 
+                      text-sm font-medium transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-pen text-xs"></i>
+                <span>Editar</span>
             </a>
             {% endif %}
 
-            <!-- Solicitar -->
-            <!-- Verifica se o usuário tem um nível de perfil definido-->
-            {% if perfilusuario.nivel %}
-            <!-- Verifica se há uma solicitação ativa para o veículo, verifica se o veículo está disponível e ativo  -->
-                {% if not solicitacao_ativa and veiculo.status == "Disponivel" and veiculo.ativo %}
-                <a href="{% url 'solicitar_veiculo' veiculo.id %}"
-                   class="flex-1 py-1.5 sm:py-2 lg:py-1.5 xl:py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600
-                          text-white text-center rounded-lg text-xs sm:text-sm font-medium transition-all 
-                          flex items-center justify-center gap-1 sm:gap-1.5
-                          min-h-[36px] sm:min-h-[40px]">
-                    <i class="fa-solid fa-paper-plane text-[10px] sm:text-xs"></i>
-                    <span class="hidden xs:inline text-[10px] sm:text-xs">Solicitar</span>
-                </a>
-                {% endif %}
+            <!-- Solicitar (Apenas se disponível) -->
+            {% if perfilusuario.nivel and not solicitacao_ativa and veiculo.status == "Disponivel" and veiculo.ativo %}
+            <a href="{% url 'solicitar_veiculo' veiculo.id %}"
+               class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 
+                      dark:bg-emerald-700 dark:hover:bg-emerald-600
+                      text-white text-center rounded-lg 
+                      text-sm font-medium transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane text-xs !text-white"></i>
+                <span class="!text-white">Solicitar</span>
+            </a>
             {% endif %}
 
         </div>
+
+        <!-- Info adicional: Cor (opcional, sutil) -->
+        {% if veiculo.cor %}
+        <div class="mt-3 flex justify-center">
+            <div class="flex items-center gap-1.5">
+                <div class="w-2.5 h-2.5 rounded-full" style="background-color: 
+                    {% if veiculo.cor|lower == 'branca' %}#e5e7eb
+                    {% elif veiculo.cor|lower == 'preta' %}#1f2937
+                    {% elif veiculo.cor|lower == 'prata' %}#9ca3af
+                    {% elif veiculo.cor|lower == 'vermelha' %}#ef4444
+                    {% elif veiculo.cor|lower == 'azul' %}#3b82f6
+                    {% else %}#9ca3af{% endif %}">
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Cor: {{ veiculo.cor|title }}
+                </p>
+            </div>
+        </div>
+        {% endif %}
 
     </div>
 
 </div>
 
 {% empty %}
-<div class="p-8 bg-[#F5F5F7] dark:bg-gray-900 border border-gray-300/50 dark:border-gray-800 rounded-xl shadow-md text-center w-full max-w-sm mx-auto">
-    <i class="fa-solid fa-car text-gray-400 dark:text-gray-600 text-3xl mb-3"></i>
+<div class="p-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm text-center w-full max-w-sm mx-auto">
+    <i class="fa-solid fa-car-side text-gray-400 dark:text-gray-600 text-4xl mb-3"></i>
     <h3 class="text-base font-medium text-gray-900 dark:text-gray-200">Nenhum veículo encontrado</h3>
     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ajuste os filtros ou adicione um novo veículo.</p>
 </div>

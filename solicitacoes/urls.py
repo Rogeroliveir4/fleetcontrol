@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from movimentacoes import views as movimentacoes_views
+from .views import api_pendentes_aprovacao
 
 urlpatterns = [
     # Motorista / ADM — criar solicitação
@@ -35,6 +36,11 @@ urlpatterns = [
 
     # Editar solicitação (USUÁRIO)
     path("editar/<int:pk>/", views.editar_solicitacao,  name="editar_solicitacao"),
+
+    # API para contar solicitações pendentes de aprovação (Gestor)
+    path("pendentes-aprovacao/", api_pendentes_aprovacao),
+    
+
 
 
 

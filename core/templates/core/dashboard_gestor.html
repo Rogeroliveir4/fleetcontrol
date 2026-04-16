@@ -56,12 +56,12 @@
         </div>
         <div class="flex gap-2">
           <a href="{% url 'gestor_solicitacoes' %}" 
-             class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
+              class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
             <i class="fa-solid fa-list-check"></i>
             <span>Solicitações</span>
           </a>
           <a href="{% url 'lista_movimentacoes' %}" 
-             class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
+              class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all text-white text-xs">
             <i class="fa-solid fa-truck-moving"></i>
             <span>Movimentações</span>
           </a>
@@ -227,7 +227,7 @@
           <i class="fa-solid fa-layer-group text-green-600 dark:text-green-400 text-sm"></i>
         </div>
         <div>
-          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Por Categoria</h3>
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Por Categoria (Descrição)</h3>
           <p class="text-[10px] text-green-600 dark:text-green-400">{{ distribuicao_categorias|length|default:0 }} categorias</p>
         </div>
       </div>

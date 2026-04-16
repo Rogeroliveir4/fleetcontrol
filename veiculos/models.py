@@ -15,6 +15,7 @@ def validar_placa_modelo(valor):
     - Antigo: ABC-1234
     - Mercosul: ABC1D23 (3 letras, 1 número, 1 letra, 2 números)
     """
+    # se o valor for vazio, não faz validação (campo pode ser opcional)
     if not valor:
         return
     
@@ -56,8 +57,10 @@ class Veiculo(models.Model):
         ("Flex", "Flex"),
         ("Gasolina", "Gasolina"),
         ("Diesel", "Diesel"),
+        ("Diesel S10", "Diesel S10"),
         ("Etanol", "Etanol"),
         ("Eletrico", "Elétrico"),
+        ("Hibrido", "Híbrido"),
         ("N/A", "N/A"),  # Adicionado
         ("Alcool/Gasolina", "Álcool/Gasolina"),  # Adicionado
     ]
@@ -69,16 +72,31 @@ class Veiculo(models.Model):
         ("Equipamento", "Equipamento"),
         ("Implemento", "Implemento"),
         ("VAN", "VAN"),  # Adicionado
+        ("Agricola", "Agrícola"),  # Adicionado
         ("Micro-Ônibus", "Micro-Ônibus"),  # Adicionado
+        ("Onibus", "Ônibus"),  # Adicionado
         ("Caminhão Basculante", "Caminhão Basculante"),
         ("Caminhão de Transporte", "Caminhão de Transporte"),
         ("Caminhão Pipa", "Caminhão Pipa"),
         ("Caminhão Lubrificante", "Caminhão Lubrificante"),
+        ("Caminhonete", "Caminhonete"),  # Adicionado
+        ("Caminhão Comboio", "Caminhão Comboio"),  # Adicionado
+        ("Caminhao Madeireiro", "Caminhão Madeireiro"),  # Adicionado
+        ("Caminhão Munk", "Caminhão Munk"),  # Adicionado
+        ("Trator de Esteira", "Trator de Esteira"),  # Adicionado
+        ("Prancha", "Prancha"),  # Adicionado
+        ("Rolo Compressor", "Rolo Compressor"),  # Adicionado
+        ("Rolo Compactador", "Rolo Compactador"),  # Adicionado
         ("Veículo de Apoio", "Veículo de Apoio"),
+        ("Reboque", "Reboque"),  # Adicionado
+        ("Carreta","Carreta"),
         ("Grupo Gerador", "Grupo Gerador"),
         ("Escavadeira Hidráulica", "Escavadeira Hidráulica"),
+        ("Escavadeira Anfíbia", "Escavadeira Anfíbia"),
+        ("Motoniveladora", "Motoniveladora"),
         ("Pá Mecânica", "Pá Mecânica"),
         ("Outros", "Outros"),
+        
     ]
 
     TIPO_PROPRIEDADE_CHOICES = [
@@ -94,6 +112,7 @@ class Veiculo(models.Model):
         ("EmTransito", "Em Trânsito"),
         ("Manutencao", "Manutenção"),
         ("Reservado", "Reservado"),
+        ("Inativo", "Inativo"),
     ]
 
     CIDADE_CHOICES = [
@@ -146,6 +165,9 @@ class Veiculo(models.Model):
 
     km_atual = models.PositiveIntegerField(default=0)
     km_anterior = models.PositiveIntegerField(default=0)
+
+    horimetro_atual = models.PositiveIntegerField(default=0)
+    horimetro_anterior = models.PositiveIntegerField(default=0)
 
     tipo_propriedade = models.CharField(
         max_length=40, choices=TIPO_PROPRIEDADE_CHOICES, default="Proprio"
@@ -208,6 +230,11 @@ class Veiculo(models.Model):
 
         if self.renavam:
             self.renavam = ''.join(filter(str.isdigit, str(self.renavam)))
+
+        if self.tipo in ["Equipamento", "Implemento"]:
+            self.km_atual = 0
+        else:
+            self.horimetro_atual = 0    
 
         # -------------------------
         # VALIDAÇÃO DE PLACA (CONDICIONAL)

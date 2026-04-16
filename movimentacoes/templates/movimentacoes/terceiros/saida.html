@@ -4,11 +4,11 @@
 {% block title %}Saída de Veículo de Terceiro{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 py-6">
 
     <!-- HEADER -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
             Saída de Veículo de Terceiro
         </h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -16,23 +16,21 @@
         </p>
     </div>
 
-    <form method="POST" id="saidaForm"
-          class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <form method="POST" id="saidaForm" enctype="multipart/form-data"
+          class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {% csrf_token %}
 
         <!-- ======================================================
-             COLUNA PRINCIPAL — RESUMO
+             COLUNA 1 — RESUMO DO VEÍCULO + FOTOS SAÍDA
         ====================================================== -->
-        <div class="xl:col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-6">
 
             <!-- CARD RESUMO -->
-            <div class="
-                rounded-2xl p-6
-                bg-gradient-to-br from-gray-50 to-gray-100
-                dark:from-[#020617] dark:to-[#0f172a]
-                border border-gray-200 dark:border-gray-800
-                shadow-sm
-            ">
+            <div class="rounded-2xl p-6
+                        bg-gradient-to-br from-gray-50 to-gray-100
+                        dark:from-[#020617] dark:to-[#0f172a]
+                        border border-gray-200 dark:border-gray-800
+                        shadow-sm">
 
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -40,66 +38,46 @@
                         Identificação do Veículo
                     </h2>
 
-                    <span class="
-                        px-4 py-1.5 rounded-full text-sm font-bold tracking-widest
-                        bg-gray-900 text-white
-                        dark:bg-gray-100 dark:text-gray-900
-                    ">
+                    <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-widest
+                                 bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900">
                         {{ mov.placa }}
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <!-- EMPRESA -->
                     <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
                         <p class="text-xs uppercase text-gray-500 font-semibold">Empresa</p>
-                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">
-                            {{ mov.empresa }}
-                        </p>
+                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">{{ mov.empresa }}</p>
                     </div>
 
-                    <!-- MOTORISTA -->
                     <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
                         <p class="text-xs uppercase text-gray-500 font-semibold">Motorista</p>
-                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">
-                            {{ mov.motorista_nome }}
-                        </p>
+                        <p class="text-base font-medium text-gray-900 dark:text-white mt-1">{{ mov.motorista_nome }}</p>
                     </div>
 
-                    <!-- TIPO -->
                     <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
                         <p class="text-xs uppercase text-gray-500 font-semibold">Tipo de Veículo</p>
-                        <p class="text-base text-gray-900 dark:text-white mt-1">
-                            {{ mov.tipo_veiculo }}
-                        </p>
+                        <p class="text-base text-gray-900 dark:text-white mt-1">{{ mov.tipo_veiculo }}</p>
                     </div>
 
-                    <!-- DATA -->
                     <div class="rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
                         <p class="text-xs uppercase text-gray-500 font-semibold">Entrada no Pátio</p>
-                        <p class="text-base text-gray-900 dark:text-white mt-1">
-                            {{ mov.data_entrada|date:"d/m/Y H:i" }}
-                        </p>
+                        <p class="text-base text-gray-900 dark:text-white mt-1">{{ mov.data_entrada|date:"d/m/Y H:i" }}</p>
                     </div>
 
                     {% if mov.descricao_veiculo %}
                     <div class="md:col-span-2 rounded-xl p-4 bg-white dark:bg-[#020617] border dark:border-gray-800">
                         <p class="text-xs uppercase text-gray-500 font-semibold">Descrição do Veículo</p>
-                        <p class="text-sm text-gray-900 dark:text-white mt-1">
-                            {{ mov.descricao_veiculo }}
-                        </p>
+                        <p class="text-sm text-gray-900 dark:text-white mt-1">{{ mov.descricao_veiculo }}</p>
                     </div>
                     {% endif %}
 
                     {% if mov.tags %}
                     <div class="md:col-span-2">
-                        <span class="
-                            inline-flex items-center gap-2 px-4 py-2 rounded-full
-                            bg-[#00594C]/10 text-[#00594C]
-                            dark:bg-[#00594C]/20 dark:text-emerald-300
-                            text-sm font-semibold
-                        ">
+                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full
+                                     bg-[#00594C]/10 text-[#00594C] dark:bg-[#00594C]/20 dark:text-emerald-300
+                                     text-sm font-semibold">
                             <i class="fa-solid fa-tag text-xs"></i>
                             {{ mov.tags }}
                         </span>
@@ -108,13 +86,11 @@
                 </div>
             </div>
 
-            <!-- MOTIVO -->
-            <div class="
-                rounded-2xl p-6
-                bg-white dark:bg-[#020617]
-                border border-gray-200 dark:border-gray-800
-                shadow-sm
-            ">
+            <!-- MOTIVO DA ENTRADA -->
+            <div class="rounded-2xl p-6
+                        bg-white dark:bg-[#020617]
+                        border border-gray-200 dark:border-gray-800
+                        shadow-sm">
                 <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400 mb-3">
                     Motivo da Entrada
                 </h3>
@@ -123,74 +99,323 @@
                 </p>
             </div>
 
+            <!-- ================================================
+                 SEÇÃO DE FOTOS DA SAÍDA
+            ================================================ -->
+            <div class="rounded-2xl p-6
+                        bg-white dark:bg-[#020617]
+                        border border-gray-200 dark:border-gray-800
+                        shadow-sm">
+                
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-camera text-[#00594C]"></i>
+                    Registro Fotográfico da Saída
+                </h2>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Tire fotos do estado do veículo no momento da saída. 
+                    Em dispositivos móveis, será aberta a câmera automaticamente.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- FOTO VEÍCULO SAÍDA -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            📸 Foto do Veículo (Saída)
+                        </label>
+                        <div class="relative">
+                            <input type="file" name="foto_saida_veiculo" id="fotoSaidaVeiculo"
+                                   accept="image/*" capture="environment"
+                                   class="hidden">
+                            
+                            <label for="fotoSaidaVeiculo" 
+                                   class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                          border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <div id="previewSaidaVeiculo" class="flex flex-col items-center justify-center h-32">
+                                    <i class="fa-solid fa-truck text-3xl text-gray-400 mb-2"></i>
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        Clique para adicionar foto
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        Opcional
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- FOTO AVARIA SAÍDA -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ⚠️ Foto de Avaria (Saída)
+                        </label>
+                        <div class="relative">
+                            <input type="file" name="foto_saida_avaria" id="fotoSaidaAvaria"
+                                   accept="image/*" capture="environment"
+                                   class="hidden">
+                            
+                            <label for="fotoSaidaAvaria" 
+                                   class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                          border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                <div id="previewSaidaAvaria" class="flex flex-col items-center justify-center h-32">
+                                    <i class="fa-solid fa-triangle-exclamation text-3xl text-orange-400 mb-2"></i>
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        Clique para adicionar foto
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        Recomendado
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOTO EXTRA (opcional) -->
+                <div class="mt-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            🔧 Foto Extra (Opcional)
+                        </label>
+                        <div class="relative">
+                            <input type="file" name="foto_saida_extra" id="fotoSaidaExtra"
+                                   accept="image/*" capture="environment"
+                                   class="hidden">
+                            
+                            <label for="fotoSaidaExtra" 
+                                   class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                          border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <div id="previewSaidaExtra" class="flex flex-col items-center justify-center h-24">
+                                    <i class="fa-solid fa-camera text-2xl text-gray-400 mb-1"></i>
+                                    <span class="text-xs text-gray-500">
+                                        Adicionar foto adicional
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ======================================================
-             COLUNA LATERAL — CONFIRMAÇÃO
+             COLUNA 2 — CONFIRMAÇÃO DA SAÍDA
         ====================================================== -->
-        <div class="
-            rounded-3xl p-6
-            bg-gradient-to-br from-red-50 to-red-100
-            dark:from-red-900/20 dark:to-red-950/30
-            border border-red-200 dark:border-red-900/40
-            shadow-xl
-        ">
+        <div class="rounded-3xl p-6
+                    bg-gradient-to-br from-red-50 to-red-100
+                    dark:from-red-900/20 dark:to-red-950/30
+                    border border-red-200 dark:border-red-900/40
+                    shadow-xl">
 
             <h2 class="text-lg font-bold text-red-700 dark:text-red-300 flex items-center gap-2 mb-6">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 Confirmação de Saída
             </h2>
 
-            <!-- OBS -->
+            <!-- OBSERVAÇÕES -->
             <div class="mb-6">
                 <label class="block text-xs uppercase font-semibold mb-2 text-gray-600 dark:text-gray-400">
                     Observações da Saída
                 </label>
                 <textarea name="observacoes" rows="4"
-                          placeholder="Ex: veículo saiu carregado, portão lateral..."
-                          class="
-                              w-full rounded-xl px-4 py-3 text-sm
-                              bg-white dark:bg-[#020617]
-                              text-gray-900 dark:text-white
-                              border border-gray-300 dark:border-gray-700
-                              focus:outline-none focus:ring-2 focus:ring-red-500
-                              transition
-                          "></textarea>
+                          placeholder="Ex: veículo saiu carregado, portão lateral, avarias identificadas..."
+                          class="w-full rounded-xl px-4 py-3 text-sm
+                                 bg-white dark:bg-[#020617]
+                                 text-gray-900 dark:text-white
+                                 border border-gray-300 dark:border-gray-700
+                                 focus:outline-none focus:ring-2 focus:ring-red-500
+                                 transition"></textarea>
             </div>
 
             <!-- ALERTA -->
             <div class="rounded-xl p-4 bg-red-600 text-white text-sm leading-relaxed mb-8">
+                <i class="fa-solid fa-info-circle mr-2"></i>
                 <strong>Atenção:</strong> após confirmar, o veículo será removido da lista de veículos no pátio.
                 Essa ação é definitiva.
             </div>
 
             <!-- BOTÕES -->
             <div class="space-y-3">
-                <button type="submit"
-                        class="
-                            w-full py-3 rounded-xl font-semibold
-                            bg-red-600 hover:bg-red-700
-                            text-white
-                            shadow-lg shadow-red-600/30
-                            transition-all
-                        ">
+                <button type="submit" id="submitBtn"
+                        class="w-full py-3 rounded-xl font-semibold
+                               bg-red-600 hover:bg-red-700
+                               text-white shadow-lg shadow-red-600/30
+                               transition-all">
                     <i class="fa-solid fa-check mr-2"></i>
                     Confirmar Saída
                 </button>
 
                 <a href="{% url 'terceiros_portaria_lista' %}"
-                   class="
-                       w-full block text-center py-3 rounded-xl
-                       border border-gray-300 dark:border-gray-700
-                       text-gray-700 dark:text-gray-300
-                       hover:bg-gray-100 dark:hover:bg-gray-800
-                       transition
-                   ">
+                   class="w-full block text-center py-3 rounded-xl
+                          border border-gray-300 dark:border-gray-700
+                          text-gray-700 dark:text-gray-300
+                          hover:bg-gray-100 dark:hover:bg-gray-800
+                          transition">
                     Cancelar
                 </a>
             </div>
-
         </div>
     </form>
 </div>
+
+<script>
+    // Detectar se é dispositivo móvel
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Função para comprimir imagem
+    async function compressImage(file, maxSizeMB = 5, maxWidthOrHeight = 1920) {
+        return new Promise((resolve, reject) => {
+            if (file.size <= maxSizeMB * 1024 * 1024) {
+                resolve(file);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidthOrHeight) {
+                            height = (height * maxWidthOrHeight) / width;
+                            width = maxWidthOrHeight;
+                        }
+                    } else {
+                        if (height > maxWidthOrHeight) {
+                            width = (width * maxWidthOrHeight) / height;
+                            height = maxWidthOrHeight;
+                        }
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob((blob) => {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        
+                        console.log(`Compressão: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+                        resolve(compressedFile);
+                    }, 'image/jpeg', 0.7);
+                };
+                
+                img.onerror = reject;
+            };
+            
+            reader.onerror = reject;
+        });
+    }
+
+    // Função para configurar preview com compressão
+    async function setupPhotoWithCompression(input, previewElement) {
+        if (!input.files || !input.files[0]) return;
+        
+        let file = input.files[0];
+        
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor, selecione um arquivo de imagem válido.');
+            input.value = '';
+            return;
+        }
+        
+        previewElement.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-32">
+                <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i>
+                <span class="text-sm text-gray-500">Comprimindo...</span>
+            </div>
+        `;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            try {
+                const compressed = await compressImage(file, 5);
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(compressed);
+                input.files = dataTransfer.files;
+                file = compressed;
+            } catch (error) {
+                console.error('Erro na compressão:', error);
+            }
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewElement.innerHTML = `
+                <div class="relative">
+                    <img src="${e.target.result}" class="object-cover h-32 w-full rounded-lg">
+                    <span class="absolute bottom-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        ✓
+                    </span>
+                </div>
+                <span class="mt-1 text-xs text-green-600">Foto carregada</span>
+            `;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Configurar previews
+    const fotoVeiculo = document.getElementById('fotoSaidaVeiculo');
+    const previewVeiculo = document.getElementById('previewSaidaVeiculo');
+    if (fotoVeiculo && previewVeiculo) {
+        fotoVeiculo.addEventListener('change', () => setupPhotoWithCompression(fotoVeiculo, previewVeiculo));
+    }
+
+    const fotoAvaria = document.getElementById('fotoSaidaAvaria');
+    const previewAvaria = document.getElementById('previewSaidaAvaria');
+    if (fotoAvaria && previewAvaria) {
+        fotoAvaria.addEventListener('change', () => setupPhotoWithCompression(fotoAvaria, previewAvaria));
+    }
+
+    const fotoExtra = document.getElementById('fotoSaidaExtra');
+    const previewExtra = document.getElementById('previewSaidaExtra');
+    if (fotoExtra && previewExtra) {
+        fotoExtra.addEventListener('change', () => setupPhotoWithCompression(fotoExtra, previewExtra));
+    }
+
+    // Remover atributo capture em desktop
+    if (!isMobileDevice()) {
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.removeAttribute('capture');
+        });
+    }
+
+    // Validação do formulário
+    document.getElementById('saidaForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+        return true;
+    });
+</script>
+
+<style>
+    @media (max-width: 640px) {
+        input, textarea, button {
+            font-size: 16px !important;
+        }
+        button, a {
+            min-height: 44px;
+        }
+    }
+    
+    label[for^="fotoSaida"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
 {% endblock %}

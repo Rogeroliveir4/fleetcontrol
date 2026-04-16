@@ -41,17 +41,18 @@
   <span class="menuText font-medium">Dashboard</span>
 </a>
 
+
 <!-- Aprovações -->
 <div class="relative">
   <a href="{% url 'gestor_solicitacoes' %}"
     class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
     <div class="relative">
       <i class="fa-solid fa-check-double text-base text-gray-500 group-hover:text-primary"></i>
-      {% if pendentes_aprovacao > 0 %}
-      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg animate-pulse">
-        {{ pendentes_aprovacao }}
+      <span id="contador-aprovacoes"
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 items-center justify-center rounded-full px-1.5 shadow-lg"
+            style="display: {{ pendentes_aprovacao|yesno:'flex,none' }}">
+          {{ pendentes_aprovacao }}
       </span>
-      {% endif %}
     </div>
     <span class="menuText font-medium">Aprovações</span>
   </a>
@@ -112,10 +113,26 @@
 </div>
 
 <a href="{% url 'listar_saidas_portaria' %}"
-  class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">
-  <i class="fa-solid fa-right-from-bracket text-base text-gray-500 group-hover:text-primary"></i>
-  <span class="menuText font-medium">Saídas Pendentes</span>
+    class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 transition-all">
+
+    <!-- ÍCONE + BADGE -->
+    <div class="relative flex items-center justify-center">
+
+        <i class="fa-solid fa-truck"></i>
+
+        <span class="notificacao-badge 
+                    bg-red-500 text-white text-xs font-bold 
+                    min-w-[20px] h-5 
+                    flex items-center justify-center 
+                    rounded-full px-1.5 shadow-lg">
+        </span>
+
+    </div>
+
+    <span class="menuText">Saídas Pendentes</span>
+
 </a>
+
 
 <a href="{% url 'lista_movimentacoes' %}"
   class="menu-item group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200">

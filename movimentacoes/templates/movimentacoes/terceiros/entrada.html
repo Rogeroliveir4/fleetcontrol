@@ -33,268 +33,456 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                 <!-- FOTO PLACA (OBRIGATÓRIA) -->
-                <label class="relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
-                              border-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 transition">
-
-                    <input type="file" name="foto_placa" id="fotoPlaca"
-                           accept="image/*" class="hidden" required>
-
-                    <div id="previewPlaca" class="flex flex-col items-center justify-center h-40">
-                        <i class="fa-solid fa-car text-4xl text-red-400 mb-2"></i>
-                        <span class="font-semibold text-red-600 text-sm">
-                            Foto da Placa *
-                        </span>
-                        <span class="text-xs text-red-500 mt-1">
-                            Obrigatória
-                        </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Foto da Placa *
+                    </label>
+                    <div class="relative">
+                        <input type="file" name="foto_placa" id="fotoPlaca"
+                               accept="image/*" capture="environment" required
+                               class="hidden">
+                        
+                        <label for="fotoPlaca" 
+                               class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                      border-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors">
+                            <div id="previewPlaca" class="flex flex-col items-center justify-center h-40">
+                                <i class="fa-solid fa-car text-4xl text-red-400 mb-2"></i>
+                                <span class="font-semibold text-red-600 text-sm">
+                                    Clique para adicionar foto
+                                </span>
+                                <span class="text-xs text-red-500 mt-1">
+                                    Obrigatória
+                                </span>
+                            </div>
+                        </label>
                     </div>
-                </label>
+                </div>
 
                 <!-- FOTO VEÍCULO -->
-                <label class="relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
-                              border-gray-300 hover:bg-gray-50 transition">
-
-                    <input type="file" name="foto_veiculo" accept="image/*" class="hidden">
-
-                    <div class="flex flex-col items-center justify-center h-40">
-                        <i class="fa-solid fa-truck text-4xl text-gray-400 mb-2"></i>
-                        <span class="text-sm font-medium text-gray-600">
-                            Foto do Veículo
-                        </span>
-                        <span class="text-xs text-gray-400">
-                            Opcional
-                        </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Foto do Veículo
+                    </label>
+                    <div class="relative">
+                        <input type="file" name="foto_veiculo" id="fotoVeiculo"
+                               accept="image/*" capture="environment"
+                               class="hidden">
+                        
+                        <label for="fotoVeiculo" 
+                               class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                      border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <div id="previewVeiculo" class="flex flex-col items-center justify-center h-40">
+                                <i class="fa-solid fa-truck text-4xl text-gray-400 mb-2"></i>
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Clique para adicionar foto
+                                </span>
+                                <span class="text-xs text-gray-400">
+                                    Opcional
+                                </span>
+                            </div>
+                        </label>
                     </div>
-                </label>
+                </div>
 
                 <!-- FOTO MOTORISTA -->
-                <label class="relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
-                              border-gray-300 hover:bg-gray-50 transition">
-
-                    <input type="file" name="foto_motorista" accept="image/*" class="hidden">
-
-                    <div class="flex flex-col items-center justify-center h-40">
-                        <i class="fa-solid fa-user text-4xl text-gray-400 mb-2"></i>
-                        <span class="text-sm font-medium text-gray-600">
-                            Foto do Motorista
-                        </span>
-                        <span class="text-xs text-gray-400">
-                            Opcional
-                        </span>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Foto do Motorista
+                    </label>
+                    <div class="relative">
+                        <input type="file" name="foto_motorista" id="fotoMotorista"
+                               accept="image/*" capture="environment"
+                               class="hidden">
+                        
+                        <label for="fotoMotorista" 
+                               class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
+                                      border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <div id="previewMotorista" class="flex flex-col items-center justify-center h-40">
+                                <i class="fa-solid fa-user text-4xl text-gray-400 mb-2"></i>
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Clique para adicionar foto
+                                </span>
+                                <span class="text-xs text-gray-400">
+                                    Opcional
+                                </span>
+                            </div>
+                        </label>
                     </div>
-                </label>
-
+                </div>
             </div>
         </div>
 
         <!-- ======================================================
-     DADOS DA ENTRADA — PREMIUM (LIGHT / DARK)
-====================================================== -->
-<div class="
-    rounded-2xl shadow-xl p-6
-    bg-white dark:bg-gradient-to-br dark:from-[#0f172a] dark:to-[#020617]
-    border border-gray-200 dark:border-gray-800
-">
+             COLUNA 2 — DADOS DA ENTRADA
+        ====================================================== -->
+        <div class="rounded-2xl shadow-xl p-6
+                    bg-white dark:bg-gradient-to-br dark:from-[#0f172a] dark:to-[#020617]
+                    border border-gray-200 dark:border-gray-800">
 
-    <h2 class="text-lg font-semibold mb-6 flex items-center gap-2
-               text-gray-900 dark:text-white">
-        <i class="fa-solid fa-clipboard-list text-emerald-600 dark:text-emerald-400"></i>
-        Dados da Entrada
-    </h2>
+            <h2 class="text-lg font-semibold mb-6 flex items-center gap-2
+                       text-gray-900 dark:text-white">
+                <i class="fa-solid fa-clipboard-list text-emerald-600 dark:text-emerald-400"></i>
+                Dados da Entrada
+            </h2>
 
-    <div class="space-y-5">
+            <div class="space-y-5">
 
-        <!-- Empresa -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Empresa *
-            </label>
-            <input type="text" name="empresa" required
-                   placeholder="Ex: Refrinorte"
-                   class="
-                       w-full rounded-lg px-3 py-2 text-sm
-                       bg-white dark:bg-[#020617]
-                       text-gray-900 dark:text-white
-                       placeholder-gray-400 dark:placeholder-gray-500
-                       border border-gray-300 dark:border-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500
-                       focus:border-emerald-500 transition
-                   ">
+                <!-- Empresa -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Empresa *
+                    </label>
+                    <input type="text" name="empresa" required
+                           placeholder="Ex: Refrinorte"
+                           class="w-full rounded-lg px-3 py-2 text-sm
+                                  bg-white dark:bg-[#020617]
+                                  text-gray-900 dark:text-white
+                                  placeholder-gray-400 dark:placeholder-gray-500
+                                  border border-gray-300 dark:border-gray-700
+                                  focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                  focus:border-emerald-500 transition uppercase">
+                </div>
+
+                <!-- Tipo de Veículo -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Tipo de Veículo *
+                    </label>
+                    <div class="relative">
+                        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+                            <i class="fa-solid fa-truck"></i>
+                        </span>
+                        <input type="text" name="tipo_veiculo" id="tipo_veiculo" required
+                               placeholder="Caminhão, Van, Carro, etc."
+                               class="w-full rounded-lg pl-10 pr-3 py-2 text-sm
+                                      bg-white dark:bg-[#020617]
+                                      text-gray-900 dark:text-white
+                                      placeholder-gray-400 dark:placeholder-gray-500
+                                      border border-gray-300 dark:border-gray-700
+                                      focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                      focus:border-emerald-500 transition">
+                    </div>
+                </div>
+
+                <!-- Placa -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Placa *
+                    </label>
+                    <input type="text" name="placa" required
+                           placeholder="ABC-1234"
+                           class="w-full rounded-lg px-3 py-2 text-sm uppercase
+                                  bg-white dark:bg-[#020617]
+                                  text-gray-900 dark:text-white
+                                  placeholder-gray-400 dark:placeholder-gray-500
+                                  border border-gray-300 dark:border-gray-700
+                                  focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                  focus:border-emerald-500 transition">
+                </div>
+
+                <!-- Motorista -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Motorista *
+                    </label>
+                    <input type="text" name="motorista_nome" required
+                           placeholder="Nome completo"
+                           class="w-full rounded-lg px-3 py-2 text-sm
+                                  bg-white dark:bg-[#020617]
+                                  text-gray-900 dark:text-white
+                                  placeholder-gray-400 dark:placeholder-gray-500
+                                  border border-gray-300 dark:border-gray-700
+                                  focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                  focus:border-emerald-500 transition uppercase">
+                </div>
+
+                <!-- Documento -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Documento
+                    </label>
+                    <input type="text" name="documento"
+                           placeholder="RG ou CPF"
+                           class="w-full rounded-lg px-3 py-2 text-sm
+                                  bg-white dark:bg-[#020617]
+                                  text-gray-900 dark:text-white
+                                  placeholder-gray-400 dark:placeholder-gray-500
+                                  border border-gray-300 dark:border-gray-700
+                                  focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                  focus:border-emerald-500 transition">
+                </div>
+
+                <!-- Motivo -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Motivo da Entrada *
+                    </label>
+                    <textarea name="motivo" rows="3" required
+                              placeholder="Informe o motivo da entrada"
+                              class="w-full rounded-lg px-3 py-2 text-sm resize-none
+                                     bg-white dark:bg-[#020617]
+                                     text-gray-900 dark:text-white
+                                     placeholder-gray-400 dark:placeholder-gray-500
+                                     border border-gray-300 dark:border-gray-700
+                                     focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                     focus:border-emerald-500 transition"></textarea>
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide mb-1
+                                  text-gray-600 dark:text-gray-400">
+                        Observações
+                    </label>
+                    <textarea name="observacoes" rows="3"
+                              placeholder="Opcional"
+                              class="w-full rounded-lg px-3 py-2 text-sm resize-none
+                                     bg-white dark:bg-[#020617]
+                                     text-gray-900 dark:text-white
+                                     placeholder-gray-400 dark:placeholder-gray-500
+                                     border border-gray-300 dark:border-gray-700
+                                     focus:outline-none focus:ring-2 focus:ring-emerald-500
+                                     focus:border-emerald-500 transition"></textarea>
+                </div>
+
+            </div>
+
+            <!-- BOTÃO -->
+            <div class="mt-8">
+                <button type="submit" id="submitBtn"
+                        class="w-full flex items-center justify-center gap-2
+                               bg-gradient-to-r from-[#00594C] to-emerald-600 
+                               hover:from-[#00463C] hover:to-emerald-700
+                               text-white font-semibold py-3 rounded-xl
+                               shadow-lg shadow-emerald-600/20
+                               transition-all">
+                    <i class="fa-solid fa-check"></i>
+                    Registrar Entrada
+                </button>
+            </div>
         </div>
-
-        <div>
-    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-        Tipo de Veículo
-    </label>
-
-    <div class="relative">
-        <!-- Ícone -->
-        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
-            <i class="fa-solid fa-truck"></i>
-        </span>
-
-        <select
-            name="tipo_veiculo"
-            required
-            class="
-                w-full pl-10 pr-4 py-2.5 rounded-xl
-                border border-gray-300 dark:border-gray-600
-                bg-white dark:bg-gray-800
-                text-gray-900 dark:text-gray-100
-                text-sm font-medium
-                shadow-sm
-                focus:outline-none
-                focus:ring-2 focus:ring-[#00594C]/40
-                focus:border-[#00594C]
-                transition">
-            <option value="">Selecione</option>
-            <option value="CAMINHAO">Caminhão</option>
-            <option value="CARRO">Carro</option>
-            <option value="VAN">Van</option>
-            <option value="ONIBUS">Ônibus</option>
-            <option value="CAMINHONETE">Caminhonete</option>
-            <option value="OUTRO">Outro</option>
-        </select>
-    </div>
-</div>
-
-
-        <!-- Placa -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Placa *
-            </label>
-            <input type="text" name="placa" required
-                   placeholder="ABC-1234"
-                   class="
-                       w-full rounded-lg px-3 py-2 text-sm uppercase
-                       bg-white dark:bg-[#020617]
-                       text-gray-900 dark:text-white
-                       placeholder-gray-400 dark:placeholder-gray-500
-                       border border-gray-300 dark:border-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500
-                       focus:border-emerald-500 transition
-                   ">
-        </div>
-
-        <!-- Motorista -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Motorista *
-            </label>
-            <input type="text" name="motorista_nome" required
-                   placeholder="Nome completo"
-                   class="
-                       w-full rounded-lg px-3 py-2 text-sm
-                       bg-white dark:bg-[#020617]
-                       text-gray-900 dark:text-white
-                       placeholder-gray-400 dark:placeholder-gray-500
-                       border border-gray-300 dark:border-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500
-                       focus:border-emerald-500 transition
-                   ">
-        </div>
-
-        <!-- Documento -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Documento
-            </label>
-            <input type="text" name="documento"
-                   placeholder="RG ou CPF"
-                   class="
-                       w-full rounded-lg px-3 py-2 text-sm
-                       bg-white dark:bg-[#020617]
-                       text-gray-900 dark:text-white
-                       placeholder-gray-400 dark:placeholder-gray-500
-                       border border-gray-300 dark:border-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500
-                       focus:border-emerald-500 transition
-                   ">
-        </div>
-
-        <!-- Motivo -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Motivo da Entrada *
-            </label>
-            <textarea name="motivo" rows="3" required
-                      placeholder="Informe o motivo da entrada"
-                      class="
-                          w-full rounded-lg px-3 py-2 text-sm resize-none
-                          bg-white dark:bg-[#020617]
-                          text-gray-900 dark:text-white
-                          placeholder-gray-400 dark:placeholder-gray-500
-                          border border-gray-300 dark:border-gray-700
-                          focus:outline-none focus:ring-2 focus:ring-emerald-500
-                          focus:border-emerald-500 transition
-                      "></textarea>
-        </div>
-
-        <!-- Observações -->
-        <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide mb-1
-                          text-gray-600 dark:text-gray-400">
-                Observações
-            </label>
-            <textarea name="observacoes" rows="3"
-                      placeholder="Opcional"
-                      class="
-                          w-full rounded-lg px-3 py-2 text-sm resize-none
-                          bg-white dark:bg-[#020617]
-                          text-gray-900 dark:text-white
-                          placeholder-gray-400 dark:placeholder-gray-500
-                          border border-gray-300 dark:border-gray-700
-                          focus:outline-none focus:ring-2 focus:ring-emerald-500
-                          focus:border-emerald-500 transition"></textarea>
-        </div>
-
-    </div>
-
-    <!-- BOTÃO -->
-    <div class="mt-8">
-        <button type="submit"
-                class="
-                    w-full flex items-center justify-center gap-2
-                    bg-emerald-600 hover:bg-emerald-700
-                    text-white font-semibold py-3 rounded-xl
-                    shadow-lg shadow-emerald-600/20
-                    transition-all
-                ">
-            <i class="fa-solid fa-check"></i>
-            Registrar Entrada
-        </button>
-    </div>
-</div>
     </form>
 </div>
 
-<!-- ======================================================
-    SCRIPT — PREVIEW FOTO PLACA (CORRIGE SEU PROBLEMA)
-====================================================== -->
 <script>
-document.getElementById("fotoPlaca").addEventListener("change", function () {
-    const preview = document.getElementById("previewPlaca");
-    const file = this.files[0];
+    // Detectar se é dispositivo móvel
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
 
-    if (file) {
+    // Função para comprimir imagem
+    async function compressImage(file, maxSizeMB = 5, maxWidthOrHeight = 1920) {
+        return new Promise((resolve, reject) => {
+            // Se a imagem já for menor que o limite, retorna ela mesma
+            if (file.size <= maxSizeMB * 1024 * 1024) {
+                resolve(file);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                
+                img.onload = () => {
+                    // Calcular novas dimensões mantendo proporção
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidthOrHeight) {
+                            height = (height * maxWidthOrHeight) / width;
+                            width = maxWidthOrHeight;
+                        }
+                    } else {
+                        if (height > maxWidthOrHeight) {
+                            width = (width * maxWidthOrHeight) / height;
+                            height = maxWidthOrHeight;
+                        }
+                    }
+                    
+                    // Criar canvas para compressão
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Comprimir (qualidade 0.7 = 70%)
+                    canvas.toBlob((blob) => {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        
+                        console.log(`Compressão: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+                        resolve(compressedFile);
+                    }, 'image/jpeg', 0.7);
+                };
+                
+                img.onerror = reject;
+            };
+            
+            reader.onerror = reject;
+        });
+    }
+
+    // Função para configurar preview com compressão
+    async function setupPhotoWithCompression(input, previewElement) {
+        if (!input.files || !input.files[0]) return;
+        
+        let file = input.files[0];
+        
+        // Verificar se é imagem
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor, selecione um arquivo de imagem válido.');
+            input.value = '';
+            return;
+        }
+        
+        // Mostrar indicador de carregamento
+        previewElement.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-40">
+                <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i>
+                <span class="text-sm text-gray-500">Comprimindo imagem...</span>
+            </div>
+        `;
+        
+        // Verificar tamanho e comprimir se necessário
+        if (file.size > 5 * 1024 * 1024) {
+            try {
+                const compressed = await compressImage(file, 5);
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(compressed);
+                input.files = dataTransfer.files;
+                file = compressed;
+            } catch (error) {
+                console.error('Erro na compressão:', error);
+                alert('Não foi possível comprimir a imagem. Ela será enviada no tamanho original.');
+            }
+        }
+        
+        // Mostrar preview
         const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.innerHTML = `
-                <img src="${e.target.result}" class="object-cover h-40 w-full rounded-lg">
+        reader.onload = function(e) {
+            previewElement.innerHTML = `
+                <div class="relative">
+                    <img src="${e.target.result}" class="object-cover h-40 w-full rounded-lg">
+                    <span class="absolute bottom-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        ✓
+                    </span>
+                </div>
                 <span class="mt-2 text-xs text-green-600 font-semibold">
                     Foto carregada
                 </span>
             `;
         };
         reader.readAsDataURL(file);
+        
+        // Alerta se ainda estiver grande
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`A imagem ainda está com ${(file.size / 1024 / 1024).toFixed(2)}MB. Recomendamos usar imagens menores que 5MB.`);
+        }
     }
-});
+
+    // Configurar preview para cada input de foto
+    const fotoPlaca = document.getElementById('fotoPlaca');
+    const previewPlaca = document.getElementById('previewPlaca');
+    if (fotoPlaca && previewPlaca) {
+        fotoPlaca.addEventListener('change', function() {
+            setupPhotoWithCompression(this, previewPlaca);
+        });
+    }
+
+    const fotoVeiculo = document.getElementById('fotoVeiculo');
+    const previewVeiculo = document.getElementById('previewVeiculo');
+    if (fotoVeiculo && previewVeiculo) {
+        fotoVeiculo.addEventListener('change', function() {
+            setupPhotoWithCompression(this, previewVeiculo);
+        });
+    }
+
+    const fotoMotorista = document.getElementById('fotoMotorista');
+    const previewMotorista = document.getElementById('previewMotorista');
+    if (fotoMotorista && previewMotorista) {
+        fotoMotorista.addEventListener('change', function() {
+            setupPhotoWithCompression(this, previewMotorista);
+        });
+    }
+
+    // Remover atributo capture em desktop
+    if (!isMobileDevice()) {
+        const fotoInputs = document.querySelectorAll('input[type="file"]');
+        fotoInputs.forEach(input => {
+            input.removeAttribute('capture');
+        });
+    }
+
+    // Validação do formulário antes de enviar
+    document.getElementById('entradaForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        const fotoPlacaInput = document.getElementById('fotoPlaca');
+        
+        // Validar se a foto da placa foi tirada
+        if (!fotoPlacaInput.files || !fotoPlacaInput.files[0]) {
+            e.preventDefault();
+            alert('A foto da placa é obrigatória. Por favor, tire uma foto da placa do veículo.');
+            return false;
+        }
+        
+        // Mostrar loading no botão
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+        
+        return true;
+    });
+
+    // Máscara para placa (automático)
+    const placaInput = document.querySelector('input[name="placa"]');
+    if (placaInput) {
+        placaInput.addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase();
+            value = value.replace(/[^A-Z0-9]/g, '');
+            
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            }
+            
+            e.target.value = value;
+        });
+    }
 </script>
+
+<style>
+    /* Estilos para melhorar a experiência em dispositivos móveis */
+    @media (max-width: 640px) {
+        input, textarea, button {
+            font-size: 16px !important;
+        }
+        
+        button, a {
+            min-height: 44px;
+        }
+    }
+    
+    /* Animações suaves */
+    #previewPlaca, #previewVeiculo, #previewMotorista {
+        transition: all 0.3s ease;
+    }
+    
+    label[for^="foto"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
 
 {% endblock %}

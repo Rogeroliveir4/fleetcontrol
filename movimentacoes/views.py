@@ -15,7 +15,9 @@ from django.contrib.auth.decorators import login_required
 from .models import MovimentacaoTerceiro
 from contratos.models import Contrato
 from django.utils.timezone import localtime
-
+from PIL import Image
+from django.core.files.uploadedfile import UploadedFile
+import io
 
 
 # FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
@@ -462,104 +464,6 @@ def movimentacao_detalhe(request, pk):
     return render(request, "movimentacoes/detalhe.html", {"mov": mov})
 
 
-# REGISTRAR RETORNO (PORTARIA)
-
-@login_required
-def registrar_retorno(request, pk):
-    mov = get_object_or_404(Movimentacao, pk=pk)
-    
-    # DEFINIR CONTEXTO (PORTARIA x MANUAL)
-    perfil = getattr(request.user, "perfilusuario", None)
-    
-    # Template por perfil
-    if perfil and perfil.nivel == "portaria":
-        template = "movimentacoes/retorno_portaria.html"
-    else:
-        template = "movimentacoes/retorno.html"
-    
-    if request.method == "POST":
-
-        # KM RETORNO (VALIDAÇÃO)
-        km_retorno_str = request.POST.get("km_retorno", "0")
-        km_retorno_limpo = km_retorno_str.replace(".", "").replace(",", "")
-        
-        try:
-            km_retorno_valor = int(km_retorno_limpo)
-        except ValueError:
-            km_retorno_valor = 0
-        
-        if km_retorno_valor <= (mov.km_saida or 0):
-            messages.error(request, "O KM de retorno deve ser maior que o KM de saída.")
-            return redirect(request.path)
-        
-        km_atual_veiculo = mov.veiculo.km_atual or 0
-        if km_retorno_valor < km_atual_veiculo:
-            messages.error(
-                request,
-                f"O KM de retorno ({km_retorno_valor}) não pode ser menor que o KM atual do veículo ({km_atual_veiculo})."
-            )
-            return redirect(request.path)
-        
-
-        # ATUALIZAR MOVIMENTAÇÃO
-        observacao = request.POST.get("observacao", "")
-        
-        if perfil and perfil.nivel == "portaria":
-            mov.observacao_portaria_retorno = observacao
-        else:
-            if observacao:
-                mov.observacao = (mov.observacao or "") + f"\n[Retorno] {observacao}"
-        
-        mov.km_retorno = km_retorno_valor
-        mov.data_retorno = timezone.now()
-        mov.distancia_percorrida = km_retorno_valor - (mov.km_saida or 0)
-        mov.status = "finalizado"
-        
-
-        # PORTEIRO + FOTOS (RETORNO)
-        if perfil and perfil.nivel == "portaria":
-            mov.porteiro_retorno = request.user
-            mov.porteiro_retorno_nome = (
-                request.user.get_full_name() or request.user.username
-            )
-            
-            mov.foto_retorno_geral = request.FILES.get("foto_retorno_geral")
-            mov.foto_retorno_painel = request.FILES.get("foto_retorno_painel")
-            mov.foto_retorno_avaria = request.FILES.get("foto_retorno_avaria")
-            mov.foto_retorno_equipamento = request.FILES.get("foto_retorno_equipamento")
-            mov.foto_retorno_cacamba = request.FILES.get("foto_retorno_cacamba")
-            mov.foto_retorno_prancha = request.FILES.get("foto_retorno_prancha")
-            mov.foto_retorno_porta_malas = request.FILES.get("foto_retorno_porta_malas")
-            mov.foto_retorno_combustivel = request.FILES.get("foto_retorno_combustivel")
-        
-        mov.save()
-        
-
-        # SOLICITAÇÃO VINCULADA
-        if mov.solicitacao:
-            mov.solicitacao.status = "FINALIZADA"
-            mov.solicitacao.data_retorno = mov.data_retorno
-            mov.solicitacao.save()
-        
-
-        # 👈 VEÍCULO - ATUALIZAR SEM VALIDAÇÕES (USANDO QUERY DIRETA)
-        from django.db import connection
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "UPDATE veiculos_veiculo SET status = %s, km_atual = %s WHERE id = %s",
-                ["Disponivel", km_retorno_valor, mov.veiculo.id]
-            )
-        
-        # REDIRECT FINAL
-        messages.success(request, "Retorno registrado com sucesso!")
-        return redirect("lista_movimentacoes")
-    
-    # GET
-    return render(request, template, {
-        "mov": mov,
-        "km_saida": mov.km_saida,
-    })
-
 
 
 # EXPORTAÇÃO COM FILTROS
@@ -623,7 +527,7 @@ def atualizar_filtros_session(request):
 
 
 
-
+"""
 # CHECKLIST DE SAÍDA (motorista)
 def checklist_saida_motorista(request, solicitacao_id):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
@@ -679,6 +583,49 @@ def checklist_saida_motorista(request, solicitacao_id):
         "solicitacao": solicitacao
     })
 
+"""
+def compress_image(image_file, max_size_mb=5, quality=70):
+    """Comprime imagem no backend como fallback"""
+    if not image_file:
+        return image_file
+    
+    # Se a imagem já for menor que o limite, retorna ela mesma
+    if image_file.size <= max_size_mb * 1024 * 1024:
+        return image_file
+    
+    try:
+        # Abrir imagem com PIL
+        img = Image.open(image_file)
+        
+        # Converter para RGB se necessário (remover canal alpha)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+        
+        # Redimensionar se muito grande
+        max_size = 1920
+        if img.width > max_size or img.height > max_size:
+            ratio = min(max_size / img.width, max_size / img.height)
+            new_size = (int(img.width * ratio), int(img.height * ratio))
+            img = img.resize(new_size, Image.Resampling.LANCZOS)
+        
+        # Salvar em memória com compressão
+        output = io.BytesIO()
+        img.save(output, format='JPEG', quality=quality, optimize=True)
+        output.seek(0)
+        
+        # Criar novo arquivo
+        compressed_file = UploadedFile(
+            output,
+            name=image_file.name,
+            content_type='image/jpeg'
+        )
+        
+        print(f"Backend compress: {image_file.size/1024/1024:.2f}MB → {output.getbuffer().nbytes/1024/1024:.2f}MB")
+        return compressed_file
+        
+    except Exception as e:
+        print(f"Erro na compressão backend: {e}")
+        return image_file
 
 
 # REGISTRA A SAÍDA - PORTARIA
@@ -686,15 +633,12 @@ def checklist_saida_motorista(request, solicitacao_id):
 def portaria_registrar_saida(request, solicitacao_id):
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
 
-
     contrato = None
 
     if solicitacao and solicitacao.contrato:
         contrato = solicitacao.contrato
-
     elif solicitacao.veiculo and solicitacao.veiculo.contrato:
         contrato = solicitacao.veiculo.contrato
-
     elif request.user.perfilusuario.contrato:
         contrato = request.user.perfilusuario.contrato
 
@@ -711,52 +655,46 @@ def portaria_registrar_saida(request, solicitacao_id):
         }
     )
 
-    #  Garantir que a movimentação tenha o contrato definido (caso criada pela primeira vez sem contrato)
+    # Garantir que a movimentação tenha o contrato definido
     if not mov.contrato:
         mov.contrato = contrato
         mov.save(update_fields=["contrato"])
 
-    # Garantir que a movimentação tenha o contrato definido (caso criada manualmente sem solicitação)
-    if not mov.contrato:
-        mov.contrato = contrato
-        mov.save()
-
-    # Verificar se a movimentação já está em andamento
+    
     if request.method == "POST":
         mov.km_saida = mov.veiculo.km_atual
         mov.data_saida = timezone.now()
         mov.status = "em_andamento"
         
-        #  IMPORTANTE: Salvar observações da portaria
+        # Observações da portaria
         mov.observacao_portaria = request.POST.get("observacao_portaria", "")
-        
-        # Outras observações (para compatibilidade)
         mov.observacao = request.POST.get("observacao", "")
         
-        mov.foto_portaria_geral = request.FILES.get("foto_portaria_geral")
-        mov.foto_portaria_avaria = request.FILES.get("foto_portaria_avaria")
-        mov.foto_portaria_painel = request.FILES.get("foto_portaria_painel")
-        mov.foto_portaria_equipamento = request.FILES.get("foto_portaria_equipamento")
+        # Fotos com compressão
+        foto_geral = request.FILES.get("foto_portaria_geral")
+        if foto_geral:
+            mov.foto_portaria_geral = compress_image(foto_geral)
         
-        # Equipamentos especiais
-        mov.com_cacamba = request.POST.get("com_cacamba") == "on"
-        mov.cacamba_descricao = request.POST.get("cacamba_descricao", "")
-        mov.com_prancha = request.POST.get("com_prancha") == "on"
-        mov.prancha_descricao = request.POST.get("prancha_descricao", "")
-
+        foto_avaria = request.FILES.get("foto_portaria_avaria")
+        if foto_avaria:
+            mov.foto_portaria_avaria = compress_image(foto_avaria)
+        
+        foto_painel = request.FILES.get("foto_portaria_painel")
+        if foto_painel:
+            mov.foto_portaria_painel = compress_image(foto_painel)
+        
+        foto_equipamento = request.FILES.get("foto_portaria_equipamento")
+        if foto_equipamento:
+            mov.foto_portaria_equipamento = compress_image(foto_equipamento)
+        
+        # Caçamba e Prancha
+        mov.com_cacamba = request.POST.get("com_cacamba") == "true" or request.POST.get("com_cacamba") == "on"
+        mov.com_prancha = request.POST.get("com_prancha") == "true" or request.POST.get("com_prancha") == "on"
         # Porteiro que liberou
         mov.porteiro_saida = request.user
         mov.porteiro_saida_nome = request.user.get_full_name() or request.user.username
-
         mov.save()
 
-        solicitacao.status = "EM_TRANSITO"
-        solicitacao.save()
-
-        veiculo = mov.veiculo
-        veiculo.status = "EmTransito"
-        veiculo.km_anterior = veiculo.km_atual
-        veiculo.save()
 
         messages.success(request, "Saída registrada com sucesso.")
         return redirect("/movimentacoes/?status=transito")
@@ -767,7 +705,130 @@ def portaria_registrar_saida(request, solicitacao_id):
     })
 
 
-# RETORNO DO MOTORISTA
+
+
+# REGISTRAR RETORNO (PORTARIA)
+@login_required
+def registrar_retorno(request, pk):
+    mov = get_object_or_404(Movimentacao, pk=pk)
+    
+    # DEFINIR CONTEXTO (PORTARIA x MANUAL)
+    perfil = getattr(request.user, "perfilusuario", None)
+    
+    # Template por perfil
+    if perfil and perfil.nivel == "portaria":
+        template = "movimentacoes/retorno_portaria.html"
+    else:
+        template = "movimentacoes/retorno.html"
+    
+    if request.method == "POST":
+
+        # KM RETORNO (VALIDAÇÃO)
+        km_retorno_str = request.POST.get("km_retorno", "0")
+        km_retorno_limpo = km_retorno_str.replace(".", "").replace(",", "")
+        
+        try:
+            km_retorno_valor = int(km_retorno_limpo)
+        except ValueError:
+            km_retorno_valor = 0
+        
+        if km_retorno_valor <= (mov.km_saida or 0):
+            messages.error(request, "O KM de retorno deve ser maior que o KM de saída.")
+            return redirect(request.path)
+        
+        km_atual_veiculo = mov.veiculo.km_atual or 0
+        if km_retorno_valor < km_atual_veiculo:
+            messages.error(
+                request,
+                f"O KM de retorno ({km_retorno_valor}) não pode ser menor que o KM atual do veículo ({km_atual_veiculo})."
+            )
+            return redirect(request.path)
+        
+
+        # ATUALIZAR MOVIMENTAÇÃO
+        observacao = request.POST.get("observacao", "")
+        
+        if perfil and perfil.nivel == "portaria":
+            mov.observacao_portaria_retorno = observacao
+        else:
+            if observacao:
+                mov.observacao = (mov.observacao or "") + f"\n[Retorno] {observacao}"
+        
+        mov.km_retorno = km_retorno_valor
+        mov.data_retorno = timezone.now()
+        mov.distancia_percorrida = km_retorno_valor - (mov.km_saida or 0)
+        mov.status = "finalizado"
+        
+
+        # PORTEIRO + FOTOS (RETORNO) COM COMPRESSÃO
+        if perfil and perfil.nivel == "portaria":
+            mov.porteiro_retorno = request.user
+            mov.porteiro_retorno_nome = (
+                request.user.get_full_name() or request.user.username
+            )
+            
+            # Aplicar compressão em todas as fotos
+            foto_geral = request.FILES.get("foto_retorno_geral")
+            if foto_geral:
+                mov.foto_retorno_geral = compress_image(foto_geral)
+            
+            foto_painel = request.FILES.get("foto_retorno_painel")
+            if foto_painel:
+                mov.foto_retorno_painel = compress_image(foto_painel)
+            
+            foto_avaria = request.FILES.get("foto_retorno_avaria")
+            if foto_avaria:
+                mov.foto_retorno_avaria = compress_image(foto_avaria)
+            
+            foto_equipamento = request.FILES.get("foto_retorno_equipamento")
+            if foto_equipamento:
+                mov.foto_retorno_equipamento = compress_image(foto_equipamento)
+            
+            foto_cacamba = request.FILES.get("foto_retorno_cacamba")
+            if foto_cacamba:
+                mov.foto_retorno_cacamba = compress_image(foto_cacamba)
+            
+            foto_prancha = request.FILES.get("foto_retorno_prancha")
+            if foto_prancha:
+                mov.foto_retorno_prancha = compress_image(foto_prancha)
+            
+            foto_porta_malas = request.FILES.get("foto_retorno_porta_malas")
+            if foto_porta_malas:
+                mov.foto_retorno_porta_malas = compress_image(foto_porta_malas)
+            
+            foto_combustivel = request.FILES.get("foto_retorno_combustivel")
+            if foto_combustivel:
+                mov.foto_retorno_combustivel = compress_image(foto_combustivel)
+        
+        mov.save()
+        
+
+        # SOLICITAÇÃO VINCULADA
+        if mov.solicitacao:
+            mov.solicitacao.status = "FINALIZADA"
+            mov.solicitacao.data_retorno = mov.data_retorno
+            mov.solicitacao.save()
+        
+
+        # VEÍCULO - ATUALIZAR SEM VALIDAÇÕES
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE veiculos_veiculo SET status = %s, km_atual = %s WHERE id = %s",
+                ["Disponivel", km_retorno_valor, mov.veiculo.id]
+            )
+        
+        # REDIRECT FINAL
+        messages.success(request, "Retorno registrado com sucesso!")
+        return redirect("lista_movimentacoes")
+    
+    # GET
+    return render(request, template, {
+        "mov": mov,
+        "km_saida": mov.km_saida,
+    })
+
+""" RETORNO DO MOTORISTA
 def checklist_retorno_motorista(request, pk):
     mov = get_object_or_404(Movimentacao, pk=pk)
 
@@ -834,9 +895,10 @@ def checklist_retorno_motorista(request, pk):
     })
 
 
+"""
 
-#REGISTRA A ENTRADA NA PORTARIA
-# movimentacoes/views.py - Atualize a view terceiro_entrada
+
+# REGISTRA A ENTRADA NA PORTARIA
 @login_required
 def terceiro_entrada(request):
     if request.method == "POST":
@@ -850,7 +912,7 @@ def terceiro_entrada(request):
             descricao_veiculo=request.POST.get("descricao_veiculo", ""),
             tags=request.POST.get("tags", "").upper(),
             
-            # 🔹 NOVOS CAMPOS
+            #  NOVOS CAMPOS
             motivo_entrada=request.POST.get("motivo", ""),
             observacoes_entrada=request.POST.get("observacoes", ""),
             
@@ -870,6 +932,23 @@ def terceiro_entrada(request):
     return render(request, "movimentacoes/terceiros/entrada.html")
 
 
+# CONTADOR DE SOLICITAÇÕES PENDENTES PARA PORTARIA
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def contador_portaria(request):
+    perfil = request.user.perfilusuario
+
+    if perfil.nivel != "portaria":
+        return JsonResponse({"erro": "não autorizado"}, status=403)
+
+    qtd = SolicitacaoVeiculo.objects.filter(
+        contrato=perfil.contrato,
+        status="AGUARDANDO_SAIDA_PORTARIA"
+    ).count()
+
+    return JsonResponse({"pendentes": qtd})
 
 # LISTA PARA PORTARIA REGISTRAR ENTRADA/SAÍDA DE TERCEIROS + FILTROS + ESTATÍSTICAS
 @login_required
@@ -1034,6 +1113,9 @@ def terceiro_saida(request, pk):
         
         #  SALVAR OBSERVAÇÕES DA SAÍDA
         mov.observacoes_saida = request.POST.get("observacoes", "")
+        mov.foto_saida_veiculo = request.FILES.get("foto_saida_veiculo")
+        mov.foto_saida_avaria = request.FILES.get("foto_saida_avaria")
+        mov.foto_saida_extra = request.FILES.get("foto_saida_extra")
         
         mov.status = "SAIDA"
         mov.save()

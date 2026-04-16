@@ -21,9 +21,9 @@ urlpatterns = [
     # Aplicações principais
     path("veiculos/", include("veiculos.urls")),
     path("motoristas/", include("motoristas.urls")),
-    path("movimentacoes/", include("movimentacoes.urls")),
+    path("movimentacoes/", include("movimentacoes.urls")), 
     path('solicitacoes/', include('solicitacoes.urls')),
-    
+        
     path("dashboard/motorista/", views.dashboard_motorista, name="dashboard_motorista"),
 
     path("dashboard/gestor/", views.dashboard_gestor, name="dashboard_gestor"),
@@ -41,10 +41,8 @@ urlpatterns = [
     path('financeiro/', include('financeiro.urls')),
 
 
-
+    # ROTAS DO SOLICITANTE
     path("solicitante/", include("solicitantes.urls")),
-
-
 
 ]
 

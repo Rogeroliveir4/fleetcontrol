@@ -619,4 +619,34 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
+<script>
+let ultimaId = null;
+let primeiraExecucao = true;
+
+function atualizarContadorAprovacoes() {
+    fetch('/solicitacoes/pendentes-aprovacao/')
+        .then(res => res.json())
+        .then(data => {
+            const total = data.total;
+            const novaId = data.ultima_id;
+
+            if (primeiraExecucao) {
+                ultimaId = novaId;
+                primeiraExecucao = false;
+                return;
+            }
+
+            if (novaId !== ultimaId) {
+                location.reload();
+                return;
+            }
+
+            ultimaId = novaId;
+        });
+}
+
+setInterval(atualizarContadorAprovacoes, 3000);
+atualizarContadorAprovacoes();
+</script>
+
 {% endblock %}

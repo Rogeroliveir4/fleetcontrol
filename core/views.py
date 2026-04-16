@@ -326,8 +326,7 @@ def dashboard_gestor(request):
     # Nome do contrato
     contrato_nome = perfil.contrato.nome if perfil.contrato and hasattr(perfil.contrato, 'nome') else None
 
-    
-    
+        
     # ========== CONTEXTO (INICIALIZADO CORRETAMENTE) ==========
     context = {
         # Solicitações data
@@ -435,7 +434,7 @@ def dashboard_motorista(request):
             data_reprovacao__isnull=False
         ).count(),
 
-        #  🆕 CANCELADAS (usa data_cancelamento)
+        #   CANCELADAS (usa data_cancelamento)
         "canceladas": qs.filter(
             data_cancelamento__isnull=False
         ).count(),
@@ -461,7 +460,7 @@ def dashboard_motorista(request):
 
 
 
-
+# GESTOR DE SOLICITAÇÕES (APROVAR/REPROVAR)
 def gestor_solicitacoes(request):
 
     if not request.user.is_authenticated:
@@ -484,7 +483,7 @@ def gestor_solicitacoes(request):
     })
 
 
-
+# APROVAR/REPROVAR SOLICITAÇÃO (VIEWS SIMPLES, SEM FORMULÁRIO)
 def aprovar_solicitacao(request, id):
     sol = SolicitacaoVeiculo.objects.get(id=id)
 
@@ -499,7 +498,7 @@ def aprovar_solicitacao(request, id):
 
     return redirect("gestor_solicitacoes")
 
-
+# REPROVAR SOLICITAÇÃO (VIEWS SIMPLES, SEM FORMULÁRIO)
 def reprovar_solicitacao(request, id):
     sol = SolicitacaoVeiculo.objects.get(id=id)
 

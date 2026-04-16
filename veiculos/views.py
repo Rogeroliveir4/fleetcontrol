@@ -316,6 +316,7 @@ def criar_veiculo(request):
             marca=request.POST.get("marca", "").strip(),
             ano=request.POST.get("ano"),
             km_atual=request.POST.get("km_atual", 0).replace(".", ""),
+            horimetro_atual=request.POST.get("horimetro_atual", 0).replace(".", ""),
             cor=request.POST.get("cor", "").strip(),
             categoria=request.POST.get("categoria"),
             status=request.POST.get("status", "Disponivel"),
@@ -463,9 +464,7 @@ def editar_veiculo(request, id):
         contrato_id = request.POST.get("id_contrato")
         contrato_obj = Contrato.objects.filter(id=contrato_id).first() if contrato_id else None
 
-        # ---------------------------------------------
         #  8) Atualização dos demais campos
-        # ---------------------------------------------
         try:
             # Campos obrigatórios
             veiculo.contrato = contrato_obj
@@ -477,6 +476,9 @@ def editar_veiculo(request, id):
             # KM (remove pontos da formatação)
             km_atual_str = request.POST.get("km_atual", "0").replace(".", "")
             veiculo.km_atual = int(km_atual_str) if km_atual_str.isdigit() else 0
+
+            # Horímetro (remove pontos da formatação)
+            veiculo.horimetro_atual = int(request.POST.get("horimetro_atual", "0").replace(".", "")) if request.POST.get("horimetro_atual", "0").replace(".", "").isdigit() else 0
             
             # Demais campos
             veiculo.cor = request.POST.get("cor", "").strip()

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'False'
 
 if not SECRET_KEY:
     raise Exception("SECRET_KEY não definida!")
@@ -17,7 +17,7 @@ if DEBUG:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ['54.242.113.40','127.0.0.1','192.168.0.6', 'seu-dominio.com']
+ALLOWED_HOSTS = ['54.242.113.40','127.0.0.1','172.16.0.60', 'seu-dominio.com']
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)
@@ -43,8 +43,16 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 
-#ASGI_APPLICATION = "fleetcontrol.asgi.application"
-ASGI_APPLICATION = "core.asgi.application"
+ASGI_APPLICATION = "fleetcontrol.asgi.application"
+#ASGI_APPLICATION = "core.asgi.application"
+WSGI_APPLICATION = 'core.wsgi.application'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 
 INSTALLED_APPS = [
@@ -104,7 +112,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -147,6 +154,14 @@ TAILWIND_APP_NAME = 'theme'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Aumentar limite de upload (já que vamos comprimir)
+DATA_UPLOAD_MAX_NUMBER_FILES = 20
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
+
+# Limite máximo do arquivo (10MB antes da compressão)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 
 SESSION_COOKIE_AGE = 60 * 60  # Se o usuário ficar 1h sem mexer → desloga
 SESSION_SAVE_EVERY_REQUEST = True

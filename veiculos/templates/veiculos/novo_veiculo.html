@@ -200,9 +200,9 @@
         <i class="fa-solid fa-car text-blue-500 text-xs"></i>
         Tipo *
     </p>
-    <select name="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
-               rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
-               focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
+    <select name="tipo" id="tipo" required class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+              focus:ring-2 focus:ring-[#00594C] focus:outline-none appearance-none">
         <option value="">Selecione</option>
         {% for value, label in tipos_choices %}
             <option value="{{ value }}">{{ label }}</option>
@@ -263,7 +263,7 @@
           </div>
 
           <!-- KM ATUAL -->
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <div id="campo-km" name="campo-km" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                 <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
                     <i class="fa-solid fa-gauge-high text-yellow-500 text-xs"></i>
                     KM Atual *
@@ -272,6 +272,22 @@
                       name="km_atual" 
                       id="km_atual"
                       required 
+                      placeholder="0" 
+                      value="0"
+                      class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+                              rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white
+                              focus:ring-2 focus:ring-[#00594C] focus:outline-none">
+            </div>
+
+            <!-- HORÍMETRO ATUAL -->
+            <div id="campo-horimetro" name="campo-horimetro" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 hidden">
+                <p class="text-xs text-gray-500 dark:text-gray-300 mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-clock text-blue-500 text-xs"></i>
+                    Horímetro Atual *
+                </p>
+                <input type="text" 
+                      name="horimetro_atual" 
+                      id="horimetro_atual"
                       placeholder="0" 
                       value="0"
                       class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
@@ -401,10 +417,10 @@
           <button type="submit" id="submitBtn" class="inline-flex justify-center items-center gap-2 px-4 py-3 
                     text-sm font-medium !text-white custom-green hover:custom-green-light 
                     rounded-lg transition-colors min-h-[44px] flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed">
-            <i class="fa-solid fa-check"></i>
-            <span id="submitText">Salvar Veículo</span>
+            <i class="fa-solid fa-check !text-white"></i>
+            <span id="submitText" class="!text-white">Salvar Veículo</span>
             <span id="loadingSpinner" class="hidden">
-              <i class="fa-solid fa-spinner fa-spin"></i> Processando...
+              <i class="fa-solid fa-spinner fa-spin !text-white"></i> Processando...
             </span>
           </button>
 
@@ -457,6 +473,31 @@
 
 
 <script>
+
+  // LÓGICA PARA EXIBIR CAMPOS KM OU HORÍMETRO BASEADO NO TIPO SELECIONADO
+function atualizarCamposUso() {
+    const tipo = document.getElementById("tipo").value;
+
+    const equipamentos = ["Equipamento", "Implemento"];
+
+    const campoKM = document.getElementById("campo-km");
+    const campoHorimetro = document.getElementById("campo-horimetro");
+
+    if (equipamentos.includes(tipo)) {
+        campoKM.classList.add("hidden");
+        campoHorimetro.classList.remove("hidden");
+    } else {
+        campoKM.classList.remove("hidden");
+        campoHorimetro.classList.add("hidden");
+    }
+}
+
+// quando mudar o tipo
+document.getElementById("tipo").addEventListener("change", atualizarCamposUso);
+
+// ao carregar a página
+document.addEventListener("DOMContentLoaded", atualizarCamposUso);
+
 // MÁSCARA PARA CAMPO KM - VERSÃO SIMPLES E FUNCIONAL
 document.addEventListener('DOMContentLoaded', function() {
     const kmField = document.getElementById('km_atual');

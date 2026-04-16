@@ -520,13 +520,13 @@ DESKTOP - APENAS O HEADER E FILTROS
     </div>
 
     <!-- RESULTADOS DESKTOP -->
-    <div class="px-6 py-6">
-        <div id="resultados-desktop">
+    <div class="flex-1 px-6 py-6">
+        <div id="resultados-desktop" class="min-h-[calc(100vh-400px)]">
             {% include "movimentacoes/partials/cards.html" %}
         </div>
 
         <!-- PAGINAÇÃO DESKTOP -->
-        <div id="paginacao-desktop" class="mt-6">
+        <div id="paginacao-desktop" class="mt-auto">
             {% include "movimentacoes/partials/paginacao_desktop.html" %}
         </div>
     </div>

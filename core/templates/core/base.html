@@ -19,7 +19,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="fontawesome-free/css/brands.min.css">
     <link rel="stylesheet" href="fontawesome-free/css/regular.min.css">
-
+    <!-- Font Awesome 6 (CORRETO) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     
 
@@ -91,6 +92,7 @@
                 arrow.classList.remove("rotate-180");
             }
         }
+        
  
         function toggleTheme() {
             const html = document.documentElement;
@@ -470,7 +472,6 @@
 
 
 
-
             <!-- DEFERED STYLES -->
     <style>
     /* Mobile First */
@@ -841,12 +842,54 @@
 
 
 
-
-
-
-
-
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden relative">
+
+
+        <body class="min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden relative">
+    
+    <!-- HUB DE MENSAGENS GLOBAIS DO SISTEMA -->
+    {% if messages %}
+    <div id="django-messages-container" class="fixed top-4 right-4 z-[9999] w-full max-w-sm space-y-3">
+        {% for message in messages %}
+        {% with message_type=message.tags|default:'info' %}
+        <div class="message-alert flex items-start gap-3 p-4 rounded-xl shadow-xl border-l-4 
+                    {% if 'success' in message_type %}bg-green-50 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200
+                    {% elif 'error' in message_type %}bg-red-50 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-200
+                    {% elif 'warning' in message_type %}bg-yellow-50 dark:bg-yellow-900/30 border-yellow-500 text-yellow-800 dark:text-yellow-200
+                    {% else %}bg-blue-50 dark:bg-blue-900/30 border-blue-500 text-blue-800 dark:text-blue-200{% endif %}
+                    animate-slide-in-right">
+            
+            <!-- Ícone -->
+            <div class="flex-shrink-0">
+                {% if 'success' in message_type %}
+                <i class="fas fa-check-circle text-green-500 dark:text-green-400 text-lg"></i>
+                {% elif 'error' in message_type %}
+                <i class="fas fa-exclamation-circle text-red-500 dark:text-red-400 text-lg"></i>
+                {% elif 'warning' in message_type %}
+                <i class="fas fa-exclamation-triangle text-yellow-500 dark:text-yellow-400 text-lg"></i>
+                {% else %}
+                <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-lg"></i>
+                {% endif %}
+            </div>
+            
+            <!-- Mensagem -->
+            <div class="flex-1 text-sm font-medium">
+                {{ message }}
+            </div>
+            
+            <!-- Botão fechar -->
+            <button onclick="this.parentElement.remove()" class="flex-shrink-0 hover:opacity-70 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- TOP SAFE AREA -->
+    <div class="h-safe-top bg-transparent"></div>
+
     <!-- TOP SAFE AREA -->
     <div class="h-safe-top bg-transparent"></div>
 
@@ -906,6 +949,216 @@
     <div class="h-safe-bottom bg-transparent"></div>
 
 </body>
+
+
+
+<script>
+
+
+// CONTADOR DE APROVAÇÕES PENDENTES (RELOAD AUTOMÁTICO SE AUMENTAR)     - VISÃO DO GESTOR
+let ultimaId = null;
+let primeiraExecucao = true; // ← flag separada
+
+function usuarioEstaInteragindo() {
+    const active = document.activeElement;
+
+    const digitando = active && (
+        active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT"
+    );
+
+    const modalAberto = document.querySelector(".modal-aprovacao");
+
+    return digitando || modalAberto;
+}
+
+function mostrarAvisoNovaAprovacao() {
+    if (document.getElementById("aviso-nova-aprovacao")) return;
+
+    const aviso = document.createElement("div");
+    aviso.id = "aviso-nova-aprovacao";
+    aviso.innerHTML = `
+        <div style="position:fixed;bottom:20px;right:20px;background:#00594C;color:white;padding:10px 15px;border-radius:8px;z-index:9999;box-shadow:0 4px 10px rgba(0,0,0,0.2);cursor:pointer;display:flex;align-items:center;gap:8px;"
+             onclick="location.href='{% url 'gestor_solicitacoes' %}'">
+            <i class="fa-solid fa-check-double"></i>
+            Nova solicitação para aprovar
+        </div>
+    `;
+    document.body.appendChild(aviso);
+
+    // Remove automaticamente após 8 segundos
+    setTimeout(() => {
+        const el = document.getElementById("aviso-nova-aprovacao");
+        if (el) el.remove();
+    }, 8000);
+}
+
+function atualizarContadorAprovacoes() {
+    fetch('/solicitacoes/pendentes-aprovacao/')
+        .then(res => res.json())
+        .then(data => {
+            console.log("Retorno API:", data, "| ultimaId:", ultimaId, "| primeiraExecucao:", primeiraExecucao);
+
+            const el = document.getElementById('contador-aprovacoes');
+            if (!el) return;
+
+            const total = data.total;
+            const novaId = data.ultima_id;
+
+            // 🔢 Atualiza badge sempre
+            el.innerText = total;
+            el.style.display = total > 0 ? "flex" : "none";
+
+            // 🔥 PRIMEIRA EXECUÇÃO
+            if (primeiraExecucao) {
+                ultimaId = novaId;
+                primeiraExecucao = false;
+                return;
+            }
+
+            // 🔔 NOVA SOLICITAÇÃO (SEM RELOAD)
+            if (novaId !== ultimaId && novaId) {
+                console.log("🔔 Nova solicitação detectada");
+
+                if (!document.getElementById("aviso-nova-aprovacao")) {
+                    mostrarAvisoNovaAprovacao();
+                }
+            }
+
+            // 🔁 Atualiza estado
+            ultimaId = novaId;
+        })
+        .catch(err => console.error('Erro gestor:', err));
+}
+
+//  REATIVA O POLLING
+setInterval(atualizarContadorAprovacoes, 5000); // pode usar 3s se quiser mais rápido
+atualizarContadorAprovacoes();
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const nivel = "{{ request.user.perfilusuario.nivel|lower }}".trim();
+    const isPortaria = nivel === "portaria";
+
+    if (!isPortaria) {
+        window.portariaAtiva = false;
+        return;
+    }
+
+    window.portariaAtiva = true;
+    let ultimoValor = null;
+
+    function usuarioEstaInteragindo() {
+        const active = document.activeElement;
+
+        const digitando = active && (
+            active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.tagName === "SELECT"
+        );
+
+        //  detecta file input com arquivo
+        const fileSelecionado = document.querySelector('input[type="file"]:not([value=""])') ||
+            Array.from(document.querySelectorAll('input[type="file"]'))
+                .some(input => input.files && input.files.length > 0);
+
+        //  detecta qualquer formulário "sujo"
+        const formEmUso = document.querySelector("form input:focus, form textarea:focus, form select:focus");
+
+        return digitando || fileSelecionado || formEmUso;
+    }
+
+    function mostrarAvisoNovaSolicitacao() {
+        if (document.getElementById("aviso-nova-solicitacao")) return;
+
+        const aviso = document.createElement("div");
+        aviso.id = "aviso-nova-solicitacao";
+
+        aviso.innerHTML = `
+            <div style="
+                position:fixed;
+                bottom:20px;
+                right:20px;
+                background:#00594C;
+                color:white;
+                padding:12px 16px;
+                border-radius:10px;
+                z-index:9999;
+                box-shadow:0 6px 18px rgba(0,0,0,0.25);
+                overflow:hidden;
+                min-width:220px;
+            ">
+                <div style="font-size:14px;font-weight:500;">
+                    Nova solicitação disponível
+                </div>
+
+                <!-- barra de progresso -->
+                <div style="
+                    position:absolute;
+                    bottom:0;
+                    left:0;
+                    height:3px;
+                    background:#00d1a0;
+                    width:100%;
+                    animation: diminuirBarra 5s linear forwards;
+                "></div>
+            </div>
+        `;
+
+        document.body.appendChild(aviso);
+
+        //  remove depois de 5s
+        setTimeout(() => {
+            aviso.style.opacity = "0";
+            aviso.style.transform = "translateY(10px)";
+            aviso.style.transition = "all 0.3s ease";
+
+            setTimeout(() => aviso.remove(), 300);
+        }, 5000);
+    }
+
+    function atualizarContadorPortaria() {
+        fetch("/movimentacoes/portaria/contador/")
+            .then(response => response.json())
+            .then(data => {
+                const badges = document.querySelectorAll(".notificacao-badge");
+                if (!badges.length) return;
+
+                const atual = data.pendentes;
+
+                // 🔢 Atualiza TODOS os badges
+                badges.forEach(badge => {
+                    badge.innerText = atual;
+                    badge.style.display = atual > 0 ? "" : "none";
+                });
+
+                //  PRIMEIRA EXECUÇÃO
+                if (ultimoValor === null) {
+                    ultimoValor = atual;
+                    return;
+                }
+
+                //  NOVA SOLICITAÇÃO
+                if (atual > ultimoValor) {
+                    console.log("🚗 Nova solicitação (portaria)");
+
+                    if (!document.getElementById("aviso-nova-solicitacao")) {
+                        mostrarAvisoNovaSolicitacao();
+                    }
+                }
+
+                // Atualiza estado
+                ultimoValor = atual;
+            })
+            .catch(err => console.error("Erro portaria:", err));
+    }
+
+    setInterval(atualizarContadorPortaria, 5000);
+    atualizarContadorPortaria();
+});
+</script>
+
 
 <!-- OPTIMIZED JAVASCRIPT FOR MOBILE -->
 <script>
@@ -1072,6 +1325,45 @@
         document.body.classList.add('offline');
         // Optional: Show offline message
     });
+</script>
+
+
+<script>
+    fetch("/portaria/contador/")
+        .then(r => r.json())
+        .then(data => {
+            console.log(" CONTADOR:", data);
+        })
+        .catch(err => console.log("❌ ERRO:", err));
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".message-alert").forEach(alert => {
+
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateX(40px)";
+            alert.style.transition = "all 0.4s ease";
+
+            setTimeout(() => alert.remove(), 400);
+        }, 10000); // 🔥 10 segundos
+
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".message-alert").forEach(alert => {
+
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateX(40px)";
+            alert.style.transition = "all 0.4s ease";
+
+            setTimeout(() => alert.remove(), 400);
+        }, 10000); // 🔥 10 segundos
+
+    });
+});
+
 </script>
 
 </html>

@@ -127,7 +127,7 @@ def solicitar_veiculo(request, veiculo_id):
             data_criacao=timezone.now()
         )
 
-        messages.success(request, "Solicitação enviada ao gestor.")
+        #messages.success(request, "Solicitação enviada ao gestor.")
         return redirect("dashboard_solicitante")
 
     return render(request, "solicitantes/solicitar.html", {
