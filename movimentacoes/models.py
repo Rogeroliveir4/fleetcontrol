@@ -510,6 +510,20 @@ class MovimentacaoTerceiro(models.Model):
     foto_veiculo = models.ImageField(upload_to="terceiros/veiculo/", blank=True, null=True)
     foto_motorista = models.ImageField(upload_to="terceiros/motorista/", blank=True, null=True)
 
+    # Material/Equipamento
+    foto_material = models.ImageField(
+        upload_to='terceiros/material/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name="Foto do material/equipamento"
+    )
+    
+    descricao_material = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Descrição do material/equipamento"
+    )
+
     # FOTOS DA SAÍDA
     foto_saida_veiculo = models.ImageField(
         upload_to='terceiros/saida/veiculo/%Y/%m/%d/',

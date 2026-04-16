@@ -902,7 +902,7 @@ def checklist_retorno_motorista(request, pk):
 @login_required
 def terceiro_entrada(request):
     if request.method == "POST":
-        MovimentacaoTerceiro.objects.create(
+        mov = MovimentacaoTerceiro.objects.create(
             placa=request.POST.get("placa").upper(),
             tipo_veiculo=request.POST.get("tipo_veiculo"),
             empresa=request.POST.get("empresa").upper(),
@@ -912,9 +912,11 @@ def terceiro_entrada(request):
             descricao_veiculo=request.POST.get("descricao_veiculo", ""),
             tags=request.POST.get("tags", "").upper(),
             
-            #  NOVOS CAMPOS
             motivo_entrada=request.POST.get("motivo", ""),
             observacoes_entrada=request.POST.get("observacoes", ""),
+            
+            # NOVO CAMPO - DESCRIÇÃO DO MATERIAL
+            descricao_material=request.POST.get("descricao_material", ""),
             
             status="ENTRADA",
             
@@ -924,6 +926,9 @@ def terceiro_entrada(request):
             foto_placa=request.FILES.get("foto_placa"),
             foto_veiculo=request.FILES.get("foto_veiculo"),
             foto_motorista=request.FILES.get("foto_motorista"),
+            
+            # NOVO CAMPO - FOTO DO MATERIAL
+            foto_material=request.FILES.get("foto_material"),
         )
         
         messages.success(request, "Entrada registrada com sucesso.")

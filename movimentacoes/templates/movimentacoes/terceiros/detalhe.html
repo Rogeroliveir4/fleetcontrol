@@ -168,85 +168,123 @@
                 {% endif %}
             </div>
 
-            <!-- GALERIA DE FOTOS - ENTRADA -->
-            <div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
-                        hover:shadow transition-shadow duration-300">
-                <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-1.5">
-                        <div class="p-1 rounded bg-gradient-to-r from-emerald-500 to-teal-400">
-                            <i class="fa-solid fa-camera text-white text-xs"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">
-                            Registro Fotográfico - Entrada
-                        </h3>
-                    </div>
-                </div>
+<!-- GALERIA DE FOTOS - ENTRADA -->
+<div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 
+            hover:shadow transition-shadow duration-300">
+    <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-1.5">
+            <div class="p-1 rounded bg-gradient-to-r from-emerald-500 to-teal-400">
+                <i class="fa-solid fa-camera text-white text-xs"></i>
+            </div>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+                Registro Fotográfico - Entrada
+            </h3>
+        </div>
+    </div>
 
-                <div class="p-3">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        {% if mov.foto_placa and mov.foto_placa.url %}
-                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_placa.url }}', 'Foto da Placa (Entrada)')">
-                            <img src="{{ mov.foto_placa.url }}" 
-                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto da Placa"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Placa';">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
-                                        group-hover:opacity-100 transition-opacity duration-300">
-                                <div class="absolute bottom-1.5 left-1.5 text-white">
-                                    <i class="fa-solid fa-car-battery text-[9px]"></i>
-                                    <span class="text-[9px] font-medium ml-0.5">Placa</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if mov.foto_veiculo and mov.foto_veiculo.url %}
-                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_veiculo.url }}', 'Foto do Veículo (Entrada)')">
-                            <img src="{{ mov.foto_veiculo.url }}" 
-                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto do Veículo"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Veículo';">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
-                                        group-hover:opacity-100 transition-opacity duration-300">
-                                <div class="absolute bottom-1.5 left-1.5 text-white">
-                                    <i class="fa-solid fa-truck text-[9px]"></i>
-                                    <span class="text-[9px] font-medium ml-0.5">Veículo</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if mov.foto_motorista and mov.foto_motorista.url %}
-                        <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
-                             onclick="openLightbox('{{ mov.foto_motorista.url }}', 'Foto do Motorista (Entrada)')">
-                            <img src="{{ mov.foto_motorista.url }}" 
-                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                                 alt="Foto do Motorista"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Motorista';">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
-                                        group-hover:opacity-100 transition-opacity duration-300">
-                                <div class="absolute bottom-1.5 left-1.5 text-white">
-                                    <i class="fa-solid fa-user text-[9px]"></i>
-                                    <span class="text-[9px] font-medium ml-0.5">Motorista</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
+    <div class="p-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+            <!-- FOTO PLACA -->
+            {% if mov.foto_placa and mov.foto_placa.url %}
+            <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                 onclick="openLightbox('{{ mov.foto_placa.url }}', '📸 Foto da Placa (Entrada)')">
+                <img src="{{ mov.foto_placa.url }}" 
+                     class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                     alt="Foto da Placa"
+                     onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Placa';">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                            group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute bottom-1.5 left-1.5 text-white">
+                        <i class="fa-solid fa-tag text-[9px]"></i>
+                        <span class="text-[9px] font-medium ml-0.5">Placa</span>
                     </div>
-                    
-                    {% if not mov.foto_placa and not mov.foto_veiculo and not mov.foto_motorista %}
-                    <div class="text-center py-6">
-                        <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
-                            <i class="fa-solid fa-camera text-gray-400 text-xl"></i>
-                        </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada na entrada</p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">As fotos não foram anexadas no momento da entrada</p>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
+            {% endif %}
+
+            <!-- FOTO VEÍCULO -->
+            {% if mov.foto_veiculo and mov.foto_veiculo.url %}
+            <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                 onclick="openLightbox('{{ mov.foto_veiculo.url }}', '🚛 Foto do Veículo (Entrada)')">
+                <img src="{{ mov.foto_veiculo.url }}" 
+                     class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                     alt="Foto do Veículo"
+                     onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Veículo';">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                            group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute bottom-1.5 left-1.5 text-white">
+                        <i class="fa-solid fa-truck text-[9px]"></i>
+                        <span class="text-[9px] font-medium ml-0.5">Veículo</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- FOTO MATERIAL/EQUIPAMENTO -->
+            {% if mov.foto_material and mov.foto_material.url %}
+            <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                 onclick="openLightbox('{{ mov.foto_material.url }}', '📦 Material/Equipamento (Entrada)')">
+                <img src="{{ mov.foto_material.url }}" 
+                     class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                     alt="Foto do Material"
+                     onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Material';">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                            group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute bottom-1.5 left-1.5 text-white">
+                        <i class="fa-solid fa-boxes text-[9px]"></i>
+                        <span class="text-[9px] font-medium ml-0.5">Material</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- FOTO MOTORISTA -->
+            {% if mov.foto_motorista and mov.foto_motorista.url %}
+            <div class="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800"
+                 onclick="openLightbox('{{ mov.foto_motorista.url }}', '👤 Foto do Motorista (Entrada)')">
+                <img src="{{ mov.foto_motorista.url }}" 
+                     class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                     alt="Foto do Motorista"
+                     onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/ffffff?text=Motorista';">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 
+                            group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute bottom-1.5 left-1.5 text-white">
+                        <i class="fa-solid fa-user text-[9px]"></i>
+                        <span class="text-[9px] font-medium ml-0.5">Motorista</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if not mov.foto_placa and not mov.foto_veiculo and not mov.foto_material and not mov.foto_motorista %}
+        <div class="text-center py-6">
+            <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                <i class="fa-solid fa-camera text-gray-400 text-xl"></i>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma foto registrada na entrada</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">As fotos não foram anexadas no momento da entrada</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- DESCRIÇÃO DO MATERIAL (se houver) -->
+{% if mov.descricao_material %}
+<div class="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-3">
+    <div class="flex items-center gap-1.5 mb-2">
+        <div class="p-1 rounded bg-gradient-to-r from-purple-500 to-pink-400">
+            <i class="fa-solid fa-boxes text-white text-xs"></i>
+        </div>
+        <h3 class="text-sm font-bold text-gray-900 dark:text-white">
+            Material/Equipamento
+        </h3>
+    </div>
+    <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+        {{ mov.descricao_material }}
+    </p>
+</div>
+{% endif %}
 
             <!-- GALERIA DE FOTOS - SAÍDA (NOVO) -->
             {% if mov.data_saida %}
