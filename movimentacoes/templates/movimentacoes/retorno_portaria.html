@@ -8,7 +8,7 @@
     <!-- CABEÇALHO -->
     <div class="bg-[#00594C] text-white rounded-xl p-5 mb-6 shadow-sm">
         <h1 class="text-2xl font-bold">Registrar Retorno</h1>
-        <p class="text-sm opacity-90 mt-1">Confirme o KM real, fotos do veículo e observações.</p>
+        <p class="text-sm opacity-90 mt-1">Confirme o KM real, foto do hodômetro e observações.</p>
     </div>
 
     <!-- CARD PRINCIPAL -->
@@ -63,7 +63,7 @@
                     <!-- KM Retorno -->
                     <div>
                         <label for="km_retorno" class="block text-gray-700 dark:text-gray-300 mb-2 text-sm font-medium">
-                            📍 KM de Retorno (Real)
+                            📍 KM de Retorno (Real) *
                         </label>
                         <div class="relative">
                             <input 
@@ -94,23 +94,66 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO DE FOTOS OBRIGATÓRIAS -->
+            <!-- SEÇÃO DE FOTOS -->
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <i class="fa-solid fa-camera text-blue-500"></i>
-                        Fotos do Retorno (Obrigatórias)
+                        Fotos do Retorno
                     </h3>
-                    <span class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        Tirar foto diretamente
+                    <span class="text-xs text-red-500 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
+                        * Foto do hodômetro obrigatória
                     </span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- FOTO GERAL -->
+                    <!-- FOTO PAINEL (OBRIGATÓRIA - DESTAQUE) -->
+                    <div class="space-y-2 md:col-span-2 lg:col-span-1">
+                        <label for="foto_retorno_painel" class="block text-sm font-medium text-red-700 dark:text-red-400 flex items-center gap-2">
+                            <span class="text-red-500 text-lg">⚠️</span>
+                            🎛️ Foto do Painel/Odômetro *
+                            <span class="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full">OBRIGATÓRIA</span>
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="foto_retorno_painel" 
+                                   id="foto_retorno_painel"
+                                   accept="image/*" 
+                                   capture="environment"
+                                   
+                                   class="hidden">
+                            
+                            <label for="foto_retorno_painel" 
+                                   id="painelLabel"
+                                   class="block p-4 border-2 border-dashed border-red-400 dark:border-red-600 rounded-lg text-center cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors bg-red-50/30 dark:bg-red-900/10">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                        <i class="fa-solid fa-gauge-high text-red-600 dark:text-red-400 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">
+                                        Clique para tirar a foto do hodômetro *
+                                    </p>
+                                    <p class="text-sm text-red-600 dark:text-red-400 font-semibold">
+                                        ⚠️ Obrigatória - Mostrando o KM atual
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="preview_foto_retorno_painel" class="mt-2 hidden">
+                            <div class="relative">
+                                <img src="" alt="Preview" class="w-full h-32 object-cover rounded-lg border-2 border-green-300">
+                                <button type="button" onclick="removerFoto('foto_retorno_painel', 'preview_foto_retorno_painel')"
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOTO GERAL (OPCIONAL) -->
                     <div class="space-y-2">
                         <label for="foto_retorno_geral" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            📸 Foto Geral do Veículo *
+                            📸 Foto Geral do Veículo
                         </label>
                         <div class="relative">
                             <input type="file" 
@@ -118,7 +161,6 @@
                                 id="foto_retorno_geral"
                                 accept="image/*" 
                                 capture="environment"
-                                required
                                 class="hidden">
                             
                             <label for="foto_retorno_geral" 
@@ -140,46 +182,6 @@
                             <div class="relative">
                                 <img src="" alt="Preview" class="w-full h-32 object-cover rounded-lg border-2 border-green-300">
                                 <button type="button" onclick="removerFoto('foto_retorno_geral', 'preview_foto_retorno_geral')"
-                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
-                                    ×
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FOTO PAINEL -->
-                    <div class="space-y-2">
-                        <label for="foto_retorno_painel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            🎛️ Foto do Painel/Odômetro *
-                        </label>
-                        <div class="relative">
-                            <input type="file" 
-                                   name="foto_retorno_painel" 
-                                   id="foto_retorno_painel"
-                                   accept="image/*" 
-                                   capture="environment"
-                                   required
-                                   class="hidden">
-                            
-                            <label for="foto_retorno_painel" 
-                                   class="block p-4 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                                <div class="flex flex-col items-center justify-center gap-2">
-                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                                        <i class="fa-solid fa-gauge-high text-blue-600 dark:text-blue-400 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium text-gray-700 dark:text-gray-300">
-                                        Clique para adicionar foto
-                                    </p>
-                                    <p class="text-sm text-gray-500">
-                                        Mostrando o KM atual
-                                    </p>
-                                </div>
-                            </label>
-                        </div>
-                        <div id="preview_foto_retorno_painel" class="mt-2 hidden">
-                            <div class="relative">
-                                <img src="" alt="Preview" class="w-full h-32 object-cover rounded-lg border-2 border-green-300">
-                                <button type="button" onclick="removerFoto('foto_retorno_painel', 'preview_foto_retorno_painel')"
                                         class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
                                     ×
                                 </button>
@@ -395,46 +397,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- FOTO COMBUSTÍVEL 
-                    <div class="space-y-2">
-                        <label for="foto_retorno_combustivel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ⛽ Foto do Combustível
-                        </label>
-                        <div class="relative">
-                            <input type="file" 
-                                   name="foto_retorno_combustivel" 
-                                   id="foto_retorno_combustivel"
-                                   accept="image/*" 
-                                   capture="environment"
-                                   class="hidden">
-                            
-                            <label for="foto_retorno_combustivel" 
-                                   class="block p-4 border-2 border-dashed border-yellow-300 dark:border-yellow-600 rounded-lg text-center cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors">
-                                <div class="flex flex-col items-center justify-center gap-2">
-                                    <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
-                                        <i class="fa-solid fa-gas-pump text-yellow-600 dark:text-yellow-400 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium text-gray-700 dark:text-gray-300">
-                                        Clique para adicionar foto
-                                    </p>
-                                    <p class="text-sm text-gray-500">
-                                        Nível do marcador
-                                    </p>
-                                </div>
-                            </label>
-                        </div>
-                        <div id="preview_foto_retorno_combustivel" class="mt-2 hidden">
-                            <div class="relative">
-                                <img src="" alt="Preview" class="w-full h-32 object-cover rounded-lg border-2 border-green-300">
-                                <button type="button" onclick="removerFoto('foto_retorno_combustivel', 'preview_foto_retorno_combustivel')"
-                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
-                                    ×
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
 
@@ -472,11 +434,51 @@
 
 </div>
 
+<!-- MODAL POPUP PARA FOTO OBRIGATÓRIA -->
+<div id="obrigatoryPhotoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" style="display: none;">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-20 h-20 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-camera-retro text-red-600 dark:text-red-400 text-4xl"></i>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
+                ⚠️ Foto Obrigatória!
+            </h3>
+            
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-4">
+                Você precisa tirar a <strong class="text-red-600 dark:text-red-400">FOTO DO HODÔMETRO</strong> mostrando o KM atual do veículo.
+            </p>
+            
+            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 rounded">
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    <i class="fa-solid fa-info-circle text-red-500 mr-2"></i>
+                    A foto do hodômetro é obrigatória para comprovar a quilometragem de retorno do veículo.
+                </p>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <button type="button" onclick="fecharModalEHighlight()" 
+                        class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-camera"></i>
+                    Tirar Foto Agora
+                </button>
+                
+                <button type="button" onclick="fecharModal()" 
+                        class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium rounded-lg transition-all">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Função para comprimir imagem
     async function compressImage(file, maxSizeMB = 5, maxWidthOrHeight = 1920) {
         return new Promise((resolve, reject) => {
-            // Se a imagem já for menor que o limite, retorna ela mesma
             if (file.size <= maxSizeMB * 1024 * 1024) {
                 resolve(file);
                 return;
@@ -490,7 +492,6 @@
                 img.src = e.target.result;
                 
                 img.onload = () => {
-                    // Calcular novas dimensões mantendo proporção
                     let width = img.width;
                     let height = img.height;
                     
@@ -506,7 +507,6 @@
                         }
                     }
                     
-                    // Criar canvas para compressão
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
@@ -514,7 +514,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Comprimir (qualidade 0.7 = 70%)
                     canvas.toBlob((blob) => {
                         const compressedFile = new File([blob], file.name, {
                             type: 'image/jpeg',
@@ -533,20 +532,75 @@
         });
     }
 
+    // Função para abrir o modal
+    function abrirModalFotoObrigatoria() {
+        console.log('Tentando abrir modal...'); // Debug
+        const modal = document.getElementById('obrigatoryPhotoModal');
+        if (modal) {
+            console.log('Modal encontrado, abrindo...');
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        } else {
+            console.error('Modal não encontrado no DOM!');
+            alert('⚠️ Foto obrigatória!\n\nVocê precisa tirar a foto do hodômetro mostrando o KM atual do veículo.');
+        }
+    }
+
+    // Função para fechar o modal
+    function fecharModal() {
+        console.log('Fechando modal...');
+        const modal = document.getElementById('obrigatoryPhotoModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Função para fechar o modal e destacar o campo da foto
+    function fecharModalEHighlight() {
+        fecharModal();
+        
+        // Destacar o campo da foto do hodômetro
+        const painelLabel = document.getElementById('painelLabel');
+        if (painelLabel) {
+            painelLabel.style.border = '3px solid red';
+            painelLabel.style.backgroundColor = '#fee2e2';
+            painelLabel.style.transform = 'scale(1.02)';
+            painelLabel.style.transition = 'all 0.3s ease';
+            
+            // Scroll suave até o campo
+            painelLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            setTimeout(() => {
+                painelLabel.style.border = '';
+                painelLabel.style.backgroundColor = '';
+                painelLabel.style.transform = '';
+            }, 3000);
+        }
+        
+        // Disparar o clique no input de arquivo
+        const painelInput = document.getElementById('foto_retorno_painel');
+        if (painelInput) {
+            setTimeout(() => {
+                painelInput.click();
+            }, 300);
+        }
+    }
+
     // Função para configurar preview com compressão
     async function setupPhotoWithCompression(input, previewId) {
         if (!input.files || !input.files[0]) return;
         
         let file = input.files[0];
         
-        // Verificar se é imagem
         if (!file.type.startsWith('image/')) {
             alert('Por favor, selecione um arquivo de imagem válido.');
             input.value = '';
             return;
         }
         
-        // Verificar tamanho e comprimir se necessário
         if (file.size > 5 * 1024 * 1024) {
             try {
                 const compressed = await compressImage(file, 5);
@@ -560,7 +614,6 @@
             }
         }
         
-        // Mostrar preview
         const reader = new FileReader();
         reader.onload = function(e) {
             const previewContainer = document.getElementById(previewId);
@@ -574,7 +627,6 @@
         };
         reader.readAsDataURL(file);
         
-        // Alerta se ainda estiver grande
         if (file.size > 5 * 1024 * 1024) {
             alert(`A imagem ainda está com ${(file.size / 1024 / 1024).toFixed(2)}MB. Recomendamos usar imagens menores que 5MB.`);
         }
@@ -582,14 +634,13 @@
 
     // Configurar todos os inputs de foto
     const fotoInputs = [
-        { id: 'foto_retorno_geral', preview: 'preview_foto_retorno_geral' },
         { id: 'foto_retorno_painel', preview: 'preview_foto_retorno_painel' },
+        { id: 'foto_retorno_geral', preview: 'preview_foto_retorno_geral' },
         { id: 'foto_retorno_avaria', preview: 'preview_foto_retorno_avaria' },
         { id: 'foto_retorno_equipamento', preview: 'preview_foto_retorno_equipamento' },
         { id: 'foto_retorno_cacamba', preview: 'preview_foto_retorno_cacamba' },
         { id: 'foto_retorno_prancha', preview: 'preview_foto_retorno_prancha' },
-        { id: 'foto_retorno_porta_malas', preview: 'preview_foto_retorno_porta_malas' },
-        { id: 'foto_retorno_combustivel', preview: 'preview_foto_retorno_combustivel' }
+        { id: 'foto_retorno_porta_malas', preview: 'preview_foto_retorno_porta_malas' }
     ];
 
     // Adicionar evento de change para cada input
@@ -610,7 +661,7 @@
     });
 
     // Função para remover foto
-    function removerFoto(inputId, previewId) {
+    window.removerFoto = function(inputId, previewId) {
         const input = document.getElementById(inputId);
         const preview = document.getElementById(previewId);
         
@@ -624,7 +675,7 @@
                 img.src = '';
             }
         }
-    }
+    };
 
     // Detectar se é dispositivo móvel
     function isMobileDevice() {
@@ -664,22 +715,26 @@
     }
 
     // Máscara do KM
-    document.getElementById("km_retorno").addEventListener("input", function (e) {
-        let value = e.target.value.replace(/\D/g, "");
-        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        e.target.value = value;
-        calcDistancia();
-    });
+    const kmInput = document.getElementById("km_retorno");
+    if (kmInput) {
+        kmInput.addEventListener("input", function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            e.target.value = value;
+            calcDistancia();
+        });
+    }
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('Página carregada, inicializando...');
         calcDistancia();
         
         // Verificar inicialmente o botão de submit
-        const kmRetorno = document.getElementById('km_retorno').value;
+        const kmRetorno = document.getElementById('km_retorno');
         const submitBtn = document.getElementById('submitBtn');
         
-        if (!kmRetorno) {
+        if (kmRetorno && !kmRetorno.value) {
             submitBtn.disabled = true;
         }
         
@@ -691,53 +746,102 @@
             });
         }
         
-        // Adicionar validação ao formulário
-        document.getElementById('retornoForm').addEventListener('submit', function(e) {
-            const kmRetorno = document.getElementById('km_retorno').value;
-            
-            if (!kmRetorno) {
-                e.preventDefault();
-                alert('Por favor, informe o KM de retorno.');
-                document.getElementById('km_retorno').focus();
-                return false;
-            }
-            
-            // Validar KM mínimo
-            const kmSaida = parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g, '').replace(',', '.'));
-            const kmRetornoNum = parseFloat(kmRetorno.replace(/\./g, ''));
-            
-            if (kmRetornoNum <= kmSaida) {
-                e.preventDefault();
-                alert(`O KM de retorno (${kmRetornoNum}) deve ser maior que o KM de saída (${kmSaida}).`);
-                document.getElementById('km_retorno').focus();
-                return false;
-            }
-            
-            // Validar fotos obrigatórias
-            const fotoGeral = document.getElementById('foto_retorno_geral');
-            const fotoPainel = document.getElementById('foto_retorno_painel');
-            
-            if (!fotoGeral.files[0] || !fotoPainel.files[0]) {
-                e.preventDefault();
-                alert('Por favor, tire as fotos obrigatórias:\n1. Foto Geral do Veículo\n2. Foto do Painel/Odômetro');
-                return false;
-            }
-            
-            // Converter KM para formato correto antes de enviar
-            const kmValue = kmRetorno.replace(/\./g, '');
-            document.getElementById('km_retorno').value = kmValue;
-            
-            // Mostrar loading no botão
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
-            
-            return true;
-        });
+        // Adicionar validação ao formulário com MODAL POPUP
+        const form = document.getElementById('retornoForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Formulário submetido, validando...');
+                
+                // Validar KM
+                const kmRetorno = document.getElementById('km_retorno');
+                if (!kmRetorno.value) {
+                    e.preventDefault();
+                    alert('❌ KM de retorno não informado!\n\nPor favor, informe a quilometragem atual do veículo.');
+                    kmRetorno.focus();
+                    return false;
+                }
+                
+                // Validar KM mínimo
+                const kmSaida = parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g, '').replace(',', '.'));
+                const kmRetornoNum = parseFloat(kmRetorno.value.replace(/\./g, ''));
+                
+                if (kmRetornoNum <= kmSaida) {
+                    e.preventDefault();
+                    alert(`❌ KM de retorno inválido!\n\nO KM de retorno (${kmRetornoNum}) deve ser maior que o KM de saída (${kmSaida}).\n\nVerifique o valor informado.`);
+                    kmRetorno.focus();
+                    return false;
+                }
+                
+                // VALIDAR FOTO DO HODÔMETRO (OBRIGATÓRIA) - ABRE MODAL
+                const fotoPainel = document.getElementById('foto_retorno_painel');
+                
+                if (!fotoPainel.files || !fotoPainel.files[0]) {
+                    e.preventDefault();
+                    console.log('Foto do hodômetro não encontrada, abrindo modal...');
+                    abrirModalFotoObrigatoria(); // Abre o modal personalizado
+                    return false;
+                }
+                
+                // Converter KM para formato correto antes de enviar
+                const kmValue = kmRetorno.value.replace(/\./g, '');
+                kmRetorno.value = kmValue;
+                
+                // Mostrar loading no botão
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                
+                console.log('✅ Formulário validado com sucesso! Enviando...');
+                return true;
+            });
+        }
         
         // Habilitar botão quando KM for preenchido
-        document.getElementById('km_retorno').addEventListener('input', function() {
-            const kmValor = this.value.trim();
-            submitBtn.disabled = !kmValor;
+        if (kmInput) {
+            kmInput.addEventListener('input', function() {
+                const kmValor = this.value.trim();
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = !kmValor;
+                }
+            });
+        }
+        
+        // Feedback visual para foto do hodômetro
+        const painelInput = document.getElementById('foto_retorno_painel');
+        if (painelInput) {
+            painelInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const painelLabel = document.getElementById('painelLabel');
+                    if (painelLabel) {
+                        painelLabel.style.border = '2px solid #10b981';
+                        painelLabel.style.backgroundColor = '#f0fdf4';
+                        setTimeout(() => {
+                            painelLabel.style.border = '';
+                            painelLabel.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                }
+            });
+        }
+        
+        // Fechar modal ao clicar fora
+        const modal = document.getElementById('obrigatoryPhotoModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    fecharModal();
+                }
+            });
+        }
+        
+        // Fechar modal com tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('obrigatoryPhotoModal');
+                if (modal && modal.style.display === 'flex') {
+                    fecharModal();
+                }
+            }
         });
     });
 </script>
@@ -762,9 +866,38 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    [id^="foto_retorno_"]:required + label {
-        border-color: #3b82f6;
-        border-width: 2px;
+    /* Destaque para o campo obrigatório */
+    #painelLabel {
+        font-weight: bold;
+    }
+    
+    /* Animação do modal */
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    #obrigatoryPhotoModal > div {
+        animation: modalFadeIn 0.2s ease-out;
+    }
+    
+    /* Animação de shake para destaque */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .error-highlight {
+        animation: shake 0.3s ease-in-out;
+        border-color: red !important;
+        background-color: #fee2e2 !important;
     }
 </style>
 

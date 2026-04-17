@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'False'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 if not SECRET_KEY:
     raise Exception("SECRET_KEY não definida!")
@@ -17,7 +17,7 @@ if DEBUG:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ['54.242.113.40','127.0.0.1','172.16.0.60', 'seu-dominio.com']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 LOGIN_REDIRECT_URL = '/pos-login/'
 
 # CONFIGURAÇÕES ENVIO DE EMAIL (GMAIL SMTP)
@@ -50,7 +50,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
     },
 }
 
@@ -77,7 +80,9 @@ INSTALLED_APPS = [
     'solicitacoes.apps.SolicitacoesConfig',
     'channels',
     'solicitantes',
+    'sorl.thumbnail',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,6 +129,12 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_TZ = True
@@ -166,3 +177,15 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 SESSION_COOKIE_AGE = 60 * 60  # Se o usuário ficar 1h sem mexer → desloga
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
