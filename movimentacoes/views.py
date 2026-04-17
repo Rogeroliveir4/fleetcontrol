@@ -923,20 +923,36 @@ def processar_imagem(file):
 def terceiro_entrada(request):
     if request.method == "POST":
         try:
-            # processa todas as imagens (placa agora é opcional)
-            #foto_placa = processar_imagem(request.FILES.get("foto_placa"))  # pode ser None
-            foto_veiculo = processar_imagem(request.FILES.get("foto_veiculo"))  # obrigatório
+            #  processa imagens
+            foto_veiculo = processar_imagem(request.FILES.get("foto_veiculo"))
             foto_motorista = processar_imagem(request.FILES.get("foto_motorista"))
             foto_material = processar_imagem(request.FILES.get("foto_material"))
 
-            # validação extra: foto_veiculo é obrigatória
+            #  valida obrigatória
             if not foto_veiculo:
                 raise ValueError("A foto do veículo é obrigatória")
 
-            # cria registro
+            #  cria registro COMPLETO
             MovimentacaoTerceiro.objects.create(
-                # ... todos os campos ...
-                #foto_placa=foto_placa, 
+                placa=request.POST.get("placa", "").upper(),
+                tipo_veiculo=request.POST.get("tipo_veiculo"),
+                empresa=request.POST.get("empresa", "").upper(),
+                motorista_nome=request.POST.get("motorista_nome", "").upper(),
+                documento=request.POST.get("documento"),
+
+                descricao_veiculo=request.POST.get("descricao_veiculo", ""),
+                tags=request.POST.get("tags", "").upper(),
+
+                motivo_entrada=request.POST.get("motivo", ""),
+                observacoes_entrada=request.POST.get("observacoes", ""),
+                descricao_material=request.POST.get("descricao_material", ""),
+
+                status="ENTRADA",
+
+                porteiro_entrada=request.user,
+                porteiro_entrada_nome=request.user.get_full_name() or request.user.username,
+
+                #  imagens
                 foto_veiculo=foto_veiculo,
                 foto_motorista=foto_motorista,
                 foto_material=foto_material,
