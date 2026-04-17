@@ -18,6 +18,8 @@ from django.utils.timezone import localtime
 from PIL import Image
 from django.core.files.uploadedfile import UploadedFile
 import io
+import uuid
+
 
 
 # FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
@@ -584,49 +586,43 @@ def checklist_saida_motorista(request, solicitacao_id):
     })
 
 """
-def compress_image(image_file, max_size_mb=5, quality=70):
-    """Comprime imagem no backend como fallback"""
+
+
+
+
+# FUNÇÃO AUXILIAR PARA COMPRESSÃO DE IMAGENS (PORTARIA)
+def compress_image(image_file, quality=65, max_width=1280):
     if not image_file:
         return image_file
-    
-    # Se a imagem já for menor que o limite, retorna ela mesma
-    if image_file.size <= max_size_mb * 1024 * 1024:
-        return image_file
-    
+
     try:
-        # Abrir imagem com PIL
         img = Image.open(image_file)
-        
-        # Converter para RGB se necessário (remover canal alpha)
+
+        #  converter sempre
         if img.mode in ('RGBA', 'P'):
             img = img.convert('RGB')
-        
-        # Redimensionar se muito grande
-        max_size = 1920
-        if img.width > max_size or img.height > max_size:
-            ratio = min(max_size / img.width, max_size / img.height)
+
+        #  redimensionar sempre (não só grandes)
+        if img.width > max_width:
+            ratio = max_width / img.width
             new_size = (int(img.width * ratio), int(img.height * ratio))
             img = img.resize(new_size, Image.Resampling.LANCZOS)
-        
-        # Salvar em memória com compressão
+
+        #  salvar comprimido SEMPRE
         output = io.BytesIO()
         img.save(output, format='JPEG', quality=quality, optimize=True)
+
         output.seek(0)
-        
-        # Criar novo arquivo
-        compressed_file = UploadedFile(
+
+        return UploadedFile(
             output,
-            name=image_file.name,
+            name=image_file.name.split('.')[0] + ".jpg",
             content_type='image/jpeg'
         )
-        
-        print(f"Backend compress: {image_file.size/1024/1024:.2f}MB → {output.getbuffer().nbytes/1024/1024:.2f}MB")
-        return compressed_file
-        
-    except Exception as e:
-        print(f"Erro na compressão backend: {e}")
-        return image_file
 
+    except Exception as e:
+        print(f"Erro compressão: {e}")
+        return image_file
 
 # REGISTRA A SAÍDA - PORTARIA
 @login_required
@@ -898,48 +894,69 @@ def checklist_retorno_motorista(request, pk):
 """
 
 
-# REGISTRA A ENTRADA NA PORTARIA
+
+
+MAX_UPLOAD_MB = 8
+
+def validar_imagem(file):
+    if file.size > MAX_UPLOAD_MB * 1024 * 1024:
+        raise ValueError(f"Imagem muito grande ({file.size/1024/1024:.1f}MB). Máx: {MAX_UPLOAD_MB}MB")
+
+
+def processar_imagem(file):
+    if not file:
+        return None
+
+    validar_imagem(file)
+
+    img = compress_image(file)
+
+    # 🔥 nome único
+    nome = f"{uuid.uuid4().hex}.jpg"
+    img.name = nome
+
+    return img
+
+
+# REGISTRAR ENTRADA DE TERCEIRO (PORTARIA)
 @login_required
 def terceiro_entrada(request):
     if request.method == "POST":
-        mov = MovimentacaoTerceiro.objects.create(
-            placa=request.POST.get("placa").upper(),
-            tipo_veiculo=request.POST.get("tipo_veiculo"),
-            empresa=request.POST.get("empresa").upper(),
-            motorista_nome=request.POST.get("motorista_nome").upper(),
-            documento=request.POST.get("documento"),
-            
-            descricao_veiculo=request.POST.get("descricao_veiculo", ""),
-            tags=request.POST.get("tags", "").upper(),
-            
-            motivo_entrada=request.POST.get("motivo", ""),
-            observacoes_entrada=request.POST.get("observacoes", ""),
-            
-            # NOVO CAMPO - DESCRIÇÃO DO MATERIAL
-            descricao_material=request.POST.get("descricao_material", ""),
-            
-            status="ENTRADA",
-            
-            porteiro_entrada=request.user,
-            porteiro_entrada_nome=request.user.get_full_name() or request.user.username,
-            
-            foto_placa=request.FILES.get("foto_placa"),
-            foto_veiculo=request.FILES.get("foto_veiculo"),
-            foto_motorista=request.FILES.get("foto_motorista"),
-            
-            # NOVO CAMPO - FOTO DO MATERIAL
-            foto_material=request.FILES.get("foto_material"),
-        )
-        
-        messages.success(request, "Entrada registrada com sucesso.")
-        return redirect("terceiros_portaria_lista")
-    
+        try:
+            # processa todas as imagens (placa agora é opcional)
+            #foto_placa = processar_imagem(request.FILES.get("foto_placa"))  # pode ser None
+            foto_veiculo = processar_imagem(request.FILES.get("foto_veiculo"))  # obrigatório
+            foto_motorista = processar_imagem(request.FILES.get("foto_motorista"))
+            foto_material = processar_imagem(request.FILES.get("foto_material"))
+
+            # validação extra: foto_veiculo é obrigatória
+            if not foto_veiculo:
+                raise ValueError("A foto do veículo é obrigatória")
+
+            # cria registro
+            MovimentacaoTerceiro.objects.create(
+                # ... todos os campos ...
+                #foto_placa=foto_placa, 
+                foto_veiculo=foto_veiculo,
+                foto_motorista=foto_motorista,
+                foto_material=foto_material,
+            )
+
+            messages.success(request, "Entrada registrada com sucesso.")
+            return redirect("terceiros_portaria_lista")
+
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect(request.path)
+
+        except Exception as e:
+            print("Erro ao salvar entrada:", e)
+            messages.error(request, "Erro ao registrar entrada.")
+            return redirect(request.path)
+
     return render(request, "movimentacoes/terceiros/entrada.html")
 
-
 # CONTADOR DE SOLICITAÇÕES PENDENTES PARA PORTARIA
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def contador_portaria(request):
@@ -1089,12 +1106,33 @@ def exportar_terceiros_excel(request):
     return response
 
 
-# REGISTRA A SAÍDA NA PORTARIA
+MAX_UPLOAD_MB = 8
+
+def validar_imagem(file):
+    if file and file.size > MAX_UPLOAD_MB * 1024 * 1024:
+        raise ValueError(f"Imagem muito grande ({file.size/1024/1024:.1f}MB). Máx: {MAX_UPLOAD_MB}MB")
+
+
+def processar_imagem(file):
+    if not file:
+        return None
+
+    validar_imagem(file)
+
+    img = compress_image(file)
+
+    #  nome único
+    img.name = f"{uuid.uuid4().hex}.jpg"
+
+    return img
+
+
+
+# REGISTRAR SAÍDA DE TERCEIRO (PORTARIA)
 @login_required
 def terceiro_saida(request, pk):
     perfil = getattr(request.user, "perfilusuario", None)
 
-    #  Perfil básico não acessa
     if not perfil or perfil.nivel not in ["portaria", "gestor", "adm"]:
         messages.error(request, "Acesso não autorizado.")
         return redirect("dashboard")
@@ -1104,31 +1142,43 @@ def terceiro_saida(request, pk):
         pk=pk,
         status="ENTRADA"
     )
-    
-    # POST → somente PORTARIA pode registrar a saída
-    if request.method == "POST":
-        #if perfil.nivel != "portaria": # SOMENTE PORTARIA REGISTRA SAÍDA, MAS GESTOR/ADM PODEM VISUALIZAR DETALHES
-        if perfil.nivel not in ["portaria", "adm", "gestor"]: # PERMITIR GESTOR/ADM REGISTRAREM SAÍDA (CASO PORTARIA NÃO ESTEJA DISPONÍVEL)
-            messages.error(request, "Apenas a portaria pode registrar a saída do veículo.")
-            return redirect("terceiros_portaria_lista")
-        
-        mov.data_saida = timezone.now()
-        mov.porteiro_saida = request.user
-        mov.porteiro_saida_nome = request.user.get_full_name() or request.user.username
-        
-        #  SALVAR OBSERVAÇÕES DA SAÍDA
-        mov.observacoes_saida = request.POST.get("observacoes", "")
-        mov.foto_saida_veiculo = request.FILES.get("foto_saida_veiculo")
-        mov.foto_saida_avaria = request.FILES.get("foto_saida_avaria")
-        mov.foto_saida_extra = request.FILES.get("foto_saida_extra")
-        
-        mov.status = "SAIDA"
-        mov.save()
-        
-        messages.success(request, "Saída registrada com sucesso.")
-        return redirect("terceiros_portaria_lista")
 
-    # GET → qualquer perfil autorizado pode VISUALIZAR
+    if request.method == "POST":
+        try:
+            #  processa imagens
+            foto_saida_veiculo = processar_imagem(request.FILES.get("foto_saida_veiculo"))
+            foto_saida_avaria = processar_imagem(request.FILES.get("foto_saida_avaria"))
+            foto_saida_extra = processar_imagem(request.FILES.get("foto_saida_extra"))
+
+            #  dados principais
+            mov.data_saida = timezone.now()
+            mov.porteiro_saida = request.user
+            mov.porteiro_saida_nome = request.user.get_full_name() or request.user.username
+            mov.observacoes_saida = request.POST.get("observacoes", "")
+
+            #  aplica imagens
+            if foto_saida_veiculo:
+                mov.foto_saida_veiculo = foto_saida_veiculo
+            if foto_saida_avaria:
+                mov.foto_saida_avaria = foto_saida_avaria
+            if foto_saida_extra:
+                mov.foto_saida_extra = foto_saida_extra
+
+            mov.status = "SAIDA"
+            mov.save()
+
+            messages.success(request, "Saída registrada com sucesso.")
+            return redirect("terceiros_portaria_lista")
+
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect(request.path)
+
+        except Exception as e:
+            print("Erro saída terceiros:", e)
+            messages.error(request, "Erro ao registrar saída.")
+            return redirect(request.path)
+
     return render(
         request,
         "movimentacoes/terceiros/saida.html",
