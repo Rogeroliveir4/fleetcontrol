@@ -195,8 +195,9 @@ def solicitar_veiculo(request, veiculo_id):
                 tag_interna=veiculo.tag_interna
             )
 
-           # if perfil.nivel != "gestor":
-               # notificar_gestores_nova_solicitacao(request, solicitacao)
+            # NOTIFICA GESTORES SE FOR SOLICITANTE (GESTOR/ADM JÁ APROVA, ENTÃO NÃO PRECISA NOTIFICAR)
+            if perfil.nivel != "gestor":
+                notificar_gestores_nova_solicitacao(request, solicitacao)
 
             Veiculo.objects.filter(id=veiculo.id).update(status="Reservado")
 
