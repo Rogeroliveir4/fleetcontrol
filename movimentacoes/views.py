@@ -661,6 +661,10 @@ def portaria_registrar_saida(request, solicitacao_id):
         mov.km_saida = mov.veiculo.km_atual
         mov.data_saida = timezone.now()
         mov.status = "em_andamento"
+
+        if solicitacao:
+            solicitacao.status = "EM_ANDAMENTO"
+            solicitacao.save()
         
         # Observações da portaria
         mov.observacao_portaria = request.POST.get("observacao_portaria", "")
@@ -938,7 +942,7 @@ def terceiro_entrada(request):
                 tipo_veiculo=request.POST.get("tipo_veiculo"),
                 empresa=request.POST.get("empresa", "").upper(),
                 motorista_nome=request.POST.get("motorista_nome", "").upper(),
-                documento=request.POST.get("documento"),
+                #documento=request.POST.get("documento"),
 
                 descricao_veiculo=request.POST.get("descricao_veiculo", ""),
                 tags=request.POST.get("tags", "").upper(),
