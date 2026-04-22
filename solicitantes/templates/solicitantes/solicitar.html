@@ -1,486 +1,386 @@
 {% extends "core/base.html" %}
 {% load static %}
+
 {% block title %}
   {% if modo_edicao %}Editar Solicitação{% else %}Solicitar Veículo{% endif %} | FleetControl
 {% endblock %}
 
-{% block extra_head %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<style>
-  /* Variáveis de design com suporte a dark mode */
-  :root {
-    --primary: #00594C;
-    --primary-dark: #004033;
-    --primary-light: #E6F4F1;
-    --success: #10B981;
-    --danger: #EF4444;
-    --warning: #F59E0B;
-  }
-  
-  [data-theme="dark"] {
-    --primary: #14B8A6;
-    --primary-dark: #0D9488;
-    --primary-light: #134E4A;
-  }
-  
-  /* Status Badges com suporte a dark mode */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  
-  .status-active {
-    background: #D1FAE5;
-    color: #065F46;
-  }
-  
-  .status-warning {
-    background: #FEF3C7;
-    color: #92400E;
-  }
-  
-  .status-expired {
-    background: #FEE2E2;
-    color: #991B1B;
-  }
-  
-  [data-theme="dark"] .status-active {
-    background: #064E3B;
-    color: #A7F3D0;
-  }
-  
-  [data-theme="dark"] .status-warning {
-    background: #78350F;
-    color: #FDE68A;
-  }
-  
-  [data-theme="dark"] .status-expired {
-    background: #7F1D1D;
-    color: #FECACA;
-  }
-  
-  /* Input styles com suporte a dark mode */
-  .form-input {
-    transition: all 0.2s ease;
-  }
-  
-  .form-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 89, 76, 0.1);
-  }
-  
-  .form-input.error {
-    border-color: var(--danger);
-    background-color: #FEF2F2;
-  }
-  
-  .form-input.success {
-    border-color: var(--success);
-  }
-  
-  [data-theme="dark"] .form-input.error {
-    background-color: rgba(239, 68, 68, 0.1);
-  }
-  
-  /* Animações */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-  
-  .fade-in-up {
-    animation: fadeInUp 0.4s ease-out;
-  }
-  
-  .shake {
-    animation: shake 0.4s ease-in-out;
-  }
-  
-  /* Loading button */
-  .btn-loading {
-    position: relative;
-    pointer-events: none;
-    opacity: 0.8;
-  }
-  
-  .btn-loading .btn-text {
-    opacity: 0;
-  }
-  
-  .btn-loading::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 50%;
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 0.6s linear infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Card hover effect */
-  .card-hover {
-    transition: all 0.3s ease;
-  }
-  
-  .card-hover:hover {
-    transform: translateY(-2px);
-  }
-  
-  /* Responsividade */
-  @media (max-width: 768px) {
-    input, select, textarea {
-      font-size: 16px !important;
-    }
-  }
-  
-  /* Date input custom */
-  input[type="datetime-local"] {
-    cursor: pointer;
-  }
-  
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-  }
-  
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-    background-color: var(--gray-100);
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-6 md:py-10">
-  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-950 dark:via-gray-900 dark:to-emerald-950/20">
+  
+  <div class="max-w-3xl mx-auto px-4 py-6 lg:py-8">
     
-    <!-- Header -->
-    <div class="text-center mb-8 fade-in-up">
-      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#00594C] to-[#004033] dark:from-teal-600 dark:to-teal-800 flex items-center justify-center shadow-lg mb-4">
-        <i class="fas fa-car text-2xl !text-white "></i>
+    <!-- Cabeçalho Compacto -->
+    <div class="mb-6">
+      <div class="flex items-center gap-2 mb-2">
+        <a href="{% if modo_edicao %}{% url 'minhas_solicitacoes' %}{% else %}{% url 'lista_veiculos' %}{% endif %}" 
+            class="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors">
+          <i class="fas fa-arrow-left text-sm"></i>
+        </a>
+        <span class="text-xs font-medium text-emerald-700 dark:text-emerald-500 uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full">Frota</span>
       </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        {% if modo_edicao %}
-          Editar Solicitação
-        {% else %}
-          Solicitar Veículo
-        {% endif %}
-      </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        {% if modo_edicao %}
-          Atualize as informações da solicitação
-        {% else %}
-          Preencha os dados abaixo para solicitar um veículo
-        {% endif %}
-      </p>
-    </div>
-    
-    <!-- Card Principal -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden fade-in-up">
       
-      <!-- Informações do Veículo -->
-      <div class="p-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00594C] to-[#004033] dark:from-teal-600 dark:to-teal-800 flex items-center justify-center">
-              <i class="fas fa-car-side text-white text-sm !text-white "></i>
+      <div class="flex items-center gap-3">
+        <div class="w-1 h-8 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full"></div>
+        <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-emerald-800 to-teal-700 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
+          {% if modo_edicao %}Editar solicitação{% else %}Solicitar veículo{% endif %}
+        </h1>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-6 space-y-3">
+          
+          <!-- Card Veículo - Verde -->
+          <div class="bg-emerald-700 dark:from-emerald-700 dark:to-teal-900 rounded-2xl p-4 shadow-lg shadow-emerald-600/20 dark:shadow-emerald-900/30">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white/90">Veículo selecionado</h3>
+              <span class="px-3 py-3 bg-gray-700 backdrop-blur-sm !text-white text-xs font-bold rounded-full">
+                {{ veiculo.tag_interna }}
+              </span>
             </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Veículo selecionado</p>
-              <p class="font-bold text-gray-900 dark:text-white">{{ veiculo.marca }} {{ veiculo.modelo }}</p>
+            
+            <p class="text-lg font-bold text-white">{{ veiculo.marca }} {{ veiculo.modelo }}</p>
+            <p class="text-sm text-white/70">Placa {{ veiculo.placa }}</p>
+            
+            <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/20">
+              <div>
+                <p class="text-xs text-white/60">Combustível</p>
+                <p class="text-sm font-medium text-white">{{ veiculo.combustivel}}</p>
+              </div>
+              <div>
+                <p class="text-xs text-white/60">Km</p>
+                <p class="text-sm font-medium text-white">{{ veiculo.km_atual|default:"--" }}</p>
+              </div>
+            </div>
+            
+            <div class="mt-3 pt-3 border-t border-white/20">
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                <span class="text-xs text-white/80">Disponível para uso</span>
+              </div>
             </div>
           </div>
-          <span class="px-3 py-2 rounded-full bg-[#00594C] dark:bg-teal-700 !text-white text-xs font-bold uppercase tracking-wide">
-            {{ veiculo.tag_interna }}
-          </span>
-        </div>
-        <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-500 dark:text-gray-400">
-          <span><i class="fas fa-tag mr-1"></i> Placa: {{ veiculo.placa }}</span>
-          <span><i class="fas fa-gas-pump mr-1"></i> {{ veiculo.combustivel|default:"Flex" }}</span>
-          {% if veiculo.km_atual %}
-          <span><i class="fas fa-tachometer-alt mr-1"></i> {{ veiculo.km_atual }} km</span>
-          {% endif %}
+          
+          <!-- Card Solicitante - Verde Claro -->
+          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl p-4 border-2 border-emerald-200 dark:border-emerald-800/50">
+            <h3 class="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-user-circle text-emerald-600 dark:text-emerald-400"></i>
+              Solicitante
+            </h3>
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                {{ request.user.username|first|upper }}
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ request.user.perfilusuario.nome_exibicao|default:request.user.username }}</p>
+                <p class="text-xs text-emerald-700 dark:text-emerald-400">{{ request.user.perfilusuario.contrato.nome|default:"Sem contrato" }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Dica Rápida -->
+          <div class="bg-amber-50 dark:bg-amber-950/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/50">
+            <div class="flex items-start gap-2">
+              <i class="fas fa-lightbulb text-amber-500 text-sm mt-0.5"></i>
+              <div>
+                <p class="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Dica rápida</p>
+                <p class="text-xs text-amber-700 dark:text-amber-400/80">Preencha todos os campos para agilizar a aprovação da sua solicitação.</p>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
       
       <!-- Formulário -->
-      <form method="post"
-            action="{% if modo_edicao %}
-                      {% url 'editar_solicitacao' solicitacao.id %}
-                    {% else %}
-                      {% url 'solicitar_veiculo' veiculo.id %}
-                    {% endif %}"
-            id="solicitacaoForm"
-            class="p-5 md:p-6 space-y-5"
-            novalidate>
-        {% csrf_token %}
+      <div class="lg:col-span-2">
         
-        <!-- Messages -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="p-4 rounded-xl text-sm font-medium {% if message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border-l-4 border-red-500{% elif message.tags == 'success' %}bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border-l-4 border-green-500{% else %}bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border-l-4 border-blue-500{% endif %}">
-              <div class="flex items-center gap-3">
-                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
-                <span>{{ message }}</span>
+        <form method="post"
+              action="{% if modo_edicao %}{% url 'editar_solicitacao' solicitacao.id %}{% else %}{% url 'solicitar_veiculo' veiculo.id %}{% endif %}"
+              id="solicitacaoForm"
+              class="space-y-5">
+          {% csrf_token %}
+          
+          <!-- Messages -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="p-3 rounded-xl text-sm {% if message.tags == 'error' %}bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 text-red-800 dark:text-red-300{% elif message.tags == 'success' %}bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-500 text-emerald-800 dark:text-emerald-300{% else %}bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-500 text-blue-800 dark:text-blue-300{% endif %}">
+                <div class="flex items-center gap-2">
+                  <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+                  <span>{{ message }}</span>
+                </div>
               </div>
-            </div>
-          {% endfor %}
-        {% endif %}
-        
-        <!-- Solicitante -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-              <i class="fas fa-user text-white text-sm"></i>
-            </div>
-            <div>
-              <p class="text-xs font-semibold text-blue-700 dark:text-blue-400">Solicitante</p>
-              <p class="font-bold text-gray-900 dark:text-white">{{ request.user.perfilusuario.nome_exibicao|default:request.user.username }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ request.user.perfilusuario.contrato.nome|default:"Sem contrato" }}</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Motorista -->
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-            <i class="fas fa-id-card text-[#00594C] dark:text-teal-500 mr-2"></i>
-            Motorista *
-          </label>
-          <select name="motorista" required
-                  id="motoristaSelect"
-                  onchange="updateMotoristaInfo(this.value)"
-                  class="form-input w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-[#00594C] dark:focus:border-teal-500 transition-all">
-            <option value="" disabled {% if not modo_edicao %}selected{% endif %}>
-              Selecione um motorista...
-            </option>
-            {% for motorista in motoristas %}
-              <option value="{{ motorista.id }}"
-                {% if modo_edicao and solicitacao.motorista.id == motorista.id %}selected{% endif %}
-                data-nome="{{ motorista.nome }}"
-                data-status="{{ motorista.status_cnh }}"
-                data-status-texto="{{ motorista.status_texto }}"
-                data-vencimento="{{ motorista.cnh_vencimento|date:'d/m/Y' }}"
-                data-categoria="{{ motorista.cnh_categoria|default:'-' }}"
-                data-telefone="{{ motorista.telefone|default:'' }}">
-                {{ motorista.nome }} — {{ motorista.status_texto }}
-              </option>
             {% endfor %}
-          </select>
+          {% endif %}
           
-          <!-- Motorista Info Card -->
-          <div id="motoristaInfoCard" class="hidden bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 border border-gray-200 dark:border-gray-600 space-y-2 fade-in-up">
-            <div class="flex items-start justify-between flex-wrap gap-2">
-              <div>
-                <p class="font-bold text-gray-900 dark:text-white" id="motoristaNome"></p>
-                <p class="text-xs text-gray-600 dark:text-gray-400" id="motoristaCategoria"></p>
+          <!-- Motorista -->
+          <div class="bg-white dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+            <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <i class="fas fa-user-circle text-emerald-600 dark:text-emerald-400 text-xs"></i>
               </div>
-              <span id="statusBadge" class="status-badge"></span>
-            </div>
-            <div class="flex flex-wrap gap-3 text-xs">
-              <span class="flex items-center gap-1 text-gray-600 dark:text-gray-400"><i class="fas fa-calendar-alt"></i> Vencimento: <strong id="motoristaVencimento" class="text-gray-900 dark:text-white"></strong></span>
-              <span id="telefoneContainer" class="flex items-center gap-1 text-gray-600 dark:text-gray-400 hidden"><i class="fas fa-phone"></i> <span id="motoristaTelefone" class="text-gray-900 dark:text-white"></span></span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Destino -->
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-            <i class="fas fa-map-marker-alt text-[#00594C] dark:text-teal-500 mr-2"></i>
-            Destino *
-          </label>
-          <input type="text" name="destino" required
-                 id="destinoInput"
-                 value="{{ solicitacao.destino|default:'' }}"
-                 placeholder="Ex: Aeroporto, Centro de Distribuição, Filial..."
-                 class="form-input w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-[#00594C] dark:focus:border-teal-500 transition-all">
-          <div id="destinoError" class="text-xs text-red-500 dark:text-red-400 hidden"></div>
-        </div>
-        
-        <!-- Datas -->
-        <div class="space-y-4">
-          <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <i class="fas fa-calendar-alt text-[#00594C] dark:text-teal-500 mr-2"></i>
-              Período da Viagem
-            </h3>
-          </div>
-          
-          <!-- Data de Saída -->
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <i class="fas fa-sign-out-alt text-[#00594C] dark:text-teal-500 mr-2"></i>
-              Data e Hora de Saída *
+              Motorista <span class="text-red-500">*</span>
             </label>
-            <input type="datetime-local" name="data_saida" required
-                   id="dataSaida"
-                   value="{% if solicitacao.data_saida %}{{ solicitacao.data_saida|date:'Y-m-d\TH:i' }}{% endif %}"
-                   min="{% now 'Y-m-d\TH:i' %}"
-                   class="form-input w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-[#00594C] dark:focus:border-teal-500 transition-all"
-                   {% if modo_edicao %}readonly{% endif %}>
-            <div id="saidaError" class="text-xs text-red-500 dark:text-red-400 hidden"></div>
-            {% if modo_edicao %}
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              <i class="fas fa-lock mr-1"></i> Data de saída não pode ser alterada após a criação
-            </p>
-            {% endif %}
-          </div>
-          
-          <!-- Previsão de Retorno -->
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <i class="fas fa-sign-in-alt text-[#00594C] dark:text-teal-500 mr-2"></i>
-              Previsão de Retorno *
-            </label>
-            <input type="datetime-local" name="previsao_retorno" required
-                   id="dataRetorno"
-                   value="{% if solicitacao.previsao_retorno %}{{ solicitacao.previsao_retorno|date:'Y-m-d\TH:i' }}{% endif %}"
-                   class="form-input w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-[#00594C] dark:focus:border-teal-500 transition-all">
-            <div id="retornoError" class="text-xs text-red-500 dark:text-red-400 hidden"></div>
-          </div>
-          
-          <!-- Duração da Viagem -->
-          <div id="duracaoViagem" class="hidden p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div class="flex items-center gap-2 text-sm">
-              <i class="fas fa-clock text-[#00594C] dark:text-teal-500"></i>
-              <span class="text-gray-600 dark:text-gray-400">Duração estimada:</span>
-              <strong id="duracaoText" class="text-gray-900 dark:text-white"></strong>
+            
+            <select name="motorista" required
+                    id="motoristaSelect"
+                    onchange="updateMotoristaInfo(this.value)"
+                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl text-sm text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer"
+                    style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2310b981\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E'); background-position: right 1rem center; background-repeat: no-repeat; background-size: 1.2rem;">
+              <option value="" disabled {% if not modo_edicao %}selected{% endif %}>Selecione um motorista...</option>
+              {% for motorista in motoristas %}
+                <option value="{{ motorista.id }}"
+                  {% if modo_edicao and solicitacao.motorista.id == motorista.id %}selected{% endif %}
+                  data-nome="{{ motorista.nome }}"
+                  data-status="{{ motorista.status_cnh }}"
+                  data-status-texto="{{ motorista.status_texto }}"
+                  data-vencimento="{{ motorista.cnh_vencimento|date:'d/m/Y' }}"
+                  data-categoria="{{ motorista.cnh_categoria|default:'-' }}"
+                  data-telefone="{{ motorista.telefone|default:'' }}">
+                  {{ motorista.nome }} • {{ motorista.status_texto }}
+                </option>
+              {% endfor %}
+            </select>
+            
+            <div id="motoristaInfoCard" class="hidden bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-xl p-3 border border-emerald-200 dark:border-emerald-800/50 mt-3">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-gray-900 dark:text-white" id="motoristaNome"></p>
+                  <p class="text-xs text-emerald-700 dark:text-emerald-400" id="motoristaCategoria"></p>
+                </div>
+                <span id="statusBadge" class="px-2 py-1 rounded-full text-xs font-medium"></span>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-3 mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-800/30">
+                <div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Vencimento CNH</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white" id="motoristaVencimento"></p>
+                </div>
+                <div id="telefoneContainer" class="hidden">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Telefone</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white" id="motoristaTelefone"></p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Justificativa -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <i class="fas fa-file-alt text-[#00594C] dark:text-teal-500 mr-2"></i>
-              Justificativa
+          
+          <!-- Destino -->
+          <div class="bg-white dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+            <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <i class="fas fa-map-pin text-emerald-600 dark:text-emerald-400 text-xs"></i>
+              </div>
+              Destino <span class="text-red-500">*</span>
             </label>
-            <span class="text-xs text-gray-400 dark:text-gray-500" id="charCounter">0/500</span>
+            
+            <input type="text" name="destino" required
+                   id="destinoInput"
+                   value="{{ solicitacao.destino|default:'' }}"
+                   placeholder="Ex: Aeroporto, Centro de Distribuição..."
+                   class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all">
+            <div id="destinoError" class="text-xs text-red-500 dark:text-red-400 hidden mt-1"></div>
           </div>
-          <textarea name="justificativa" rows="4" maxlength="500"
-                    id="justificativaTextarea"
-                    placeholder="Descreva o motivo da viagem, passageiros, material a ser transportado..."
-                    class="form-input w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-[#00594C] dark:focus:border-teal-500 transition-all resize-none">{{ solicitacao.justificativa|default:'' }}</textarea>
-        </div>
-        
-        <!-- Botões -->
-        <div class="pt-4 flex flex-col sm:flex-row gap-3">
-          <button type="submit"
-                  id="submitBtn"
-                  class="flex-1 bg-gradient-to-r from-[#00594C] to-[#004033] dark:from-teal-600 dark:to-teal-800 hover:from-[#004033] hover:to-[#004033] dark:hover:from-teal-700 dark:hover:to-teal-700 text-white font-semibold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 relative">
-            <span class="btn-text">
-              {% if modo_edicao %}
-                <i class="fas fa-save"></i> Salvar Alterações
-              {% else %}
-                <i class="fas fa-paper-plane"></i> Enviar Solicitação
-              {% endif %}
-            </span>
-          </button>
-          <a href="{% if modo_edicao %}{% url 'minhas_solicitacoes' %}{% else %}{% url 'lista_veiculos' %}{% endif %}"
-             class="flex-1 text-center border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 py-3 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
-            <i class="fas fa-times"></i> Cancelar
-          </a>
-        </div>
-        
-      </form>
+          
+          <!-- Período -->
+          <div class="bg-white dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+            <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <i class="fas fa-calendar text-emerald-600 dark:text-emerald-400 text-xs"></i>
+              </div>
+              Período da viagem
+            </label>
+            
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+  <!-- Saída -->
+  <div>
+    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+      Saída prevista <span class="text-red-500">*</span>
+    </label>
+
+    <div class="relative">
+      <input type="datetime-local" 
+             name="previsao_saida" 
+             required
+             id="dataSaida"
+
+             value="{% if solicitacao.previsao_saida %}{{ solicitacao.previsao_saida|date:'Y-m-d\\TH:i' }}{% endif %}"
+
+             min="{% now 'Y-m-d\\TH:i' %}"
+
+             class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl text-base text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer appearance-none ios-datetime-fix"
+             style="min-height: 48px; -webkit-appearance: none;">
+
+      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-emerald-600 dark:text-emerald-400">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
     </div>
-    
-    <!-- Footer -->
-    <div class="mt-6 text-center">
-      <p class="text-xs text-gray-400 dark:text-gray-500">
-        <i class="fas fa-shield-alt mr-1"></i>
-        Dados protegidos conforme política de segurança
-      </p>
+  </div>
+
+
+  <!-- Retorno -->
+  <div>
+    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+      Retorno <span class="text-red-500">*</span>
+    </label>
+
+    <div class="relative">
+      <input type="datetime-local" 
+             name="previsao_retorno" 
+             required
+             id="dataRetorno"
+
+             value="{% if solicitacao.previsao_retorno %}{{ solicitacao.previsao_retorno|date:'Y-m-d\\TH:i' }}{% endif %}"
+
+             min="{% if solicitacao.previsao_saida %}{{ solicitacao.previsao_saida|date:'Y-m-d\\TH:i' }}{% else %}{% now 'Y-m-d\\TH:i' %}{% endif %}"
+
+             class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl text-base text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer appearance-none ios-datetime-fix"
+             style="min-height: 48px; -webkit-appearance: none;">
+
+      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-emerald-600 dark:text-emerald-400">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
+    </div>
+  </div>
+
+</div>
+            
+            <div id="retornoError" class="text-xs text-red-500 dark:text-red-400 hidden mt-1"></div>
+            
+            <div id="duracaoViagem" class="hidden bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/40 dark:to-teal-950/40 rounded-xl p-3 border border-emerald-300 dark:border-emerald-800 mt-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <i class="fas fa-clock text-white text-xs"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-emerald-800 dark:text-emerald-300">Duração estimada</p>
+                  <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-200" id="duracaoText"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Justificativa -->
+          <div class="bg-white dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <i class="fas fa-align-left text-emerald-600 dark:text-emerald-400 text-xs"></i>
+                </div>
+                Justificativa
+              </label>
+              <span class="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full" id="charCounter">0/500</span>
+            </div>
+            
+            <textarea name="justificativa" rows="3" maxlength="500"
+                      id="justificativaTextarea"
+                      placeholder="Descreva o motivo da viagem..."
+                      class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none">{{ solicitacao.justificativa|default:'' }}</textarea>
+          </div>
+          
+          <!-- Botões -->
+          <div class="flex flex-col sm:flex-row gap-2 pt-2">
+            <button type="submit"
+                    id="submitBtn"
+                    class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-lg shadow-emerald-600/30 hover:shadow-xl hover:shadow-emerald-600/40 flex items-center justify-center gap-2 text-sm transform hover:-translate-y-0.5">
+              <i class="fas {% if modo_edicao %}fa-save{% else %}fa-paper-plane{% endif %} text-sm"></i>
+              <span>{% if modo_edicao %}Salvar{% else %}Enviar solicitação{% endif %}</span>
+            </button>
+            
+            <a href="{% if modo_edicao %}{% url 'minhas_solicitacoes' %}{% else %}{% url 'lista_veiculos' %}{% endif %}"
+               class="flex-1 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+              <i class="fas fa-times text-sm"></i>
+              <span>Cancelar</span>
+            </a>
+          </div>
+          
+        </form>
+        
+      </div>
+      
     </div>
     
   </div>
+  
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dataSaida = document.getElementById("dataSaida");
+    const dataRetorno = document.getElementById("dataRetorno");
+
+    function validarDatas() {
+        const saida = dataSaida.value;
+        const retorno = dataRetorno.value;
+
+        // reset visual
+        dataSaida.classList.remove("border-red-500");
+        dataRetorno.classList.remove("border-red-500");
+
+        if (saida && retorno) {
+
+            if (retorno <= saida) {
+                dataRetorno.classList.add("border-red-500");
+                return false;
+            }
+
+            if (saida >= retorno) {
+                dataSaida.classList.add("border-red-500");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function atualizarMinRetorno() {
+        if (dataSaida.value) {
+            dataRetorno.min = dataSaida.value;
+        }
+    }
+
+    // 🔥 eventos
+    dataSaida.addEventListener("change", function () {
+        atualizarMinRetorno();
+        validarDatas();
+
+        // limpa retorno inválido
+        if (dataRetorno.value && dataRetorno.value <= dataSaida.value) {
+            dataRetorno.value = "";
+        }
+    });
+
+    dataRetorno.addEventListener("change", validarDatas);
+
+    //  valida no submit
+    document.querySelector("form").addEventListener("submit", function (e) {
+        if (!validarDatas()) {
+            e.preventDefault();
+            alert("A data de retorno deve ser maior que a saída.");
+        }
+    });
+
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   
-  // Elementos
   const dataSaida = document.getElementById('dataSaida');
   const dataRetorno = document.getElementById('dataRetorno');
-  const saidaError = document.getElementById('saidaError');
   const retornoError = document.getElementById('retornoError');
   const duracaoDiv = document.getElementById('duracaoViagem');
   const duracaoText = document.getElementById('duracaoText');
   
-  // Função para validar datas
-  function validateDates() {
-    let isValid = true;
-    
-    // Limpa erros anteriores
-    if (saidaError) {
-      saidaError.classList.add('hidden');
-      saidaError.textContent = '';
-    }
-    if (retornoError) {
-      retornoError.classList.add('hidden');
-      retornoError.textContent = '';
-    }
-    
-    // Remove classes de erro
-    if (dataSaida) dataSaida.classList.remove('error', 'success');
-    if (dataRetorno) dataRetorno.classList.remove('error', 'success');
-    
-    // Valida se tem data de saída
-    if (!dataSaida || !dataSaida.value) {
-      return true;
-    }
-    
-    const saida = new Date(dataSaida.value);
-    const retorno = dataRetorno && dataRetorno.value ? new Date(dataRetorno.value) : null;
-    
-    // Regra principal: retorno não pode ser menor que saída
-    if (retorno && retorno < saida) {
-      if (retornoError) {
-        retornoError.textContent = 'A data de retorno deve ser igual ou posterior à data de saída';
-        retornoError.classList.remove('hidden');
-      }
-      if (dataRetorno) dataRetorno.classList.add('error');
-      isValid = false;
-    } else if (retorno) {
-      if (dataRetorno) dataRetorno.classList.add('success');
-    }
-    
-    if (dataSaida) dataSaida.classList.add('success');
-    
-    return isValid;
-  }
-  
-  // Função para calcular duração
   function calculateTripDuration() {
     if (!dataSaida || !dataRetorno || !dataSaida.value || !dataRetorno.value) {
       if (duracaoDiv) duracaoDiv.classList.add('hidden');
@@ -504,16 +404,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let durationStr = '';
     if (diffDays > 0) {
       durationStr = `${diffDays} dia${diffDays > 1 ? 's' : ''}`;
-      if (remainingHours > 0) {
-        durationStr += ` e ${remainingHours} hora${remainingHours > 1 ? 's' : ''}`;
-      }
+      if (remainingHours > 0) durationStr += ` e ${remainingHours}h`;
     } else if (diffHours > 0) {
-      durationStr = `${diffHours} hora${diffHours > 1 ? 's' : ''}`;
-      if (diffMinutes > 0) {
-        durationStr += ` e ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
-      }
+      durationStr = `${diffHours}h`;
+      if (diffMinutes > 0) durationStr += ` ${diffMinutes}min`;
     } else if (diffMinutes > 0) {
-      durationStr = `${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+      durationStr = `${diffMinutes}min`;
     } else {
       durationStr = 'mesmo horário';
     }
@@ -522,17 +418,27 @@ document.addEventListener('DOMContentLoaded', function() {
     if (duracaoDiv) duracaoDiv.classList.remove('hidden');
   }
   
-  // Adiciona event listeners
+  function validateDates() {
+    if (!dataSaida || !dataRetorno) return true;
+    if (retornoError) retornoError.classList.add('hidden');
+    if (!dataSaida.value || !dataRetorno.value) return true;
+    
+    if (new Date(dataRetorno.value) < new Date(dataSaida.value)) {
+      if (retornoError) {
+        retornoError.textContent = 'Retorno deve ser ≥ saída';
+        retornoError.classList.remove('hidden');
+      }
+      return false;
+    }
+    return true;
+  }
+  
   if (dataSaida) {
     dataSaida.addEventListener('change', function() {
       validateDates();
       calculateTripDuration();
-      
-      // Atualiza o min do retorno baseado na saída
       if (dataRetorno && dataSaida.value) {
         dataRetorno.min = dataSaida.value;
-        
-        // Se o retorno for menor que a nova saída, limpa
         if (dataRetorno.value && new Date(dataRetorno.value) < new Date(dataSaida.value)) {
           dataRetorno.value = '';
         }
@@ -547,21 +453,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Inicializa o min do retorno baseado na saída inicial
   if (dataRetorno && dataSaida && dataSaida.value) {
     dataRetorno.min = dataSaida.value;
   }
-  
-  // Calcula duração inicial
   calculateTripDuration();
   
-  // Motorista info
   const motoristaSelect = document.getElementById('motoristaSelect');
   if (motoristaSelect && motoristaSelect.value) {
     updateMotoristaInfo(motoristaSelect.value);
   }
   
-  // Contador de caracteres
   const textarea = document.getElementById('justificativaTextarea');
   if (textarea) {
     textarea.addEventListener('input', function() {
@@ -569,12 +470,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const length = this.value.length;
       if (counter) {
         counter.textContent = `${length}/500`;
-        counter.className = length > 450 ? 'text-amber-600 dark:text-amber-400 font-semibold text-xs' : 'text-gray-400 dark:text-gray-500 text-xs';
+        counter.className = length > 450 ? 'text-amber-600 text-xs bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-full' : 'text-emerald-600 dark:text-emerald-400 text-xs bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-full';
       }
     });
+    textarea.dispatchEvent(new Event('input'));
   }
   
-  // Validação destino
   const destinoInput = document.getElementById('destinoInput');
   const destinoError = document.getElementById('destinoError');
   
@@ -582,26 +483,21 @@ document.addEventListener('DOMContentLoaded', function() {
     destinoInput.addEventListener('input', function() {
       if (!this.value.trim()) {
         if (destinoError) {
-          destinoError.textContent = 'O destino é obrigatório';
+          destinoError.textContent = 'Destino obrigatório';
           destinoError.classList.remove('hidden');
         }
-        this.classList.add('error');
       } else if (this.value.trim().length < 3) {
         if (destinoError) {
-          destinoError.textContent = 'O destino deve ter pelo menos 3 caracteres';
+          destinoError.textContent = 'Mínimo 3 caracteres';
           destinoError.classList.remove('hidden');
         }
-        this.classList.add('error');
       } else {
         if (destinoError) destinoError.classList.add('hidden');
-        this.classList.remove('error');
-        this.classList.add('success');
       }
     });
   }
 });
 
-// Atualiza informações do motorista
 function updateMotoristaInfo(motoristaId) {
   const select = document.getElementById('motoristaSelect');
   const card = document.getElementById('motoristaInfoCard');
@@ -613,7 +509,6 @@ function updateMotoristaInfo(motoristaId) {
   
   const opt = select.options[select.selectedIndex];
   const status = opt.dataset.status;
-  const statusText = opt.dataset.statusTexto;
   
   document.getElementById('motoristaNome').textContent = opt.dataset.nome;
   document.getElementById('motoristaCategoria').textContent = 
@@ -621,35 +516,27 @@ function updateMotoristaInfo(motoristaId) {
   document.getElementById('motoristaVencimento').textContent = opt.dataset.vencimento || 'Não informado';
   
   const telefoneContainer = document.getElementById('telefoneContainer');
-  const telefoneSpan = document.getElementById('motoristaTelefone');
   if (opt.dataset.telefone) {
-    telefoneSpan.textContent = opt.dataset.telefone;
+    document.getElementById('motoristaTelefone').textContent = opt.dataset.telefone;
     telefoneContainer.classList.remove('hidden');
   } else {
     telefoneContainer.classList.add('hidden');
   }
   
   const statusBadge = document.getElementById('statusBadge');
-  statusBadge.innerHTML = '';
-  statusBadge.className = 'status-badge ';
+  statusBadge.textContent = opt.dataset.statusTexto;
   
   if (status === 'ativo') {
-    statusBadge.classList.add('status-active');
-    statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> ' + statusText;
+    statusBadge.className = 'px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300';
   } else if (status === 'proximo_vencimento') {
-    statusBadge.classList.add('status-warning');
-    statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + statusText;
+    statusBadge.className = 'px-2 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300';
   } else {
-    statusBadge.classList.add('status-expired');
-    statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> ' + statusText;
+    statusBadge.className = 'px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300';
   }
   
-  if (card) {
-    card.classList.remove('hidden');
-  }
+  if (card) card.classList.remove('hidden');
 }
 
-// Validação final do formulário
 function validateForm() {
   const motoristaSelect = document.getElementById('motoristaSelect');
   const destinoInput = document.getElementById('destinoInput');
@@ -658,89 +545,172 @@ function validateForm() {
   const submitBtn = document.getElementById('submitBtn');
   let isValid = true;
   
-  // Valida motorista
   if (!motoristaSelect.value) {
-    showToast('Selecione um motorista para a viagem', 'error');
-    motoristaSelect.classList.add('error', 'shake');
-    setTimeout(() => motoristaSelect.classList.remove('shake'), 500);
+    showToast('Selecione um motorista', 'error');
     isValid = false;
   }
   
-  // Valida destino
   if (!destinoInput.value.trim()) {
-    showToast('Informe o destino da viagem', 'error');
-    destinoInput.classList.add('error');
+    showToast('Informe o destino', 'error');
     isValid = false;
   } else if (destinoInput.value.trim().length < 3) {
-    showToast('Destino deve ter pelo menos 3 caracteres', 'error');
-    destinoInput.classList.add('error');
+    showToast('Destino: mínimo 3 caracteres', 'error');
     isValid = false;
   }
   
-  // Valida datas
   if (!dataSaida.value) {
-    showToast('Selecione a data e hora de saída', 'error');
+    showToast('Selecione data de saída', 'error');
     isValid = false;
   }
   
   if (!dataRetorno.value) {
-    showToast('Selecione a previsão de retorno', 'error');
+    showToast('Selecione data de retorno', 'error');
     isValid = false;
   }
   
-  if (dataSaida.value && dataRetorno.value) {
-    const saida = new Date(dataSaida.value);
-    const retorno = new Date(dataRetorno.value);
-    
-    if (retorno < saida) {
-      showToast('A data de retorno deve ser igual ou posterior à data de saída', 'error');
-      isValid = false;
-    }
+  if (dataSaida.value && dataRetorno.value && new Date(dataRetorno.value) < new Date(dataSaida.value)) {
+    showToast('Retorno deve ser ≥ saída', 'error');
+    isValid = false;
   }
   
-  if (!isValid) {
-    return false;
-  }
+  if (!isValid) return false;
   
-  // Desabilita botão
   submitBtn.disabled = true;
-  submitBtn.classList.add('btn-loading');
-  
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processando...</span>';
   return true;
 }
 
-// Toast notification
 function showToast(message, type = 'info') {
   const existingToast = document.querySelector('.custom-toast');
   if (existingToast) existingToast.remove();
   
   const toast = document.createElement('div');
-  toast.className = `custom-toast fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-3 rounded-xl shadow-lg text-white font-medium text-sm max-w-[90vw] text-center ${
-    type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+  toast.className = `custom-toast fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-lg shadow-lg text-white text-sm font-medium backdrop-blur-sm ${
+    type === 'error' ? 'bg-red-500/95' : type === 'success' ? 'bg-emerald-500/95' : 'bg-gray-800/95'
   }`;
-  toast.innerHTML = `
-    <div class="flex items-center gap-2">
-      <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-      <span>${message}</span>
-    </div>
-  `;
+  toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
   
   document.body.appendChild(toast);
   
   setTimeout(() => {
     toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 4000);
+    toast.style.transform = 'translate(-50%, 10px)';
+    toast.style.transition = 'all 0.2s';
+    setTimeout(() => toast.remove(), 200);
+  }, 3000);
 }
 
-// Adiciona listener ao formulário
 const form = document.getElementById('solicitacaoForm');
 if (form) {
   form.addEventListener('submit', function(e) {
-    if (!validateForm()) {
-      e.preventDefault();
-    }
+    if (!validateForm()) e.preventDefault();
   });
 }
 </script>
+
+<style>
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+  .dark input[type="datetime-local"] {
+    color-scheme: dark;
+  }
+  @media (max-width: 640px) {
+    input, select, textarea, button {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Fix específico para inputs datetime-local no iOS */
+.ios-datetime-fix {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  min-height: 48px !important;
+  line-height: 1.4 !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Garante que o texto do placeholder/valor fique alinhado corretamente no iOS */
+.ios-datetime-fix::-webkit-datetime-edit {
+  line-height: 1.4 !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+.ios-datetime-fix::-webkit-datetime-edit-fields-wrapper {
+  padding: 0 !important;
+}
+
+.ios-datetime-fix::-webkit-datetime-edit-text {
+  padding: 0 2px !important;
+  color: inherit !important;
+}
+
+.ios-datetime-fix::-webkit-datetime-edit-month-field,
+.ios-datetime-fix::-webkit-datetime-edit-day-field,
+.ios-datetime-fix::-webkit-datetime-edit-year-field,
+.ios-datetime-fix::-webkit-datetime-edit-hour-field,
+.ios-datetime-fix::-webkit-datetime-edit-minute-field {
+  padding: 0 2px !important;
+  color: inherit !important;
+}
+
+/* Placeholder no iOS */
+.ios-datetime-fix::-webkit-datetime-edit[value=""] {
+  color: #9ca3af !important;
+}
+
+.dark .ios-datetime-fix::-webkit-datetime-edit[value=""] {
+  color: #6b7280 !important;
+}
+
+/* Calendário picker no iOS */
+.ios-datetime-fix::-webkit-calendar-picker-indicator {
+  opacity: 0 !important;
+  position: absolute !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: pointer !important;
+  color-scheme: light !important;
+}
+
+.dark .ios-datetime-fix::-webkit-calendar-picker-indicator {
+  color-scheme: dark !important;
+}
+
+/* Remove estilos padrão que podem causar problemas no iOS */
+.ios-datetime-fix::-webkit-inner-spin-button,
+.ios-datetime-fix::-webkit-outer-spin-button,
+.ios-datetime-fix::-webkit-clear-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Ajustes específicos para iPhone */
+@supports (-webkit-touch-callout: none) {
+  .ios-datetime-fix {
+    font-size: 16px !important; /* Previne zoom automático */
+  }
+  
+  /* Ajuste adicional para telas pequenas */
+  @media (max-width: 428px) {
+    .ios-datetime-fix {
+      font-size: 14px !important;
+      padding-left: 12px !important;
+      padding-right: 40px !important;
+    }
+  }
+}
+</style>
+
 {% endblock %}

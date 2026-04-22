@@ -66,7 +66,8 @@ class SolicitacaoVeiculo(models.Model):
 
     destino = models.CharField(max_length=255)
     justificativa = models.TextField(blank=True, null=True)
-    previsao_retorno = models.DateTimeField()
+    previsao_retorno = models.DateTimeField(null=True, blank=True)
+    previsao_saida = models.DateTimeField(null=True, blank=True)
 
     status = models.CharField(
         max_length=40,
@@ -182,7 +183,7 @@ class SolicitacaoVeiculo(models.Model):
 
 
     def save(self, *args, **kwargs):
-        # 🔹 Preenche automaticamente o nome do solicitante a partir do perfil
+        #  Preenche automaticamente o nome do solicitante a partir do perfil
         if self.solicitante and not self.solicitante_nome:
             try:
                 perfil = self.solicitante.perfilusuario
@@ -200,7 +201,7 @@ class SolicitacaoVeiculo(models.Model):
                 username = self.solicitante.username.split('@')[0]
                 self.solicitante_nome = username.replace('.', ' ').title()
         
-        # 🔹 Mesma lógica para gestor_responsavel
+        #  Mesma lógica para gestor_responsavel
         if self.gestor_responsavel and not self.gestor_responsavel_nome:
             try:
                 perfil = self.gestor_responsavel.perfilusuario
@@ -215,7 +216,7 @@ class SolicitacaoVeiculo(models.Model):
                 username = self.gestor_responsavel.username.split('@')[0]
                 self.gestor_responsavel_nome = username.replace('.', ' ').title()
         
-        # 🔹 Mesma lógica para gestor_reprovador
+        #  Mesma lógica para gestor_reprovador
         if self.gestor_reprovador and not self.gestor_reprovador_nome:
             try:
                 perfil = self.gestor_reprovador.perfilusuario

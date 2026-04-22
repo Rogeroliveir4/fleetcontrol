@@ -87,7 +87,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
 
 
-# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM) - AQUI É CRIA A SOLICITAÇÃPO, MAS SE FOR GESTOR/ADM JÁ APROVA AUTOMATICAMENTE
+# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM) - AQUI  CRIA A SOLICITAÇÃPO, MAS SE FOR GESTOR/ADM JÁ APROVA AUTOMATICAMENTE
 @login_required
 def solicitar_veiculo(request, veiculo_id):
 
@@ -138,8 +138,22 @@ def solicitar_veiculo(request, veiculo_id):
             motorista_id = request.POST.get("motorista")
             destino = request.POST.get("destino")
             justificativa = request.POST.get("justificativa", "")
-            
 
+
+            previsao_saida_str = request.POST.get("previsao_saida")
+            previsao_saida = None
+
+            if previsao_saida_str:
+                try:
+                    previsao_saida = datetime.strptime(
+                        previsao_saida_str,
+                        "%Y-%m-%dT%H:%M"
+                    )
+                    previsao_saida = timezone.make_aware(previsao_saida)
+                except:
+                    previsao_saida = None
+
+            # 
             previsao_retorno_str = request.POST.get("previsao_retorno")
             previsao_retorno = None
 
@@ -153,6 +167,13 @@ def solicitar_veiculo(request, veiculo_id):
                 except ValueError:
                     previsao_retorno = None
 
+            #  Validação de datas
+            if previsao_saida and previsao_retorno:
+                if previsao_retorno <= previsao_saida:
+                    messages.error(request, "Retorno deve ser após a saída.")
+                    return redirect("solicitar_veiculo", veiculo_id=veiculo.id)    
+
+            
             if not motorista_id:
                 messages.error(request, "Selecione um motorista.")
                 return redirect("solicitar_veiculo", veiculo_id=veiculo.id)
@@ -192,7 +213,8 @@ def solicitar_veiculo(request, veiculo_id):
                 solicitante=request.user,
                 solicitante_nome=nome_solicitante,
                 data_criacao=timezone.now(),
-                tag_interna=veiculo.tag_interna
+                tag_interna=veiculo.tag_interna,
+                previsao_saida=previsao_saida
             )
 
             # NOTIFICA GESTORES SE FOR SOLICITANTE (GESTOR/ADM JÁ APROVA, ENTÃO NÃO PRECISA NOTIFICAR)
@@ -218,82 +240,74 @@ def solicitar_veiculo(request, veiculo_id):
 
 
 
-# CANCELAR SOLICITAÇÃO (SOLICITANTE)
+# CANCELAR SOLICITAÇÃO (Disponível para solicitante, gestor do contrato ou ADM, mas com regras de negócio)
 @login_required
 def cancelar_solicitacao(request, pk):
 
-    solicitacao = get_object_or_404(
-        SolicitacaoVeiculo,
-        pk=pk,
-        solicitante=request.user
-    )
+    solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=pk)
 
-    if solicitacao.status != "PENDENTE":
-        messages.error(
-            request,
-            "Você só pode cancelar solicitações que ainda não foram aprovadas."
-        )
-        return redirect("minhas_solicitacoes")
+    perfil = getattr(request.user, "perfilusuario", None)
+
+    #  PERMISSÃO
+    pode_cancelar = False
+
+    if perfil:
+        if perfil.nivel == "adm":
+            pode_cancelar = True
+
+        elif perfil.nivel == "gestor":
+            # gestor pode cancelar do próprio contrato
+            if solicitacao.contrato == perfil.contrato:
+                pode_cancelar = True
+
+        elif perfil.nivel == "basico":
+            # solicitante só cancela o que criou
+            if solicitacao.solicitante == request.user:
+                pode_cancelar = True
+
+    if not pode_cancelar:
+        messages.error(request, "Você não tem permissão.")
+        return redirect("gestor_solicitacoes")
+
+    # REGRA DE NEGÓCIO
+    if solicitacao.status not in ["PENDENTE", "AGUARDANDO_SAIDA_PORTARIA"]:
+        messages.error(request, "Não é possível cancelar após a saída.")
+        return redirect("gestor_solicitacoes")
+
+    #  NÃO pode cancelar se já tem movimentação
+    existe_mov = Movimentacao.objects.filter(
+        solicitacao=solicitacao,
+        data_retorno__isnull=True
+    ).exists()
+
+    if existe_mov:
+        messages.error(request, "Veículo já saiu, não pode cancelar.")
+        return redirect("gestor_solicitacoes")
 
     if request.method == "POST":
 
         motivo = request.POST.get("motivo_cancelamento", "").strip()
 
         if not motivo:
-            messages.error(request, "Informe o motivo do cancelamento.")
-            return redirect("minhas_solicitacoes")
+            messages.error(request, "Informe o motivo.")
+            return redirect("gestor_solicitacoes")
 
-        #  CANCELAMENTO
         solicitacao.status = "CANCELADA"
         solicitacao.motivo_cancelamento = motivo
         solicitacao.data_cancelamento = timezone.now()
 
-        #  AUDITORIA (QUEM CANCELOU)
         solicitacao.cancelado_por = request.user
-
-        perfil = getattr(request.user, "perfilusuario", None)
-
-        if perfil:
-            if perfil.nome_exibicao:
-                solicitacao.cancelado_por_nome = perfil.nome_exibicao
-            elif perfil.nome:
-                solicitacao.cancelado_por_nome = perfil.nome
-            else:
-                username = request.user.username.split("@")[0]
-                solicitacao.cancelado_por_nome = username.replace(".", " ").title()
-        else:
-            solicitacao.cancelado_por_nome = (
-                request.user.get_full_name()
-                or request.user.username
-            )
+        solicitacao.cancelado_por_nome = request.user.get_full_name() or request.user.username
 
         solicitacao.save()
 
-        #  LIBERAÇÃO SEGURA DO VEÍCULO
-        if solicitacao.veiculo_id:
+        #  liberar veículo
+        Veiculo.objects.filter(id=solicitacao.veiculo_id).update(status="Disponivel")
 
-            existe_outra = SolicitacaoVeiculo.objects.filter(
-                veiculo_id=solicitacao.veiculo_id,
-                status__in=[
-                    "PENDENTE",
-                    "AGUARDANDO_SAIDA_PORTARIA",
-                    "EM_TRANSITO"
-                ]
-            ).exclude(id=solicitacao.id).exists()
+        messages.success(request, "Solicitação cancelada.")
+        return redirect("gestor_solicitacoes")
 
-            if not existe_outra:
-                Veiculo.objects.filter(
-                    id=solicitacao.veiculo_id
-                ).update(status="Disponivel")
-
-        messages.success(
-            request,
-            "Solicitação cancelada com sucesso."
-        )
-
-        return redirect("minhas_solicitacoes")
-
-    return redirect("minhas_solicitacoes")
+    return redirect("gestor_solicitacoes")
 
 
 
@@ -1361,28 +1375,46 @@ def exportar_excel_solicitacoes(request):
 # EDITAR SOLICITAÇÃO (APENAS SE ESTIVER PENDENTE E FOR O SOLICITANTE)
 @login_required
 def editar_solicitacao(request, pk):
-    solicitacao = get_object_or_404(
-        SolicitacaoVeiculo,
-        pk=pk,
-        solicitante=request.user
-    )
+    solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=pk)
 
-    if solicitacao.status != "PENDENTE":
-        messages.error(
-            request,
-            "Esta solicitação não pode mais ser editada."
-        )
-        return redirect("minhas_solicitacoes")
+    perfil = getattr(request.user, "perfilusuario", None)
+
+    #  PERMISSÃO
+    pode_editar = False
+
+    if perfil:
+        if perfil.nivel == "adm":
+            pode_editar = True
+
+        elif perfil.nivel == "gestor":
+            if solicitacao.contrato == perfil.contrato:
+                pode_editar = True
+
+        elif perfil.nivel == "basico":
+            if (
+                solicitacao.solicitante == request.user and
+                solicitacao.status == "PENDENTE"
+            ):
+                pode_editar = True
+
+    if not pode_editar:
+        messages.error(request, "Você não tem permissão.")
+        return redirect("gestor_solicitacoes")
+
+    #  REGRA DE NEGÓCIO
+    if solicitacao.status not in ["PENDENTE", "AGUARDANDO_SAIDA_PORTARIA"]:
+        messages.error(request, "Não é possível editar após a saída.")
+        return redirect("gestor_solicitacoes")
 
     contrato = solicitacao.contrato
     motoristas = Motorista.objects.filter(contrato=contrato)
 
     if request.method == "POST":
+
         motorista_id = request.POST.get("motorista")
         destino = request.POST.get("destino")
         justificativa = request.POST.get("justificativa", "")
 
-        # AJustar previsão de retorno (que agora é um campo datetime, não date)
         previsao_retorno_str = request.POST.get("previsao_retorno")
         previsao_retorno = None
 
@@ -1393,12 +1425,23 @@ def editar_solicitacao(request, pk):
                     "%Y-%m-%dT%H:%M"
                 )
                 previsao_retorno = timezone.make_aware(previsao_retorno)
-            except ValueError:
-                previsao_retorno = None
+            except:
+                pass
 
-        if not motorista_id:
-            messages.error(request, "Selecione um motorista.")
-            return redirect("editar_solicitacao", pk=pk)
+
+        previsao_saida_str = request.POST.get("previsao_saida")
+
+        if previsao_saida_str:
+            try:
+                previsao_saida = datetime.strptime(
+                    previsao_saida_str,
+                    "%Y-%m-%dT%H:%M"
+                )
+                previsao_saida = timezone.make_aware(previsao_saida)
+            except: 
+                previsao_saida = None
+
+        solicitacao.previsao_saida = previsao_saida    
 
         motorista = get_object_or_404(
             Motorista,
@@ -1410,10 +1453,11 @@ def editar_solicitacao(request, pk):
         solicitacao.destino = destino
         solicitacao.justificativa = justificativa
         solicitacao.previsao_retorno = previsao_retorno
+
         solicitacao.save()
 
-        messages.success(request, "Solicitação atualizada com sucesso.")
-        return redirect("minhas_solicitacoes")
+        messages.success(request, "Solicitação atualizada.")
+        return redirect("gestor_solicitacoes")
 
     return render(request, "solicitantes/solicitar.html", {
         "veiculo": solicitacao.veiculo,

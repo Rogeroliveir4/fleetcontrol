@@ -19,7 +19,7 @@ from PIL import Image
 from django.core.files.uploadedfile import UploadedFile
 import io
 import uuid
-
+from django.db import transaction
 
 
 # FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
@@ -103,13 +103,15 @@ def lista_movimentacoes(request):
     inicio = request.GET.get("inicio")
     fim = request.GET.get("fim")
 
-    # Query base
+    # Query base otimizada com select_related para evitar N+1
     movs = (
         Movimentacao.objects
         .select_related("veiculo", "motorista", "solicitacao", "solicitacao__contrato")
         .order_by("-data_saida")
     )
 
+    # FILTRO INICIAL PARA EXIBIR APENAS MOVIMENTAÇÕES COM DATA DE SAÍDA (EVITAR RASCUNHOS)
+    movs = movs.filter(data_saida__isnull=False)
 
     #  FILTRO AUTOMÁTICO POR CONTRATO (GESTOR)
     perfil = getattr(request.user, "perfilusuario", None)
@@ -139,7 +141,7 @@ def lista_movimentacoes(request):
                 Q(motorista__nome__icontains=search) |
                 Q(veiculo__tag_interna__icontains=search)
         )
-
+    # Filtro de status
     if status == "transito":
         movs = movs.filter(data_retorno__isnull=True)
     elif status == "finalizada":
@@ -624,87 +626,88 @@ def compress_image(image_file, quality=65, max_width=1280):
         print(f"Erro compressão: {e}")
         return image_file
 
+
+
 # REGISTRA A SAÍDA - PORTARIA
 @login_required
 def portaria_registrar_saida(request, solicitacao_id):
-    solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
 
-    contrato = None
+    # LOCK OPTIMISTA PARA EVITAR CONCORRÊNCIA (DUAS PESSOAS REGISTRANDO SAÍDA AO MESMO TEMPO)
+    with transaction.atomic():
 
-    if solicitacao and solicitacao.contrato:
-        contrato = solicitacao.contrato
-    elif solicitacao.veiculo and solicitacao.veiculo.contrato:
-        contrato = solicitacao.veiculo.contrato
-    elif request.user.perfilusuario.contrato:
-        contrato = request.user.perfilusuario.contrato
+        solicitacao = (
+            SolicitacaoVeiculo.objects
+            .select_for_update()
+            .get(id=solicitacao_id)
+        )
 
-    # Se movimentação ainda não existe, criar
-    mov, created = Movimentacao.objects.get_or_create(
-        solicitacao=solicitacao,
-        defaults={
-            "veiculo": solicitacao.veiculo,
-            "motorista": solicitacao.motorista,
-            "destino": solicitacao.destino,
-            "status": "aguardando_saida_portaria",
-            "origem": solicitacao.origem,
-            "contrato": contrato,
-        }
-    )
+        #  SE A SOLICITAÇÃO ESTIVER EM STATUS INCORRETO, NÃO DEIXA AVANÇAR
+        if solicitacao.status != "AGUARDANDO_SAIDA_PORTARIA":
+            messages.error(request, "Essa solicitação não está disponível para saída.")
+            return redirect("listar_saidas_portaria")
 
-    # Garantir que a movimentação tenha o contrato definido
-    if not mov.contrato:
-        mov.contrato = contrato
-        mov.save(update_fields=["contrato"])
+        #  Verifica duplicidade (DEPOIS do lock!)
+        mov_existente = Movimentacao.objects.filter(
+            solicitacao=solicitacao,
+            data_retorno__isnull=True
+        ).exists()
 
-    
-    if request.method == "POST":
-        mov.km_saida = mov.veiculo.km_atual
-        mov.data_saida = timezone.now()
-        mov.status = "em_andamento"
+        #  Se já existir uma movimentação em andamento para essa solicitação, não permite criar outra
+        if mov_existente:
+            messages.warning(request, "Essa saída já foi registrada.")
+            return redirect("listar_saidas_portaria")
 
-        if solicitacao:
-            solicitacao.status = "EM_ANDAMENTO"
-            solicitacao.save()
-        
-        # Observações da portaria
-        mov.observacao_portaria = request.POST.get("observacao_portaria", "")
-        mov.observacao = request.POST.get("observacao", "")
-        
-        # Fotos com compressão
-        foto_geral = request.FILES.get("foto_portaria_geral")
-        if foto_geral:
-            mov.foto_portaria_geral = compress_image(foto_geral)
-        
-        foto_avaria = request.FILES.get("foto_portaria_avaria")
-        if foto_avaria:
-            mov.foto_portaria_avaria = compress_image(foto_avaria)
-        
-        foto_painel = request.FILES.get("foto_portaria_painel")
-        if foto_painel:
-            mov.foto_portaria_painel = compress_image(foto_painel)
-        
-        foto_equipamento = request.FILES.get("foto_portaria_equipamento")
-        if foto_equipamento:
-            mov.foto_portaria_equipamento = compress_image(foto_equipamento)
-        
-        # Caçamba e Prancha
-        mov.com_cacamba = request.POST.get("com_cacamba") == "true" or request.POST.get("com_cacamba") == "on"
-        mov.com_prancha = request.POST.get("com_prancha") == "true" or request.POST.get("com_prancha") == "on"
-        # Porteiro que liberou
-        mov.porteiro_saida = request.user
-        mov.porteiro_saida_nome = request.user.get_full_name() or request.user.username
-        mov.save()
+        if request.method == "POST":
 
+            contrato = (
+                solicitacao.contrato or
+                getattr(solicitacao.veiculo, "contrato", None) or
+                getattr(request.user.perfilusuario, "contrato", None)
+            )
 
-        messages.success(request, "Saída registrada com sucesso.")
-        return redirect("/movimentacoes/?status=transito")
+            mov = Movimentacao.objects.create(
+                solicitacao=solicitacao,
+                veiculo=solicitacao.veiculo,
+                motorista=solicitacao.motorista,
+                destino=solicitacao.destino,
+                contrato=contrato,
+                km_saida=solicitacao.veiculo.km_atual,
+                data_saida=timezone.now(),
+                status="em_andamento",
+                porteiro_saida=request.user,
+                porteiro_saida_nome=request.user.get_full_name() or request.user.username,
+                observacao_portaria=request.POST.get("observacao_portaria", ""),
+                observacao=request.POST.get("observacao", ""),
+                com_cacamba=request.POST.get("com_cacamba") in ["true", "on"],
+                com_prancha=request.POST.get("com_prancha") in ["true", "on"],
+            )
+
+            # Fotos
+            if request.FILES.get("foto_portaria_geral"):
+                mov.foto_portaria_geral = compress_image(request.FILES["foto_portaria_geral"])
+
+            if request.FILES.get("foto_portaria_avaria"):
+                mov.foto_portaria_avaria = compress_image(request.FILES["foto_portaria_avaria"])
+
+            if request.FILES.get("foto_portaria_painel"):
+                mov.foto_portaria_painel = compress_image(request.FILES["foto_portaria_painel"])
+
+            if request.FILES.get("foto_portaria_equipamento"):
+                mov.foto_portaria_equipamento = compress_image(request.FILES["foto_portaria_equipamento"])
+
+            mov.save()
+
+            # Atualiza solicitação
+            solicitacao.status = "EM_TRANSITO"
+            solicitacao.data_saida = mov.data_saida
+            solicitacao.save(update_fields=["status", "data_saida"])
+
+            messages.success(request, "Saída registrada com sucesso.")
+            return redirect("/movimentacoes/?status=transito")
 
     return render(request, "movimentacoes/portaria/saida_registro.html", {
-        "mov": mov,
-        "veiculo": mov.veiculo,
+        "solicitacao": solicitacao,
     })
-
-
 
 
 # REGISTRAR RETORNO (PORTARIA)
@@ -915,7 +918,7 @@ def processar_imagem(file):
 
     img = compress_image(file)
 
-    # 🔥 nome único
+    #  nome único
     nome = f"{uuid.uuid4().hex}.jpg"
     img.name = nome
 
