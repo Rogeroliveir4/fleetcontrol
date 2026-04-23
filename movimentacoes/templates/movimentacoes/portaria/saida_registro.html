@@ -6,60 +6,58 @@
 
 {% block content %}
 
-<div class="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+<div class="max-w-4xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
 
-    <!-- CABEÇALHO COMPACTO -->
-    <div class="bg-gradient-to-r from-[#00594C] to-emerald-700 text-white rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 shadow">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-truck text-white text-base sm:text-lg"></i>
+    <!-- CABEÇALHO -->
+    <div class="bg-gradient-to-r from-[#00594C] to-emerald-700 text-white rounded-lg sm:rounded-xl p-3 sm:p-5 mb-3 sm:mb-6 shadow sm:shadow-lg">
+        <div class="flex items-center gap-2 sm:gap-4">
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-truck-arrow-right text-white text-lg sm:text-xl"></i>
             </div>
             <div class="flex-1 min-w-0">
-                <h1 class="text-lg sm:text-xl font-bold truncate">Registrar Saída do Veículo</h1>
+                <h1 class="text-base sm:text-xl font-bold truncate">Registrar Saída do Veículo</h1>
                 
-                <!-- INFORMAÇÕES PRINCIPAIS -->
-                <div class="mt-2 grid grid-cols-3 gap-2">
-                    <div class="bg-white/10 rounded p-2">
-                        <div class="flex items-center gap-1 mb-1">
-                            <i class="fa-solid fa-tag text-white/80 text-xs"></i>
-                            <span class="font-medium text-xs">TAG</span>
+                <div class="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
+                    <div class="bg-white/15 rounded-lg p-2 sm:p-2.5">
+                        <div class="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                            <i class="fa-solid fa-tag text-white/80 text-[10px] sm:text-xs"></i>
+                            <span class="font-medium text-[10px] sm:text-xs">TAG</span>
                         </div>
-                        <div class="text-sm font-bold truncate">{{ mov.veiculo.tag_interna }}</div>
+                        <div class="text-sm sm:text-base font-bold truncate">{{ solicitacao.veiculo.tag_interna }}</div>
                     </div>
 
-                    <div class="bg-white/10 rounded p-2">
-                        <div class="flex items-center gap-1 mb-1">
-                            <i class="fa-solid fa-car text-white/80 text-xs"></i>
-                            <span class="font-medium text-xs">Placa</span>
+                    <div class="bg-white/15 rounded-lg p-2 sm:p-2.5">
+                        <div class="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                            <i class="fa-solid fa-car text-white/80 text-[10px] sm:text-xs"></i>
+                            <span class="font-medium text-[10px] sm:text-xs">Placa</span>
                         </div>
-                        <div class="text-sm font-bold truncate tracking-wide">{{ mov.veiculo.placa }}</div>
+                        <div class="text-sm sm:text-base font-bold tracking-wider truncate">{{ solicitacao.veiculo.placa }}</div>
                     </div>
                     
-                    <div class="bg-white/10 rounded p-2">
-                        <div class="flex items-center gap-1 mb-1">
-                            <i class="fa-solid fa-wrench text-white/80 text-xs"></i>
-                            <span class="font-medium text-xs">Veículo</span>
+                    <div class="bg-white/15 rounded-lg p-2 sm:p-2.5">
+                        <div class="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                            <i class="fa-solid fa-wrench text-white/80 text-[10px] sm:text-xs"></i>
+                            <span class="font-medium text-[10px] sm:text-xs">Veículo</span>
                         </div>
-                        <div class="text-xs truncate">{{ mov.veiculo.marca }} {{ mov.veiculo.modelo|truncatechars:20 }}</div>
+                        <div class="text-[11px] sm:text-sm truncate">{{ solicitacao.veiculo.marca }} {{ solicitacao.veiculo.modelo|truncatechars:20 }}</div>
                     </div>
                 </div>
                 
-                <!-- MOTORISTA E DESTINO -->
-                <div class="mt-3 p-2 bg-white/10 rounded">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div class="mt-2 sm:mt-3 p-2 sm:p-3 bg-white/15 rounded-lg">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-xs sm:text-sm truncate">
-                                <i class="fa-solid fa-user mr-1 text-xs"></i>
-                                {{ mov.motorista.nome|truncatechars:25 }}
+                            <p class="font-medium text-xs sm:text-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-user text-white/80 text-[10px] sm:text-xs"></i>
+                                {{ solicitacao.motorista.nome|truncatechars:25 }}
                             </p>
-                            <p class="text-xs opacity-90 mt-1 truncate">
-                                <i class="fa-solid fa-location-dot mr-1 text-xs"></i>
-                                {{ mov.destino|truncatechars:30 }}
+                            <p class="text-[10px] sm:text-xs opacity-90 mt-0.5 sm:mt-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-location-dot text-white/80"></i>
+                                {{ solicitacao.destino|truncatechars:35 }}
                             </p>
                         </div>
-                        <div class="text-[10px] sm:text-xs bg-white/20 px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 mt-1 sm:mt-0 flex-shrink-0">
+                        <div class="flex items-center gap-1.5 bg-white/20 px-2 py-1 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                             <i class="fa-solid fa-clock text-[9px]"></i>
-                            {{ mov.data_aprovacao|date:"d/m H:i" }}
+                            {{ solicitacao.data_aprovacao|date:"d/m H:i" }}
                         </div>
                     </div>
                 </div>
@@ -69,263 +67,288 @@
 
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data" id="saidaForm"
-        class="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-4 sm:p-6 space-y-6 sm:space-y-8">
+        class="bg-white dark:bg-gray-800 shadow-sm sm:shadow-xl rounded-lg sm:rounded-xl p-3 sm:p-6 space-y-4 sm:space-y-6">
         {% csrf_token %}
 
-        <!-- SEÇÃO 1: QUILOMETRAGEM -->
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
-            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-gauge-high text-[#00594C] text-lg"></i>
-                Quilometragem Atual
-            </h2>
-            
-            <div class="relative">
-                <div class="flex items-center gap-3">
-                    <div class="flex-1">
-                        <input type="text" 
-                            value="{{ mov.veiculo.km_atual|floatformat:0 }}"  
-                            disabled
-                            class="w-full p-3 sm:p-4 rounded-lg bg-green-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-xl sm:text-2xl font-bold text-gray-800 dark:text-white text-center">
+        <!-- KM ATUAL -->
+        <div class="bg-green-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-3 sm:p-5 border border-green-200 dark:border-gray-600">
+            <div class="flex items-center justify-between sm:justify-start sm:gap-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#00594C]/10 flex items-center justify-center">
+                        <i class="fa-solid fa-gauge-high text-[#00594C] text-sm sm:text-lg"></i>
                     </div>
-                    <div class="text-lg sm:text-xl font-bold text-gray-500">
-                        km
-                    </div>
+                    <span class="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-200">KM Atual</span>
                 </div>
-                <p class="text-xs text-gray-500 mt-2 text-center sm:text-left">
-                    <i class="fa-solid fa-info-circle mr-1"></i>
-                    Quilometragem atual do sistema
-                </p>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="text-xl sm:text-2xl font-bold text-[#00594C] dark:text-emerald-400">{{ solicitacao.veiculo.km_atual|floatformat:0 }}</span>
+                    <span class="text-xs sm:text-sm text-gray-500">km</span>
+                </div>
             </div>
+            <p class="hidden sm:block text-xs text-gray-500 mt-1.5">Quilometragem do sistema — registrada como KM de saída</p>
         </div>
 
-        <!-- SEÇÃO 2: EQUIPAMENTOS ESPECIAIS -->
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                    <i class="fa-solid fa-truck-loading text-[#00594C] text-lg"></i>
-                    Equipamentos Especiais
-                </h2>
-                <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 sm:px-3 py-1 rounded-full">
-                    Opcional
-                </span>
-            </div>
-
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
-                Marque se o veículo está transportando equipamentos especiais. Os detalhes devem ser descritos no campo de observações.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- CAÇAMBA -->
-                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                            <i class="fa-solid fa-dumpster text-amber-600 dark:text-amber-400"></i>
-                        </div>
-                        <div class="flex-1">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="com_cacamba" value="true" 
-                                       class="w-5 h-5 rounded border-gray-300 text-[#00594C] focus:ring-[#00594C]">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Veículo com caçamba carregada
-                                </span>
-                            </label>
-                            <p class="text-xs text-gray-500 mt-1 ml-8">
-                                Descreva o material nas observações
-                            </p>
-                        </div>
-                    </div>
+        <!-- EQUIPAMENTOS E CARGA -->
+        <div class="sm:border sm:border-gray-200 dark:sm:border-gray-700 sm:rounded-xl sm:p-5">
+            <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                    <i class="fa-solid fa-boxes-stacked text-amber-600 dark:text-amber-400 text-sm sm:text-lg"></i>
                 </div>
+                <span class="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-200">Equipamentos & Carga</span>
+                <span class="hidden sm:inline text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 px-2 py-0.5 rounded-full">Opcional</span>
+            </div>
+            
+            <!-- GRID: EQUIPAMENTOS (2 COLUNAS) + ITENS NO VEÍCULO (2 COLUNAS) -->
+            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                <!-- CAÇAMBA -->
+                <label class="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3.5 border-2 border-gray-200 dark:border-gray-600 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 dark:has-[:checked]:bg-amber-900/20 transition-all">
+                    <input type="checkbox" name="com_cacamba" value="true" class="absolute opacity-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <i class="fa-solid fa-dumpster text-amber-600 text-base sm:text-lg flex-shrink-0"></i>
+                        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Caçamba carregada</span>
+                    </div>
+                </label>
 
                 <!-- PRANCHA -->
-                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                            <i class="fa-solid fa-truck-ramp-box text-blue-600 dark:text-blue-400"></i>
-                        </div>
-                        <div class="flex-1">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="com_prancha" value="true" 
-                                       class="w-5 h-5 rounded border-gray-300 text-[#00594C] focus:ring-[#00594C]">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Veículo com máquina na prancha
-                                </span>
-                            </label>
-                            <p class="text-xs text-gray-500 mt-1 ml-8">
-                                Descreva a máquina nas observações
-                            </p>
-                        </div>
+                <label class="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3.5 border-2 border-gray-200 dark:border-gray-600 cursor-pointer hover:border-blue-400 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 dark:has-[:checked]:bg-blue-900/20 transition-all">
+                    <input type="checkbox" name="com_prancha" value="true" class="absolute opacity-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <i class="fa-solid fa-truck-ramp-box text-blue-600 text-base sm:text-lg flex-shrink-0"></i>
+                        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Máquina na prancha</span>
                     </div>
-                </div>
+                </label>
+
+                <!-- MALAS / MALETAS -->
+                <label class="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3.5 border-2 border-gray-200 dark:border-gray-600 cursor-pointer hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 dark:has-[:checked]:bg-purple-900/20 transition-all">
+                    <input type="checkbox" name="com_malas" value="true" class="absolute opacity-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        
+                        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Malas / Maletas</span>
+                    </div>
+                </label>
+
+                <!-- OUTROS ITENS -->
+                <label class="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3.5 border-2 border-gray-200 dark:border-gray-600 cursor-pointer hover:border-teal-400 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50 dark:has-[:checked]:bg-teal-900/20 transition-all">
+                    <input type="checkbox" name="com_outros_itens" value="true" class="absolute opacity-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <i class="fa-solid fa-box-open text-teal-600 text-base sm:text-lg flex-shrink-0"></i>
+                        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Outros itens</span>
+                    </div>
+                </label>
             </div>
-
-            <!-- FOTO DO EQUIPAMENTO -->
-            <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
-                <div class="flex items-center justify-between mb-3">
-                    <label class="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                        <i class="fa-solid fa-camera text-gray-500"></i>
-                        Foto do Equipamento
-                    </label>
-                    <span class="text-xs text-gray-500">Opcional</span>
-                </div>
-                <div class="relative">
-                    <input type="file" 
-                        name="foto_portaria_equipamento"
-                        accept="image/*" 
-                        capture="environment"
-                        class="hidden" 
-                        id="fotoEquipamento">
-                    <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                         onclick="document.getElementById('fotoEquipamento').click()">
-                        <i class="fa-solid fa-camera text-3xl text-gray-400 mb-2"></i>
-                        <span class="font-medium text-gray-700 dark:text-gray-300 text-center text-sm sm:text-base">
-                            Clique para adicionar foto
-                        </span>
-                        <span class="text-xs text-gray-500 mt-1 text-center">
-                            Foto da caçamba ou máquina transportada
-                        </span>
-                    </div>
-                    <div id="previewEquipamento" class="mt-3 hidden">
-                        <img src="" alt="Preview" class="w-full max-h-48 object-cover rounded-lg">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SEÇÃO 3: REGISTRO FOTOGRÁFICO DO VEÍCULO -->
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                    <i class="fa-solid fa-images text-[#00594C] text-lg"></i>
-                    Registro Fotográfico do Veículo
-                </h2>
-                <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 sm:px-3 py-1 rounded-full">
-                    Opcional
-                </span>
-            </div>
-
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
-                Tire fotos do estado do veículo na saída. Em dispositivos móveis, será aberta a câmera automaticamente.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Foto Geral -->
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-3 sm:p-4 rounded-xl">
-                    <label class="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-2">
-                        📸 Foto do Veículo
-                    </label>
-                    <p class="text-xs text-gray-500 mb-2">Vista externa do veículo</p>
-                    <div class="relative">
-                        <input type="file" name="foto_portaria_geral" accept="image/*" capture="environment"
-                               class="hidden" id="fotoGeral">
-                        <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-3 sm:p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors h-32"
-                             onclick="document.getElementById('fotoGeral').click()">
-                            <i class="fa-solid fa-camera text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Adicionar Foto</span>
-                        </div>
-                        <div id="previewGeral" class="mt-3 hidden">
-                            <img src="" alt="Preview" class="w-full max-h-32 object-cover rounded-lg">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Foto do Painel -->
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-3 sm:p-4 rounded-xl">
-                    <label class="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-2">
-                        🎛️ Painel / Odômetro
-                    </label>
-                    <p class="text-xs text-gray-500 mb-2">Foto do painel com quilometragem</p>
-                    <div class="relative">
-                        <input type="file" name="foto_portaria_painel" accept="image/*" capture="environment"
-                               class="hidden" id="fotoPainel">
-                        <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-3 sm:p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors h-32"
-                             onclick="document.getElementById('fotoPainel').click()">
-                            <i class="fa-solid fa-gauge text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Adicionar Foto</span>
-                        </div>
-                        <div id="previewPainel" class="mt-3 hidden">
-                            <img src="" alt="Preview" class="w-full max-h-32 object-cover rounded-lg">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Foto de Avaria -->
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-3 sm:p-4 rounded-xl">
-                    <label class="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-2">
-                        ⚠️ Avarias
-                    </label>
-                    <p class="text-xs text-gray-500 mb-2">Danos existentes no veículo</p>
-                    <div class="relative">
-                        <input type="file" name="foto_portaria_avaria" accept="image/*" capture="environment"
-                               class="hidden" id="fotoAvaria">
-                        <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-3 sm:p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors h-32"
-                             onclick="document.getElementById('fotoAvaria').click()">
-                            <i class="fa-solid fa-triangle-exclamation text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Adicionar Foto</span>
-                        </div>
-                        <div id="previewAvaria" class="mt-3 hidden">
-                            <img src="" alt="Preview" class="w-full max-h-32 object-cover rounded-lg">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="desktopMessage" class="hidden mt-4 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
-                <p class="text-xs sm:text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
-                    <i class="fa-solid fa-lightbulb text-blue-500 mt-0.5"></i>
-                    <span><strong>Em computadores:</strong> Você pode selecionar fotos já existentes.</span>
-                </p>
-            </div>
-        </div>
-
-        <!-- SEÇÃO 4: OBSERVAÇÕES -->
-        <div>
-            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-clipboard text-[#00594C] text-lg"></i>
-                Observações da Portaria
-            </h2>
             
-            <div class="relative">
-                <textarea name="observacao" rows="4" maxlength="500"
-                          class="w-full p-3 sm:p-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:border-[#00594C] focus:ring-2 focus:ring-[#00594C]/20 resize-none text-sm sm:text-base"
-                          placeholder="Descreva aqui: material transportado na caçamba, tipo de máquina na prancha, condições do veículo, documentos, avarias, etc..."></textarea>
-                <div class="text-xs text-gray-500 mt-1 flex justify-between">
-                    <span><i class="fa-solid fa-info-circle mr-1"></i> Use para descrever equipamentos e observações relevantes</span>
-                    <span id="charCounter" class="font-medium">0/500</span>
+            <p class="text-[10px] sm:text-xs text-gray-500 mt-2 sm:mt-3 flex items-center gap-1">
+                <i class="fa-solid fa-circle-info text-[9px]"></i>
+                <span>Marque os equipamentos e itens que estão saindo no veículo</span>
+            </p>
+        </div>
+
+        <!-- FOTOS -->
+        <div class="sm:border sm:border-gray-200 dark:sm:border-gray-700 sm:rounded-xl sm:p-5">
+            <div class="flex items-center justify-between mb-2 sm:mb-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <i class="fa-solid fa-camera text-[#00594C] text-sm sm:text-lg"></i>
+                    </div>
+                    <span class="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-200">Registro Fotográfico</span>
                 </div>
+                <span class="hidden sm:inline text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 px-2 py-0.5 rounded-full">Opcional</span>
+            </div>
+            
+            <div class="space-y-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
+                
+                <!-- HODÔMETRO -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-blue-200 dark:border-blue-700 sm:col-span-2">
+                    <input type="file" name="foto_portaria_painel" accept="image/*" capture="environment" class="hidden" id="fotoPainel">
+                    
+                    <div onclick="document.getElementById('fotoPainel').click()" class="cursor-pointer">
+                        <div id="previewPainelContainer" class="hidden mb-2 sm:mb-3">
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img id="previewPainelImg" src="" alt="Hodômetro" class="w-full h-40 sm:h-52 object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removerFoto('fotoPainel', 'previewPainelContainer', 'previewPainelPlaceholder')"
+                                    class="absolute top-1.5 right-1.5 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow text-xs hover:bg-red-600 transition-colors">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="previewPainelPlaceholder" class="flex items-center gap-2 sm:gap-3">
+                            <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge text-blue-600 text-sm sm:text-lg"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Foto do Hodômetro</p>
+                                <p class="text-[10px] sm:text-xs text-gray-500">Registro do painel com quilometragem</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs sm:hidden"></i>
+                            <span class="hidden sm:inline text-xs text-blue-600 font-medium">Tirar foto →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GERAL -->
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-gray-200 dark:border-gray-600 sm:hover:shadow-md sm:transition-shadow">
+                    <input type="file" name="foto_portaria_geral" accept="image/*" capture="environment" class="hidden" id="fotoGeral">
+                    
+                    <div onclick="document.getElementById('fotoGeral').click()" class="cursor-pointer">
+                        <div id="previewGeralContainer" class="hidden mb-2 sm:mb-3">
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img id="previewGeralImg" src="" alt="Veículo" class="w-full h-40 sm:h-40 object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removerFoto('fotoGeral', 'previewGeralContainer', 'previewGeralPlaceholder')"
+                                    class="absolute top-1.5 right-1.5 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow text-xs hover:bg-red-600 transition-colors">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="previewGeralPlaceholder" class="flex items-center gap-2 sm:gap-3">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-truck text-gray-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Foto do Veículo</p>
+                                <p class="text-[10px] sm:text-xs text-gray-500">Vista externa</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs sm:hidden"></i>
+                            <span class="hidden sm:inline text-xs text-blue-600 font-medium">Capturar →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AVARIA -->
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-gray-200 dark:border-gray-600 sm:hover:shadow-md sm:transition-shadow">
+                    <input type="file" name="foto_portaria_avaria" accept="image/*" capture="environment" class="hidden" id="fotoAvaria">
+                    
+                    <div onclick="document.getElementById('fotoAvaria').click()" class="cursor-pointer">
+                        <div id="previewAvariaContainer" class="hidden mb-2 sm:mb-3">
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img id="previewAvariaImg" src="" alt="Avaria" class="w-full h-40 sm:h-40 object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removerFoto('fotoAvaria', 'previewAvariaContainer', 'previewAvariaPlaceholder')"
+                                    class="absolute top-1.5 right-1.5 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow text-xs hover:bg-red-600 transition-colors">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="previewAvariaPlaceholder" class="flex items-center gap-2 sm:gap-3">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-triangle-exclamation text-gray-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Foto de Avarias</p>
+                                <p class="text-[10px] sm:text-xs text-gray-500">Danos existentes</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs sm:hidden"></i>
+                            <span class="hidden sm:inline text-xs text-blue-600 font-medium">Capturar →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EQUIPAMENTO -->
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-gray-200 dark:border-gray-600 sm:hover:shadow-md sm:transition-shadow">
+                    <input type="file" name="foto_portaria_equipamento" accept="image/*" capture="environment" class="hidden" id="fotoEquipamento">
+                    
+                    <div onclick="document.getElementById('fotoEquipamento').click()" class="cursor-pointer">
+                        <div id="previewEquipamentoContainer" class="hidden mb-2 sm:mb-3">
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img id="previewEquipamentoImg" src="" alt="Equipamento" class="w-full h-40 sm:h-40 object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removerFoto('fotoEquipamento', 'previewEquipamentoContainer', 'previewEquipamentoPlaceholder')"
+                                    class="absolute top-1.5 right-1.5 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow text-xs hover:bg-red-600 transition-colors">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="previewEquipamentoPlaceholder" class="flex items-center gap-2 sm:gap-3">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-toolbox text-gray-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Foto Equipamento</p>
+                                <p class="text-[10px] sm:text-xs text-gray-500">Caçamba/prancha</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs sm:hidden"></i>
+                            <span class="hidden sm:inline text-xs text-blue-600 font-medium">Capturar →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🆕 INTERIOR / PORTA-MALAS -->
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-gray-200 dark:border-gray-600 sm:col-span-2 sm:hover:shadow-md sm:transition-shadow">
+                    <input type="file" name="foto_portaria_interior" accept="image/*" capture="environment" class="hidden" id="fotoInterior">
+                    
+                    <div onclick="document.getElementById('fotoInterior').click()" class="cursor-pointer">
+                        <div id="previewInteriorContainer" class="hidden mb-2 sm:mb-3">
+                            <div class="relative rounded-lg overflow-hidden">
+                                <img id="previewInteriorImg" src="" alt="Interior/Porta-malas" class="w-full h-40 sm:h-52 object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removerFoto('fotoInterior', 'previewInteriorContainer', 'previewInteriorPlaceholder')"
+                                    class="absolute top-1.5 right-1.5 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow text-xs hover:bg-red-600 transition-colors">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="previewInteriorPlaceholder" class="flex items-center gap-2 sm:gap-3">
+                            <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-car-side text-indigo-600 text-sm sm:text-lg"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Interior / Porta-malas</p>
+                                <p class="text-[10px] sm:text-xs text-gray-500">Registro de malas, maletas e itens no interior do veículo</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs sm:hidden"></i>
+                            <span class="hidden sm:inline text-xs text-blue-600 font-medium">Tirar foto →</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+        <div class="sm:border sm:border-gray-200 dark:sm:border-gray-700 sm:rounded-xl sm:p-5">
+            <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <i class="fa-solid fa-clipboard-list text-purple-600 text-sm sm:text-lg"></i>
+                </div>
+                <span class="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-200">Observações</span>
+            </div>
+            <textarea name="observacao" rows="3" maxlength="500"
+                class="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:border-[#00594C] focus:ring-1 sm:focus:ring-2 focus:ring-[#00594C]/20 resize-none text-sm transition-colors"
+                placeholder="Descreva: materiais na caçamba, máquinas na prancha, quantidade de malas, itens transportados, condições do veículo, avarias..."></textarea>
+            <div class="flex items-center justify-between mt-1 sm:mt-2">
+                <span class="hidden sm:inline text-xs text-gray-500">Detalhe todos os itens e equipamentos que estão saindo no veículo</span>
+                <span id="charCounter" class="text-[10px] sm:text-xs text-gray-400 ml-auto">0/500</span>
             </div>
         </div>
 
         <!-- BOTÕES -->
-        <div class="pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
-                <a href="{% url 'listar_saidas_portaria' %}"
-                   class="px-4 py-2.5 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium flex items-center justify-center gap-2 transition-colors text-sm">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Voltar</span>
-                </a>
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3 pt-2 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+            <a href="{% url 'listar_saidas_portaria' %}"
+               class="px-3 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs sm:text-sm"></i>
+                <span>Voltar</span>
+            </a>
 
-                <button type="submit"
-                        class="px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#00594C] to-emerald-600 hover:from-[#00463C] hover:to-emerald-700 text-white font-semibold shadow hover:shadow-md transition-all flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-check-circle"></i>
-                    <span>Registrar Saída</span>
-                </button>
-            </div>
+            <button type="submit"
+                class="px-3 py-2.5 sm:px-8 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#00594C] to-emerald-600 hover:from-[#00463C] hover:to-emerald-700 text-white font-semibold text-sm shadow sm:shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2">
+                <i class="fa-solid fa-check-circle text-xs sm:text-sm"></i>
+                <span>Registrar Saída</span>
+            </button>
         </div>
     </form>
 
-    <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl sm:hidden">
-        <p class="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
-            <i class="fa-solid fa-mobile-screen-button text-amber-500 mt-0.5"></i>
-            <span><strong>Em dispositivos móveis:</strong> As fotos serão tiradas diretamente pela câmera.</span>
-        </p>
-    </div>
+    <p class="text-[10px] text-gray-400 text-center mt-2 px-2 sm:hidden">
+        <i class="fa-solid fa-mobile-screen-button mr-1"></i>
+        Toque nos cards para abrir a câmera e tirar fotos
+    </p>
+    
+    <p class="hidden sm:block text-xs text-gray-400 text-center mt-3">
+        <i class="fa-solid fa-desktop mr-1"></i>
+        Clique nos cards para selecionar fotos do dispositivo
+    </p>
 </div>
 
 <script>
-    function isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-
     async function compressImage(file, maxSizeMB = 5, maxWidthOrHeight = 1920) {
         if (file.size <= maxSizeMB * 1024 * 1024) return file;
 
@@ -348,9 +371,14 @@
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
-                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
                     canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                        resolve(new File([blob], file.name, { 
+                            type: 'image/jpeg', 
+                            lastModified: Date.now() 
+                        }));
                     }, 'image/jpeg', 0.7);
                 };
                 img.onerror = reject;
@@ -359,18 +387,19 @@
         });
     }
 
-    function setupPhotoPreview(inputId, previewId) {
+    function setupPhotoPreview(inputId, previewContainerId, previewImgId, placeholderId) {
         const input = document.getElementById(inputId);
-        const preview = document.getElementById(previewId);
-        if (!input || !preview) return;
+        const container = document.getElementById(previewContainerId);
+        const img = document.getElementById(previewImgId);
+        const placeholder = document.getElementById(placeholderId);
+        
+        if (!input || !container || !img || !placeholder) return;
 
         input.addEventListener('change', async function() {
-            if (!this.files || !this.files[0]) {
-                preview.classList.add('hidden');
-                return;
-            }
+            if (!this.files || !this.files[0]) return;
 
             let file = this.files[0];
+            
             if (file.size > 5 * 1024 * 1024) {
                 try {
                     file = await compressImage(file);
@@ -378,50 +407,78 @@
                     dt.items.add(file);
                     this.files = dt.files;
                 } catch (error) {
-                    console.error('Erro na compressão:', error);
+                    console.error('Erro compressão:', error);
                 }
             }
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = preview.querySelector('img');
-                if (img) {
-                    img.src = e.target.result;
-                    preview.classList.remove('hidden');
-                }
+                img.src = e.target.result;
+                container.classList.remove('hidden');
+                placeholder.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         });
     }
 
+    function removerFoto(inputId, previewContainerId, placeholderId) {
+        const input = document.getElementById(inputId);
+        const container = document.getElementById(previewContainerId);
+        const placeholder = document.getElementById(placeholderId);
+        
+        if (input && container && placeholder) {
+            input.value = '';
+            container.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        setupPhotoPreview('fotoGeral', 'previewGeral');
-        setupPhotoPreview('fotoPainel', 'previewPainel');
-        setupPhotoPreview('fotoAvaria', 'previewAvaria');
-        setupPhotoPreview('fotoEquipamento', 'previewEquipamento');
+        setupPhotoPreview('fotoPainel', 'previewPainelContainer', 'previewPainelImg', 'previewPainelPlaceholder');
+        setupPhotoPreview('fotoGeral', 'previewGeralContainer', 'previewGeralImg', 'previewGeralPlaceholder');
+        setupPhotoPreview('fotoAvaria', 'previewAvariaContainer', 'previewAvariaImg', 'previewAvariaPlaceholder');
+        setupPhotoPreview('fotoEquipamento', 'previewEquipamentoContainer', 'previewEquipamentoImg', 'previewEquipamentoPlaceholder');
+        setupPhotoPreview('fotoInterior', 'previewInteriorContainer', 'previewInteriorImg', 'previewInteriorPlaceholder');
 
         const textarea = document.querySelector('textarea[name="observacao"]');
         const counter = document.getElementById('charCounter');
         if (textarea && counter) {
-            textarea.addEventListener('input', () => counter.textContent = `${textarea.value.length}/500`);
-            counter.textContent = `${textarea.value.length}/500`;
+            textarea.addEventListener('input', () => {
+                counter.textContent = `${textarea.value.length}/500`;
+            });
         }
 
-        if (!isMobileDevice()) {
-            document.getElementById('desktopMessage')?.classList.remove('hidden');
-            document.querySelectorAll('input[type="file"]').forEach(input => input.removeAttribute('capture'));
+        const form = document.getElementById('saidaForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Registrando...</span>';
+                }
+            });
+        }
+
+        if (!/Mobi|Android/i.test(navigator.userAgent)) {
+            document.querySelectorAll('input[capture]').forEach(i => i.removeAttribute('capture'));
         }
     });
 </script>
 
 <style>
-    .foto-item { transition: all 0.2s ease; }
-    .foto-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-    input[type="checkbox"]:checked { background-color: #00594C; border-color: #00594C; }
+    input[type="checkbox"]:checked ~ div .fa-dumpster,
+    input[type="checkbox"]:checked ~ div .fa-truck-ramp-box,
+    input[type="checkbox"]:checked ~ div .fa-suitcase,
+    input[type="checkbox"]:checked ~ div .fa-box-open {
+        filter: brightness(1.2);
+    }
+    
     @media (max-width: 640px) {
         input, textarea, button, select { font-size: 16px !important; }
         button, a { min-height: 44px; }
     }
+    
+    .object-cover { object-fit: cover; }
 </style>
 
 {% endblock %}

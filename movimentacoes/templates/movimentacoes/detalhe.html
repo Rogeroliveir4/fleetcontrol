@@ -39,7 +39,7 @@
                         {% endif %}
                         
                         <div class="text-right">
-                            <p class="text-[10px] text-white/80">Solicitação  #{{ mov.solicitacao.id|stringformat:'06d' }}</p>
+                            <p class="text-[10px] text-white/80">Solicitação #{{ mov.solicitacao.id|stringformat:'06d' }}</p>
                             <p class="text-[10px] text-white/80">Movimentação #{{ mov.id|stringformat:'06d' }}</p>
                         </div>
                     </div>
@@ -90,12 +90,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- COLUNA ESQUERDA (2/3) -->
             <div class="lg:col-span-2 space-y-4">
-                <!-- SEÇÃO: SAÍDA DO PÁTIO -->
-                <div class="bg-white dark:bg-gray-900  rounded-lg border border-gray-200 dark:border-gray-800 shadow">
+                
+                <!-- ============================================ -->
+                <!-- SEÇÃO: SAÍDA DO PÁTIO                        -->
+                <!-- ============================================ -->
+                <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow">
                     <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-t-lg">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                  <i class="fa-solid fa-arrow-right !text-white"></i>
+                                <i class="fa-solid fa-arrow-right !text-white"></i>
                                 <div>
                                     <h2 class="text-lg font-bold !text-white">Saída do Pátio</h2>
                                     <p class="text-sm opacity-90 !text-white">{{ mov.data_saida|date:'d/m/Y H:i' }}</p>
@@ -113,11 +116,65 @@
                         <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                                    <i class="fa-solid fa-gauge-high text-white text-sm !text-white"></i>
+                                    <i class="fa-solid fa-gauge-high text-white text-sm"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs text-blue-600 dark:text-blue-400">Quilometragem na Saída</p>
                                     <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ mov.km_saida }} KM</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ITENS NO VEÍCULO -->
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-boxes-stacked text-purple-500"></i>
+                                Itens e Equipamentos no Veículo
+                            </h3>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <!-- CAÇAMBA -->
+                                <div class="bg-white dark:bg-gray-900 p-3 rounded border {% if mov.com_cacamba %}border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20{% else %}border-gray-200 dark:border-gray-700{% endif %} text-center">
+                                    <div class="w-10 h-10 mx-auto mb-1 rounded-full {% if mov.com_cacamba %}bg-amber-100 dark:bg-amber-900/30{% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
+                                        <i class="fa-solid fa-dumpster text-lg {% if mov.com_cacamba %}text-amber-600 dark:text-amber-400{% else %}text-gray-400{% endif %}"></i>
+                                    </div>
+                                    <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Caçamba</p>
+                                    <span class="text-[10px] {% if mov.com_cacamba %}text-green-600 dark:text-green-400 font-bold{% else %}text-gray-500{% endif %}">
+                                        {% if mov.com_cacamba %}<i class="fa-solid fa-check mr-0.5"></i>Sim{% else %}<i class="fa-solid fa-minus mr-0.5"></i>Não{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- PRANCHA -->
+                                <div class="bg-white dark:bg-gray-900 p-3 rounded border {% if mov.com_prancha %}border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20{% else %}border-gray-200 dark:border-gray-700{% endif %} text-center">
+                                    <div class="w-10 h-10 mx-auto mb-1 rounded-full {% if mov.com_prancha %}bg-blue-100 dark:bg-blue-900/30{% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
+                                        <i class="fa-solid fa-truck-ramp-box text-lg {% if mov.com_prancha %}text-blue-600 dark:text-blue-400{% else %}text-gray-400{% endif %}"></i>
+                                    </div>
+                                    <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Prancha</p>
+                                    <span class="text-[10px] {% if mov.com_prancha %}text-green-600 dark:text-green-400 font-bold{% else %}text-gray-500{% endif %}">
+                                        {% if mov.com_prancha %}<i class="fa-solid fa-check mr-0.5"></i>Sim{% else %}<i class="fa-solid fa-minus mr-0.5"></i>Não{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- MALAS -->
+                                <div class="bg-white dark:bg-gray-900 p-3 rounded border {% if mov.com_malas %}border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20{% else %}border-gray-200 dark:border-gray-700{% endif %} text-center">
+                                    <div class="w-10 h-10 mx-auto mb-1 rounded-full {% if mov.com_malas %}bg-purple-100 dark:bg-purple-900/30{% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
+                                        <i class="fa-solid fa-suitcase text-lg {% if mov.com_malas %}text-purple-600 dark:text-purple-400{% else %}text-gray-400{% endif %}"></i>
+                                    </div>
+                                    <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Malas/Maletas</p>
+                                    <span class="text-[10px] {% if mov.com_malas %}text-green-600 dark:text-green-400 font-bold{% else %}text-gray-500{% endif %}">
+                                        {% if mov.com_malas %}<i class="fa-solid fa-check mr-0.5"></i>Sim{% else %}<i class="fa-solid fa-minus mr-0.5"></i>Não{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- OUTROS ITENS -->
+                                <div class="bg-white dark:bg-gray-900 p-3 rounded border {% if mov.com_outros_itens %}border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-900/20{% else %}border-gray-200 dark:border-gray-700{% endif %} text-center">
+                                    <div class="w-10 h-10 mx-auto mb-1 rounded-full {% if mov.com_outros_itens %}bg-teal-100 dark:bg-teal-900/30{% else %}bg-gray-100 dark:bg-gray-800{% endif %} flex items-center justify-center">
+                                        <i class="fa-solid fa-box-open text-lg {% if mov.com_outros_itens %}text-teal-600 dark:text-teal-400{% else %}text-gray-400{% endif %}"></i>
+                                    </div>
+                                    <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Outros Itens</p>
+                                    <span class="text-[10px] {% if mov.com_outros_itens %}text-green-600 dark:text-green-400 font-bold{% else %}text-gray-500{% endif %}">
+                                        {% if mov.com_outros_itens %}<i class="fa-solid fa-check mr-0.5"></i>Sim{% else %}<i class="fa-solid fa-minus mr-0.5"></i>Não{% endif %}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -143,92 +200,109 @@
                         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                             <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                 <i class="fa-solid fa-images text-blue-500"></i>
-                                Evidências Fotográficas
+                                Evidências Fotográficas - Saída
                             </h3>
                             
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                <!-- FOTO GERAL SAÍDA -->
-                                {% if mov.foto_portaria_geral %}
-                                <div class="image-card group" data-image-url="{{ mov.foto_portaria_geral.url }}" data-image-alt="Visão Geral - Saída">
-                                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                        <img src="{{ mov.foto_portaria_geral.url }}" 
-                                             alt="Visão Geral - Saída"
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <div class="mt-1 text-center">
-                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Visão Geral</p>
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Saída do veículo</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                <!-- FOTO PAINEL SAÍDA -->
-                                {% if mov.foto_portaria_painel %}
-                                <div class="image-card group" data-image-url="{{ mov.foto_portaria_painel.url }}" data-image-alt="Painel - Saída">
-                                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                        <img src="{{ mov.foto_portaria_painel.url }}" 
-                                             alt="Painel - Saída"
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <div class="mt-1 text-center">
-                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Painel</p>
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Quilometragem saída</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                <!-- FOTO AVARIA SAÍDA -->
-                                {% if mov.foto_portaria_avaria %}
-                                <div class="image-card group" data-image-url="{{ mov.foto_portaria_avaria.url }}" data-image-alt="Avaria - Saída">
-                                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                        <img src="{{ mov.foto_portaria_avaria.url }}" 
-                                             alt="Avaria - Saída"
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <div class="mt-1 text-center">
-                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Avaria</p>
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Detalhe da avaria</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                <!-- FOTO EQUIPAMENTO SAÍDA -->
-                                {% if mov.foto_portaria_equipamento %}
-                                <div class="image-card group" data-image-url="{{ mov.foto_portaria_equipamento.url }}" data-image-alt="Equipamento - Saída">
-                                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                        <img src="{{ mov.foto_portaria_equipamento.url }}" 
-                                             alt="Equipamento - Saída"
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <div class="mt-1 text-center">
-                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Equipamento</p>
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Equipamento interno</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                {% if not mov.foto_portaria_geral and not mov.foto_portaria_painel and not mov.foto_portaria_avaria and not mov.foto_portaria_equipamento %}
-                                    <div class="col-span-4 text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
-                                            <i class="fa-solid fa-camera text-gray-400"></i>
+                            {% if mov.foto_portaria_geral or mov.foto_portaria_painel or mov.foto_portaria_avaria or mov.foto_portaria_equipamento or mov.foto_portaria_interior %}
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <!-- FOTO GERAL SAÍDA -->
+                                    {% if mov.foto_portaria_geral %}
+                                    <div class="image-card group" data-image-url="{{ mov.foto_portaria_geral.url }}" data-image-alt="Visão Geral - Saída">
+                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img src="{{ mov.foto_portaria_geral.url }}" 
+                                                 alt="Visão Geral - Saída"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                         </div>
-                                        <p class="text-gray-500 dark:text-gray-400 text-sm">Nenhuma evidência fotográfica registrada</p>
+                                        <div class="mt-1 text-center">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Visão Geral</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Saída do veículo</p>
+                                        </div>
                                     </div>
-                                {% endif %}
-                            </div>
+                                    {% endif %}
+                                    
+                                    <!-- FOTO PAINEL SAÍDA -->
+                                    {% if mov.foto_portaria_painel %}
+                                    <div class="image-card group" data-image-url="{{ mov.foto_portaria_painel.url }}" data-image-alt="Painel - Saída">
+                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img src="{{ mov.foto_portaria_painel.url }}" 
+                                                 alt="Painel - Saída"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                        <div class="mt-1 text-center">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Painel</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Quilometragem saída</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- FOTO AVARIA SAÍDA -->
+                                    {% if mov.foto_portaria_avaria %}
+                                    <div class="image-card group" data-image-url="{{ mov.foto_portaria_avaria.url }}" data-image-alt="Avaria - Saída">
+                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img src="{{ mov.foto_portaria_avaria.url }}" 
+                                                 alt="Avaria - Saída"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                        <div class="mt-1 text-center">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Avaria</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Detalhe da avaria</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- FOTO EQUIPAMENTO SAÍDA -->
+                                    {% if mov.foto_portaria_equipamento %}
+                                    <div class="image-card group" data-image-url="{{ mov.foto_portaria_equipamento.url }}" data-image-alt="Equipamento - Saída">
+                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img src="{{ mov.foto_portaria_equipamento.url }}" 
+                                                 alt="Equipamento - Saída"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                        <div class="mt-1 text-center">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Equipamento</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Equipamento interno</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- FOTO INTERIOR/PORTA-MALAS SAÍDA -->
+                                    {% if mov.foto_portaria_interior %}
+                                    <div class="image-card group" data-image-url="{{ mov.foto_portaria_interior.url }}" data-image-alt="Interior/Porta-malas - Saída">
+                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img src="{{ mov.foto_portaria_interior.url }}" 
+                                                 alt="Interior/Porta-malas - Saída"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                        <div class="mt-1 text-center">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Interior</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Porta-malas e itens</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                                    <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa-solid fa-camera text-gray-400"></i>
+                                    </div>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">Nenhuma evidência fotográfica registrada na saída</p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
-                <!-- SEÇÃO: RETORNO AO PÁTIO -->
+                <!-- ============================================ -->
+                <!-- SEÇÃO: RETORNO AO PÁTIO                      -->
+                <!-- ============================================ -->
                 {% if mov.data_retorno %} 
-                    <div class="bg-white dark:bg-gray-900 rounded-lg !text-white border border-gray-200 dark:border-gray-800 shadow">
-                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 !text-white p-3 rounded-t-lg">
+                    <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow">
+                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-3 rounded-t-lg">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <i class="fa-solid fa-arrow-left !text-white"></i>
                                     <div>
-                                        <h2 class="text-lg !text-white font-bold">Retorno ao Pátio</h2>
+                                        <h2 class="text-lg font-bold !text-white">Retorno ao Pátio</h2>
                                         <p class="text-sm opacity-90 !text-white">{{ mov.data_retorno|date:'d/m/Y H:i' }}</p>
                                     </div>
                                 </div>
@@ -294,85 +368,147 @@
                             <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                                 <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                     <i class="fa-solid fa-images text-emerald-500"></i>
-                                    Evidências Fotográficas
+                                    Evidências Fotográficas - Retorno
                                 </h3>
                                 
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    <!-- FOTO GERAL RETORNO -->
-                                    {% if mov.foto_retorno_geral %}
-                                    <div class="image-card group" data-image-url="{{ mov.foto_retorno_geral.url }}" data-image-alt="Visão Geral - Retorno">
-                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                            <img src="{{ mov.foto_retorno_geral.url }}" 
-                                                 alt="Visão Geral - Retorno"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        </div>
-                                        <div class="mt-1 text-center">
-                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Visão Geral</p>
-                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Retorno do veículo</p>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <!-- FOTO PAINEL RETORNO -->
-                                    {% if mov.foto_retorno_painel %}
-                                    <div class="image-card group" data-image-url="{{ mov.foto_retorno_painel.url }}" data-image-alt="Painel - Retorno">
-                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                            <img src="{{ mov.foto_retorno_painel.url }}" 
-                                                 alt="Painel - Retorno"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        </div>
-                                        <div class="mt-1 text-center">
-                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Painel</p>
-                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Quilometragem retorno</p>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <!-- FOTO AVARIA RETORNO -->
-                                    {% if mov.foto_retorno_avaria %}
-                                    <div class="image-card group" data-image-url="{{ mov.foto_retorno_avaria.url }}" data-image-alt="Avaria - Retorno">
-                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                            <img src="{{ mov.foto_retorno_avaria.url }}" 
-                                                 alt="Avaria - Retorno"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        </div>
-                                        <div class="mt-1 text-center">
-                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Avaria</p>
-                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Detalhe da avaria</p>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <!-- FOTO EQUIPAMENTO RETORNO -->
-                                    {% if mov.foto_retorno_equipamento %}
-                                    <div class="image-card group" data-image-url="{{ mov.foto_retorno_equipamento.url }}" data-image-alt="Equipamento - Retorno">
-                                        <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                            <img src="{{ mov.foto_retorno_equipamento.url }}" 
-                                                 alt="Equipamento - Retorno"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        </div>
-                                        <div class="mt-1 text-center">
-                                            <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Equipamento</p>
-                                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Equipamento interno</p>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    {% if not mov.foto_retorno_geral and not mov.foto_retorno_painel and not mov.foto_retorno_avaria and not mov.foto_retorno_equipamento %}
-                                        <div class="col-span-4 text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
-                                                <i class="fa-solid fa-camera text-gray-400"></i>
+                                {% if mov.foto_retorno_geral or mov.foto_retorno_painel or mov.foto_retorno_avaria or mov.foto_retorno_equipamento or mov.foto_retorno_cacamba or mov.foto_retorno_prancha or mov.foto_retorno_porta_malas or mov.foto_retorno_combustivel %}
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                        <!-- FOTO GERAL RETORNO -->
+                                        {% if mov.foto_retorno_geral %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_geral.url }}" data-image-alt="Visão Geral - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_geral.url }}" 
+                                                     alt="Visão Geral - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                             </div>
-                                            <p class="text-gray-500 dark:text-gray-400 text-sm">Nenhuma evidência fotográfica registrada</p>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Visão Geral</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Retorno do veículo</p>
+                                            </div>
                                         </div>
-                                    {% endif %}
-                                </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO PAINEL RETORNO -->
+                                        {% if mov.foto_retorno_painel %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_painel.url }}" data-image-alt="Painel - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_painel.url }}" 
+                                                     alt="Painel - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Painel</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Quilometragem retorno</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO AVARIA RETORNO -->
+                                        {% if mov.foto_retorno_avaria %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_avaria.url }}" data-image-alt="Avaria - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_avaria.url }}" 
+                                                     alt="Avaria - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Avaria</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Detalhe da avaria</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO EQUIPAMENTO RETORNO -->
+                                        {% if mov.foto_retorno_equipamento %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_equipamento.url }}" data-image-alt="Equipamento - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_equipamento.url }}" 
+                                                     alt="Equipamento - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Equipamento</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Equipamento interno</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO CAÇAMBA RETORNO -->
+                                        {% if mov.foto_retorno_cacamba %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_cacamba.url }}" data-image-alt="Caçamba - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_cacamba.url }}" 
+                                                     alt="Caçamba - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Caçamba</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Retorno</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO PRANCHA RETORNO -->
+                                        {% if mov.foto_retorno_prancha %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_prancha.url }}" data-image-alt="Prancha - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_prancha.url }}" 
+                                                     alt="Prancha - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Prancha</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Retorno</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO PORTA-MALAS RETORNO -->
+                                        {% if mov.foto_retorno_porta_malas %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_porta_malas.url }}" data-image-alt="Porta-malas - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_porta_malas.url }}" 
+                                                     alt="Porta-malas - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Porta-malas</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Retorno</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- FOTO COMBUSTÍVEL RETORNO -->
+                                        {% if mov.foto_retorno_combustivel %}
+                                        <div class="image-card group" data-image-url="{{ mov.foto_retorno_combustivel.url }}" data-image-alt="Combustível - Retorno">
+                                            <div class="aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img src="{{ mov.foto_retorno_combustivel.url }}" 
+                                                     alt="Combustível - Retorno"
+                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </div>
+                                            <div class="mt-1 text-center">
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate">Combustível</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Marcador</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa-solid fa-camera text-gray-400"></i>
+                                        </div>
+                                        <p class="text-gray-500 dark:text-gray-400 text-sm">Nenhuma evidência fotográfica registrada no retorno</p>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 {% endif %}
                 
-                <!-- CARD: DETALHES DA SOLICITAÇÃO -->
+                <!-- ============================================ -->
+                <!-- CARD: DETALHES DA SOLICITAÇÃO                -->
+                <!-- ============================================ -->
                 <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3 shadow">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
@@ -460,7 +596,9 @@
                 </div>
             </div>
             
-            <!-- COLUNA DIREITA (1/3) -->
+            <!-- ============================================ -->
+            <!-- COLUNA DIREITA (1/3)                         -->
+            <!-- ============================================ -->
             <div class="space-y-4">
                 <!-- TIMELINE -->
                 <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3 shadow">
@@ -564,7 +702,6 @@
                             <span>Voltar para Lista</span>
                         </a>
                         
-                        <!-- BOTÕES ADICIONAIS -->
                         <div class="grid grid-cols-2 gap-2 pt-2">
                             <button onclick="window.print()" 
                                     class="flex items-center justify-center gap-1 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm transition-colors duration-200 shadow border border-gray-200 dark:border-gray-700">
@@ -572,11 +709,11 @@
                                 <span>Imprimir</span>
                             </button>
                             
-                            <button onclick="window.history.back()" 
-                                    class="flex items-center justify-center gap-1 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm transition-colors duration-200 shadow border border-gray-200 dark:border-gray-700">
-                                <i class="fa-solid fa-undo text-xs"></i>
-                                <span>Voltar</span>
-                            </button>
+                            <a href="{% url 'lista_movimentacoes' %}" 
+                               class="flex items-center justify-center gap-1 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm transition-colors duration-200 shadow border border-gray-200 dark:border-gray-700">
+                                <i class="fa-solid fa-list text-xs"></i>
+                                <span>Lista</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -612,12 +749,12 @@
                         </div>
                         
                         {% if mov.data_retorno %}
-                            <div class="flex justify-between items-center py-1.5">
-                                <span class="text-sm text-gray-600 dark:text-gray-300">Registrado por</span>
+                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Retorno por</span>
                                 <span class="font-semibold text-sm text-gray-900 dark:text-white">{{ mov.porteiro_retorno_nome }}</span>
                             </div>
                         {% else %}
-                            <div class="flex justify-between items-center py-1.5">
+                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-800">
                                 <span class="text-sm text-gray-600 dark:text-gray-300">Previsão</span>
                                 <span class="font-semibold text-blue-600 dark:text-blue-400 text-sm">
                                     {{ mov.solicitacao.previsao_retorno|date:'d/m H:i' }}
@@ -625,7 +762,6 @@
                             </div>
                         {% endif %}
                         
-                        <!-- KM PERCORRIDO -->
                         {% if mov.km_percorrido %}
                             <div class="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <div class="flex justify-between items-center">
@@ -640,10 +776,9 @@
         </div>
     </div>
     
-    <!-- MODAL PARA IMAGENS GRANDE -->
+    <!-- MODAL PARA IMAGENS -->
     <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black/90 p-2 sm:p-4">
         <div class="relative w-full h-full flex flex-col">
-            <!-- CABEÇALHO DO MODAL -->
             <div class="flex items-center justify-between p-3 bg-gray-900/80 rounded-t-lg">
                 <h3 id="modalTitle" class="text-white font-semibold text-sm sm:text-base truncate max-w-[80%]"></h3>
                 <button id="modalCloseBtn" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors">
@@ -651,12 +786,10 @@
                 </button>
             </div>
             
-            <!-- CONTEÚDO DA IMAGEM -->
             <div class="flex-1 flex items-center justify-center p-2">
                 <img id="modalImage" src="" alt="" class="max-w-full max-h-[70vh] object-contain">
             </div>
             
-            <!-- RODAPÉ DO MODAL -->
             <div class="p-2 bg-gray-900/80 rounded-b-lg text-center">
                 <p class="text-gray-400 text-xs sm:text-sm">Clique fora da imagem ou pressione ESC para fechar</p>
             </div>
@@ -670,17 +803,14 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
             
-            // Função para abrir o modal
             function openImageModal(imageUrl, imageTitle) {
                 if (!imageUrl) return;
-                
                 modalImage.src = imageUrl;
                 modalTitle.textContent = imageTitle || 'Imagem da movimentação';
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }
             
-            // Função para fechar o modal
             function closeImageModal() {
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
@@ -688,7 +818,6 @@
                 modalTitle.textContent = '';
             }
             
-            // Event listeners para as imagens
             document.querySelectorAll('.image-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const imageUrl = this.getAttribute('data-image-url');
@@ -697,24 +826,20 @@
                 });
             });
             
-            // Fechar modal com botão
             modalCloseBtn.addEventListener('click', closeImageModal);
             
-            // Fechar modal com ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                     closeImageModal();
                 }
             });
             
-            // Fechar modal clicando fora
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     closeImageModal();
                 }
             });
             
-            // Adicionar classe de cursor pointer nas imagens
             document.querySelectorAll('.image-card img').forEach(img => {
                 img.style.cursor = 'pointer';
             });
@@ -748,7 +873,6 @@
             to { opacity: 1; }
         }
         
-        /* Melhorias para telas pequenas */
         @media (max-width: 640px) {
             .grid-cols-4 {
                 grid-template-columns: repeat(2, 1fr);

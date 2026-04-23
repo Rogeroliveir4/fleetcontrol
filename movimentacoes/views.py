@@ -627,12 +627,11 @@ def compress_image(image_file, quality=65, max_width=1280):
         return image_file
 
 
-
-# REGISTRA A SAÍDA - PORTARIA
+# REGISTRA A SAÍDA - PORTARIA (SIMPLIFICADA)
 @login_required
 def portaria_registrar_saida(request, solicitacao_id):
 
-    # LOCK OPTIMISTA PARA EVITAR CONCORRÊNCIA (DUAS PESSOAS REGISTRANDO SAÍDA AO MESMO TEMPO)
+    # LOCK OPTIMISTA PARA EVITAR CONCORRÊNCIA
     with transaction.atomic():
 
         solicitacao = (
@@ -641,18 +640,15 @@ def portaria_registrar_saida(request, solicitacao_id):
             .get(id=solicitacao_id)
         )
 
-        #  SE A SOLICITAÇÃO ESTIVER EM STATUS INCORRETO, NÃO DEIXA AVANÇAR
         if solicitacao.status != "AGUARDANDO_SAIDA_PORTARIA":
             messages.error(request, "Essa solicitação não está disponível para saída.")
             return redirect("listar_saidas_portaria")
 
-        #  Verifica duplicidade (DEPOIS do lock!)
         mov_existente = Movimentacao.objects.filter(
             solicitacao=solicitacao,
             data_retorno__isnull=True
         ).exists()
 
-        #  Se já existir uma movimentação em andamento para essa solicitação, não permite criar outra
         if mov_existente:
             messages.warning(request, "Essa saída já foi registrada.")
             return redirect("listar_saidas_portaria")
@@ -665,7 +661,8 @@ def portaria_registrar_saida(request, solicitacao_id):
                 getattr(request.user.perfilusuario, "contrato", None)
             )
 
-            mov = Movimentacao.objects.create(
+            # Criar movimentação
+            mov = Movimentacao(
                 solicitacao=solicitacao,
                 veiculo=solicitacao.veiculo,
                 motorista=solicitacao.motorista,
@@ -676,13 +673,19 @@ def portaria_registrar_saida(request, solicitacao_id):
                 status="em_andamento",
                 porteiro_saida=request.user,
                 porteiro_saida_nome=request.user.get_full_name() or request.user.username,
-                observacao_portaria=request.POST.get("observacao_portaria", ""),
-                observacao=request.POST.get("observacao", ""),
+                observacao=request.POST.get("observacao", "").strip(),
+                observacao_portaria=request.POST.get("observacao_portaria", "").strip(),
                 com_cacamba=request.POST.get("com_cacamba") in ["true", "on"],
                 com_prancha=request.POST.get("com_prancha") in ["true", "on"],
             )
 
-            # Fotos
+            # Campos novos (se existirem no modelo)
+            if hasattr(mov, 'com_malas'):
+                mov.com_malas = request.POST.get("com_malas") in ["true", "on"]
+            if hasattr(mov, 'com_outros_itens'):
+                mov.com_outros_itens = request.POST.get("com_outros_itens") in ["true", "on"]
+
+            # Fotos da saída
             if request.FILES.get("foto_portaria_geral"):
                 mov.foto_portaria_geral = compress_image(request.FILES["foto_portaria_geral"])
 
@@ -695,12 +698,25 @@ def portaria_registrar_saida(request, solicitacao_id):
             if request.FILES.get("foto_portaria_equipamento"):
                 mov.foto_portaria_equipamento = compress_image(request.FILES["foto_portaria_equipamento"])
 
+            # Foto do interior/porta-malas (se o campo existir no modelo)
+            if request.FILES.get("foto_portaria_interior"):
+                if hasattr(mov, 'foto_portaria_interior'):
+                    mov.foto_portaria_interior = compress_image(request.FILES["foto_portaria_interior"])
+
             mov.save()
 
             # Atualiza solicitação
             solicitacao.status = "EM_TRANSITO"
             solicitacao.data_saida = mov.data_saida
             solicitacao.save(update_fields=["status", "data_saida"])
+
+            # Atualiza status do veículo
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE veiculos_veiculo SET status = %s WHERE id = %s",
+                    ["Em uso", solicitacao.veiculo.id]
+                )
 
             messages.success(request, "Saída registrada com sucesso.")
             return redirect("/movimentacoes/?status=transito")
@@ -710,6 +726,7 @@ def portaria_registrar_saida(request, solicitacao_id):
     })
 
 
+    
 # REGISTRAR RETORNO (PORTARIA)
 @login_required
 def registrar_retorno(request, pk):

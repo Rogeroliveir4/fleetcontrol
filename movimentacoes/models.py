@@ -137,6 +137,38 @@ class Movimentacao(models.Model):
         null=True,
         verbose_name="Foto do equipamento (saída)"
     )
+
+
+    # ITENS NO VEÍCULO (SAÍDA)
+    com_malas = models.BooleanField(
+        default=False,
+        verbose_name="Veículo com malas/maletas",
+        help_text="Marque se o veículo saiu com malas ou maletas"
+    )
+    malas_descricao = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Descrição das malas/itens"
+    )
+
+    com_outros_itens = models.BooleanField(
+        default=False,
+        verbose_name="Veículo com outros itens",
+        help_text="Marque se o veículo saiu com outros itens"
+    )
+    outros_itens_descricao = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Descrição de outros itens"
+    )
+
+    # FOTO DO INTERIOR/PORTA-MALAS (SAÍDA)
+    foto_portaria_interior = models.ImageField(
+        upload_to='portaria/saida/interior/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name="Foto do interior/porta-malas (saída)"
+    )
     
     # === FOTOS DO RETORNO (PORTARIA) - CAMPOS ESPECÍFICOS ===
     foto_retorno_geral = models.ImageField(
