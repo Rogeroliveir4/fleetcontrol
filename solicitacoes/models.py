@@ -143,6 +143,44 @@ class SolicitacaoVeiculo(models.Model):
         blank=True
     )
 
+# Campo de observação principal
+    observacao = models.TextField(
+        verbose_name="Observação",
+        blank=True,
+        null=True,
+        max_length=500,
+        help_text="Observações sobre a solicitação (ex: veículo sai com equipamentos)"
+    )
+    
+    # Quem fez a observação (solicitante, gestor, etc)
+    OBSERVACAO_POR_CHOICES = [
+        ('solicitante', 'Solicitante'),
+        ('gestor', 'Gestor'),
+        ('sistema', 'Sistema'),
+    ]
+    observacao_por = models.CharField(
+        verbose_name="Observação feita por",
+        max_length=20,
+        choices=OBSERVACAO_POR_CHOICES,
+        blank=True,
+        null=True
+    )
+    
+    # Nome do autor (para fallback)
+    observacao_por_nome = models.CharField(
+        verbose_name="Nome do autor da observação",
+        max_length=150,
+        blank=True,
+        null=True
+    )
+    
+    # Data da observação
+    observacao_data = models.DateTimeField(
+        verbose_name="Data da observação",
+        blank=True,
+        null=True
+    )
+
     observacao_aprovacao = models.TextField(
     null=True,
     blank=True,

@@ -6,214 +6,106 @@
 
 {% block content %}
 
-<style>
-  /* Torna o ícone nativo do navegador invisível, mas o mantém clicável exatamente sobre o seu ícone FontAwesome */
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    opacity: 100;
-    cursor: pointer;
-    width: 100rem; /* Largura suficiente para cobrir o ícone customizado */
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 10;
-  }
-</style>
-
-
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-  <div class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+  <div class="w-full px-3 sm:px-4 md:px-6 py-3 sm:py-4">
     
-    <!-- HEADER COM GRADIENTE MELHORADO -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00594C] via-[#0a7c6c] to-[#007462] mb-6 shadow-lg">
-      <div class="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-      <div class="absolute bottom-0 left-0 w-24 sm:w-36 h-24 sm:h-36 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-      
-      <div class="relative z-10 px-4 sm:px-6 py-4 sm:py-5">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-3 mb-1">
-              <div class="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                <i class="fa-solid fa-door-open text-white text-lg sm:text-xl"></i>
-              </div>
-              <div>
-                <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-white">
-                  Controle de Saídas
-                </h1>
-                <p class="text-white/80 text-xs sm:text-sm mt-0.5">
-                  Registro e monitoramento de saída de veículos
-                </p>
-              </div>
-            </div>
+    <!-- HEADER -->
+    <div class="rounded-xl bg-gradient-to-r from-[#00594C] to-[#007462] mb-4 shadow-md">
+      <div class="px-4 py-3 sm:p-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-lg">
+            <i class="fa-solid fa-door-open text-white text-base sm:text-lg"></i>
           </div>
-          
-
-        </div>
-        
-        <div class="mt-3 pt-2 border-t border-white/20 flex flex-wrap items-center justify-between gap-2 text-white/70 text-[10px] sm:text-xs">
-          <div class="flex items-center gap-3">
-            <span><i class="fa-regular fa-clock mr-1"></i>Atualizado: {% now "d/m/Y H:i" %}</span>
+          <div class="flex-1">
+            <h1 class="text-base sm:text-xl font-bold text-white">Controle de Saídas</h1>
+            <p class="text-white/70 text-xs mt-0.5">Registro de saída de veículos • {% now "d/m/Y H:i" %}</p>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- FILTROS COM DESIGN MELHORADO -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-5 shadow-sm">
-      <form method="GET" action="{% url 'listar_saidas_portaria' %}" id="filterForm" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- STATUS -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              <i class="fa-solid fa-tag mr-1 text-gray-400"></i>Status
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <button type="button"
-                    onclick="setStatusFilter('todas')"
-                    class="px-4 py-2 rounded-lg text-xs font-medium transition-all
-                          {% if status_filtro == 'todas' %}
-                      bg-blue-600 !text-white shadow-md
-                    {% else %}
-                      bg-gray-700 dark:bg-gray-700 !text-white dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
-                    {% endif %}">
-                    <i class="fa-solid fa-list mr-1 !text-white"></i>Todas
+    <!-- FILTROS REDESIGN -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-4 shadow-sm">
+      <form method="GET" action="{% url 'listar_saidas_portaria' %}" id="filterForm" class="p-3 sm:p-4">
+        <!-- Status Filters -->
+        <div class="flex flex-wrap items-center gap-2 mb-3 pb-3 border-b border-gray-100 dark:border-gray-700">
+          <span class="text-xs font-semibold text-gray-500 flex items-center gap-1">
+            <i class="fa-solid fa-tag text-[10px]"></i>Status:
+          </span>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="setStatusFilter('pendentes')"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                {% if status_filtro == 'pendentes' %}bg-orange-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}">
+              <i class="fa-regular fa-clock text-[10px] mr-1"></i>Pendentes
             </button>
-              <button type="button"
-                onclick="setStatusFilter('pendentes')"
-                class="px-4 py-2 rounded-lg text-xs font-medium transition-all
-                       {% if status_filtro == 'pendentes' %}
-                  bg-orange-500 text-white shadow-md
-                {% else %}
-                  bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
-                {% endif %}">
-                <i class="fa-regular fa-clock mr-1 "></i>Pendentes
-              </button>
-
-              <!-- FINALIZADAS 
-              <button type="button"
-                onclick="setStatusFilter('finalizadas')"
-                class="px-4 py-2 rounded-lg text-xs font-medium transition-all
-                       {% if status_filtro == 'finalizadas' %}
-                  bg-green-600 text-white shadow-md
-                {% else %}
-                  bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
-                {% endif %}">
-                <i class="fa-solid fa-flag-checkered mr-1"></i>Finalizadas
-              </button>
-              -->
-              <input type="hidden" name="status" id="statusInput" value="{{ status_filtro|default:'' }}" />
-            </div>
-          </div>
-<!---DATAS        
-<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-
-  <div class="relative">
-    <input type="date" name="data_inicio"
-           value="{{ data_inicio|default:'' }}"
-           class="w-full h-[38px] md:h-[42px] pl-3 pr-8 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none focus:ring-2 focus:ring-[#00594C] focus:border-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:z-10">
-    <i class="fa-regular fa-calendar absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm z-0"></i>
-  </div>
-
-  <div class="relative">
-    <input type="date" name="data_fim"
-           value="{{ data_fim|default:'' }}"
-           class="w-full h-[38px] md:h-[42px] pl-3 pr-8 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none focus:ring-2 focus:ring-[#00594C] focus:border-transparent [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:z-10">
-    <i class="fa-regular fa-calendar absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm z-0"></i>
-  </div>
-
-</div>
--->  
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-3">
-          <!-- BUSCA -->
-          <div class="flex-1">
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="text" name="busca" value="{{ busca|default:'' }}" 
-                     placeholder="Buscar por motorista, veículo, destino ou tag..." 
-                     class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00594C] focus:border-transparent" />
-            </div>
-          </div>
-
-          <!-- BOTÕES DE AÇÃO -->
-          <div class="flex gap-2">
-            <button type="submit" class="px-4 py-2 bg-[#00594C] hover:bg-[#004238]  rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
-              <i class="fa-solid fa-filter text-xs !text-white"></i>
-              <span class="!text-white">Filtrar</span>
-            </button>
-            <a href="{% url 'listar_saidas_portaria' %}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-              <i class="fa-solid fa-broom text-xs text-white"></i>
-              <span class="te">Limpar</span>
-            </a>
-            <!-- BOTÃO DE EXPORTAÇÃO 
-            <button type="button" onclick="exportarDados()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
-              <i class="fa-solid fa-download text-xs !text-white"></i>
-              <span class="!text-white">Exportar</span>
+             <!--
+            <button type="button" onclick="setStatusFilter('todas')"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                {% if not status_filtro or status_filtro == 'todas' %}bg-[#00594C] text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}">
+              <i class="fa-solid fa-list text-[10px] mr-1"></i>Todas
             </button>
             -->
           </div>
+          <input type="hidden" name="status" id="statusInput" value="{% if status_filtro == 'todas' or not status_filtro %}{% else %}{{ status_filtro|default:'' }}{% endif %}" />
         </div>
 
-        <!-- FILTROS ATIVOS -->
-        {% if status_filtro or busca %}
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-700">
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="font-medium text-gray-500 dark:text-gray-400">Filtros ativos:</span>
-            {% if status_filtro == 'pendentes' %}
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 rounded-full">
-              <i class="fa-regular fa-clock text-[10px]"></i>Pendentes
-            </span>
-            {% elif status_filtro == 'finalizadas' %}
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full">
-              <i class="fa-solid fa-flag-checkered text-[10px]"></i>Finalizadas
-            </span>
-            {% endif %}
-            <!---
-            {% if data_inicio %}
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
-              <i class="fa-regular fa-calendar text-[10px]"></i>De: {{ data_inicio }}
-            </span>
-            {% endif %}
-            {% if data_fim %}
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
-              <i class="fa-regular fa-calendar text-[10px]"></i>Até: {{ data_fim }}
-            </span>
-            {% endif %}
-          -->
-            {% if busca %}
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
-              <i class="fa-solid fa-search text-[10px]"></i>"{{ busca|truncatechars:20 }}"
-            </span>
-            {% endif %}
+        <!-- Search and Actions Row -->
+        <div class="flex flex-col sm:flex-row gap-2">
+          <div class="flex-1 relative">
+            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" name="busca" value="{{ busca|default:'' }}" 
+              placeholder="Buscar motorista, veículo ou destino..." 
+              class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-[#00594C] focus:border-transparent outline-none transition-all" />
+          </div>
+          
+          <div class="flex gap-2">
+            <button type="submit" class="px-4 py-2 bg-[#00594C] hover:bg-[#004238] !text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+              <i class="fa-solid fa-filter text-xs !text-white"></i>
+              <span class="!text-white">Filtrar</span>
+            </button>
+           
+            <a href="{% url 'listar_saidas_portaria' %}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+              <i class="fa-solid fa-rotate-right text-xs"></i>
+              <span>Limpar</span>
+            </a>
           </div>
         </div>
-        {% endif %}
-        
-        <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
-          <i class="fa-solid fa-info-circle mr-1"></i>
-          {% if not status_filtro and not busca %}
-            Exibindo apenas pendentes por padrão. Clique em "Todas" para ver todas as solicitações.
-          {% else %}
-            Use os filtros acima para refinar a busca.
+
+        <!-- Active Filters -->
+        {% if status_filtro and status_filtro != 'todas' or busca %}
+        <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <span class="text-xs text-gray-400">Filtros ativos:</span>
+          {% if status_filtro and status_filtro != 'todas' %}
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-[11px]">
+            <i class="fa-regular fa-clock text-[9px]"></i>
+            {{ status_filtro|title }}
+          </span>
           {% endif %}
-        </p>
+          {% if busca %}
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full text-[11px]">
+            <i class="fa-solid fa-search text-[9px]"></i>
+            "{{ busca|truncatechars:20 }}"
+          </span>
+          {% endif %}
+        </div>
+        {% endif %}
       </form>
     </div>
 
-    <!-- LISTA DE SAÍDAS - CARDS MELHORADOS -->
+    <!-- LISTA DE SAÍDAS - GRADE RESPONSIVA -->
     <div id="solicitationsContainer">
       {% if solicitacoes %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <!-- Grade responsiva: 1 coluna mobile, 2 tablets, 3/4/5 desktop -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
           {% for s in solicitacoes %}
-          <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-            <!-- CARD HEADER -->
+          <div class="group bg-white dark:bg-gray-800 rounded-lg border border-gray-400 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col">
+            
+            <!-- HEADER do Card -->
             <div class="p-3 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-800">
               <div class="flex justify-between items-start mb-2">
-                <span class="inline-flex items-center gap-1 text-xs font-mono font-semibold text-gray-500">
-                  <i class="fa-solid fa-hashtag text-[10px]"></i>
-                  ID: {{ s.id }}
+                <span class="inline-flex items-center gap-1 text-xs font-mono font-semibold text-gray-400">
+                  <i class="fa-solid fa-hashtag text-[9px]"></i>
+                  #{{ s.id }}
                 </span>
                 {% if s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 rounded-full text-[10px] font-medium">
@@ -236,51 +128,51 @@
               <!-- Motorista -->
               <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-[#00594C] flex items-center justify-center flex-shrink-0">
-                  <i class="fa-solid fa-user text-white text-xs !text-white"></i>
+                  <i class="fa-solid fa-user !text-white text-xs"></i>
                 </div>
                 <div class="min-w-0 flex-1">
                   <p class="text-sm font-semibold text-gray-900 dark:text-white truncate" title="{{ s.motorista.nome }}">
-                    {{ s.motorista.nome|truncatechars:20 }}
+                    {{ s.motorista.nome|truncatechars:25 }}
                   </p>
                   <p class="text-[10px] text-gray-500 dark:text-gray-400">CPF: {{ s.motorista.cpf }}</p>
                 </div>
               </div>
             </div>
 
-            <!-- CARD BODY -->
-            <div class="p-3 space-y-3">
-              <!-- Veículo com Tag -->
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <div class="flex items-center gap-1">
-                    <i class="fa-solid fa-car text-gray-400 text-xs"></i>
-                    <span class="text-[10px] text-gray-500">Veículo</span>
+            <!-- BODY do Card -->
+            <div class="p-3 space-y-2 flex-1">
+              <!-- Veículo -->
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1 mb-0.5">
+                    <i class="fa-solid fa-car text-gray-400 text-[10px]"></i>
+                    <span class="text-[9px] text-gray-500 uppercase tracking-wide">Veículo</span>
                   </div>
-                  {% if s.veiculo.tag_interna %}
-                    <span class="px-2 py-1.5 bg-[#00594C] !text-white dark:bg-[#00594C]  dark:!text-white font-mono font-semibold rounded-md">
-                      {{ s.veiculo.tag_interna }}
-                    </span>
-                  {% endif %}
+                  <p class="text-xs font-medium text-gray-900 dark:text-white truncate" title="{{ s.veiculo.marca }} {{ s.veiculo.modelo }}">
+                    {{ s.veiculo.marca }} {{ s.veiculo.modelo|truncatechars:20 }}
+                  </p>
+                  <p class="text-[10px] text-gray-500 font-mono">{{ s.veiculo.placa }}</p>
                 </div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white truncate" title="{{ s.veiculo.marca }} {{ s.veiculo.modelo }}">
-                  {{ s.veiculo.marca }} {{ s.veiculo.modelo|truncatechars:15 }}
-                </p>
-                <p class="text-[10px] text-gray-500">{{ s.veiculo.placa }}</p>
+                {% if s.veiculo.tag_interna %}
+                  <div class="px-2.5 py-2.5 bg-[#00594C] !text-white rounded-md text-[12px] font-mono font-bold whitespace-nowrap">
+                    {{ s.veiculo.tag_interna }}
+                  </div>
+                {% endif %}
               </div>
 
               <!-- Destino -->
               <div>
-                <div class="flex items-center gap-1 mb-1">
-                  <i class="fa-solid fa-location-dot text-gray-400 text-xs"></i>
-                  <span class="text-[10px] text-gray-500">Destino</span>
+                <div class="flex items-center gap-1 mb-0.5">
+                  <i class="fa-solid fa-location-dot text-gray-400 text-[10px]"></i>
+                  <span class="text-[9px] text-gray-500 uppercase tracking-wide">Destino</span>
                 </div>
                 <p class="text-xs text-gray-700 dark:text-gray-300 truncate" title="{{ s.destino }}">
-                  {{ s.destino|truncatechars:30 }}
+                  {{ s.destino|truncatechars:35 }}
                 </p>
               </div>
 
-              <!-- Datas -->
-              <div class="grid grid-cols-2 gap-2 p-2 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+              <!-- Datas em grid 2 colunas -->
+              <div class="grid grid-cols-2 gap-2 pt-1">
                 <div>
                   <p class="text-[8px] text-gray-400 uppercase tracking-wider">Saída</p>
                   <p class="text-xs font-semibold text-gray-900 dark:text-white">
@@ -299,51 +191,58 @@
                 </div>
               </div>
 
-              <!-- Solicitante -->
-              <div>
-                <p class="text-[8px] text-gray-400 uppercase tracking-wider mb-1">Solicitante</p>
-                <div class="flex items-center gap-1">
-                  <i class="fa-solid fa-user-pen text-gray-400 text-[10px]"></i>
-                  <p class="text-[10px] text-gray-600 dark:text-gray-400 truncate" title="{{ s.solicitante_nome }}">
-                    {{ s.solicitante_nome|default:'Não informado'|truncatechars:25 }}
-                  </p>
+              <!-- Solicitante e Aprovador em linha -->
+              <div class="grid grid-cols-2 gap-2 pt-1 text-[10px]">
+                <div>
+                  <p class="text-[8px] text-gray-400 uppercase tracking-wider">Solicitante</p>
+                  <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-user-pen text-gray-400 text-[9px]"></i>
+                    <p class="text-gray-600 dark:text-gray-400 truncate" title="{{ s.solicitante_nome }}">
+                      {{ s.solicitante_nome|default:'—'|truncatechars:15 }}
+                    </p>
+                  </div>
                 </div>
-              </div>
-                <!-- Aprovador -->
-              <div>
-                <p class="text-[8px] text-gray-400 uppercase tracking-wider mb-1">Aprovador</p>
-                <div class="flex items-center gap-1">
-                  <i class="fa-solid fa-user-pen text-gray-400 text-[10px]"></i>
-                  <p class="text-[10px] text-gray-600 dark:text-gray-400 truncate" title="{{ s.gestor_responsavel_nome}}">
-                    {{ s.gestor_responsavel_nome|default:'Não informado'|truncatechars:25 }}
-                  </p>
+                <div>
+                  <p class="text-[8px] text-gray-400 uppercase tracking-wider">Aprovador</p>
+                  <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-user-check text-gray-400 text-[9px]"></i>
+                    <p class="text-gray-600 dark:text-gray-400 truncate" title="{{ s.gestor_responsavel_nome }}">
+                      {{ s.gestor_responsavel_nome|default:'—'|truncatechars:15 }}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <!-- Justificativa (opcional) -->
+              <!-- Justificativa (quando existir) -->
               {% if s.justificativa %}
               <div class="pt-1 border-t border-gray-100 dark:border-gray-700">
-                <p class="text-[8px] text-gray-400 uppercase tracking-wider mb-1">Justificativa</p>
-                <p class="text-[10px] text-gray-500 line-clamp-2">{{ s.justificativa|truncatechars:40 }}</p>
+                <p class="text-[8px] text-gray-400 uppercase tracking-wider mb-0.5">Justificativa</p>
+                <p class="text-[10px] text-gray-500 line-clamp-2">{{ s.justificativa|truncatechars:50 }}</p>
               </div>
               {% endif %}
             </div>
 
-            <!-- CARD FOOTER - AÇÃO -->
-            <div class="p-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+            <!-- FOOTER com Ações -->
+            <div class="p-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
               {% if s.status == 'AGUARDANDO_SAIDA_PORTARIA' %}
                 <a href="{% url 'portaria_registrar_saida' s.id %}" 
-                   class="flex items-center justify-center gap-2 w-full py-2 bg-[#00594C] hover:bg-[#004238] text-white rounded-lg text-sm font-medium transition-all group-hover:shadow-md">
+                   class="flex items-center justify-center gap-2 w-full py-1.5 bg-[#00594C] hover:bg-[#004238] text-white rounded-md text-sm font-medium transition-all">
                   <i class="fa-solid fa-door-open text-xs !text-white"></i>
                   <span class="!text-white">Registrar Saída</span>
                 </a>
               {% else %}
                 <a href="{% url 'visualizar_solicitacao' s.id %}" 
-                   class="flex items-center justify-center gap-2 w-full py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-all">
-                  <i class="fa-solid fa-eye text-xs !text-white"></i>
-                  <span class="!text-white">Ver Detalhes</span>
+                   class="flex items-center justify-center gap-2 w-full py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-md text-sm font-medium transition-all">
+                  <i class="fa-solid fa-eye text-xs"></i>
+                  <span>Visualizar</span>
                 </a>
               {% endif %}
+              
+              <a href="{% url 'detalhes_solicitacao' s.id %}" 
+                 class="flex items-center justify-center gap-2 w-full py-1.5 bg-gray-300 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium transition-all border border-gray-200 dark:border-gray-600">
+                <i class="fa-solid fa-circle-info text-xs"></i>
+                <span>Detalhes</span>
+              </a>
             </div>
           </div>
           {% endfor %}
@@ -353,33 +252,33 @@
         <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
           <p class="text-sm text-gray-500 dark:text-gray-400">
             Mostrando <span class="font-semibold text-gray-900 dark:text-white">{{ solicitacoes|length }}</span> 
-            saída{{ solicitacoes|pluralize:'s' }} 
-            {% if status_filtro == 'pendentes' %}pendente{{ solicitacoes|pluralize:'s' }}{% endif %}
-            {% if status_filtro == 'finalizadas' %}finalizada{{ solicitacoes|pluralize:'s' }}{% endif %}
+            saída{{ solicitacoes|pluralize }} 
+            {% if status_filtro == 'pendentes' %}pendente{{ solicitacoes|pluralize }}{% endif %}
+            {% if status_filtro == 'finalizadas' %}finalizada{{ solicitacoes|pluralize }}{% endif %}
           </p>
         </div>
       {% else %}
         <!-- SEM RESULTADOS -->
-        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-            <i class="fa-solid fa-door-closed text-3xl text-gray-400"></i>
+        <div class="text-center py-12 sm:py-16 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-3">
+            <i class="fa-solid fa-door-closed text-2xl text-gray-400"></i>
           </div>
-          <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+          <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
             Nenhuma saída encontrada
           </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-            {% if status_filtro or busca %}
-              Nenhum registro corresponde aos filtros aplicados. Tente ajustar os filtros.
+          <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto px-4">
+            {% if status_filtro and status_filtro != 'todas' or busca %}
+              Nenhum registro corresponde aos filtros aplicados.
             {% else %}
               Não há solicitações aguardando saída no momento.
             {% endif %}
           </p>
-          {% if status_filtro or busca %}
-          <div class="mt-6">
+          {% if status_filtro and status_filtro != 'todas' or busca %}
+          <div class="mt-4">
             <a href="{% url 'listar_saidas_portaria' %}" 
-               class="inline-flex items-center gap-2 px-5 py-2 bg-[#00594C] text-white rounded-lg text-sm hover:bg-[#004238] transition-colors shadow-sm">
-              <i class="fa-solid fa-broom !text-white"></i>
-              <span class="!text-white">Limpar filtros</span>
+               class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#00594C] text-white rounded-md text-sm hover:bg-[#004238] transition-colors">
+              <i class="fa-solid fa-rotate-right text-xs"></i>
+              <span>Limpar filtros</span>
             </a>
           </div>
           {% endif %}
@@ -389,7 +288,6 @@
   </div>
 </div>
 
-<!-- Mantém os mesmos estilos e scripts existentes -->
 <style>
   .line-clamp-2 {
     display: -webkit-box;
@@ -398,96 +296,74 @@
     overflow: hidden;
   }
 
-
-
   input[type="date"]::-webkit-calendar-picker-indicator {
-      opacity: 0;
-      position: absolute;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
   }
   
   [title] {
     cursor: help;
   }
   
-  .transition-all {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Função auxiliar para definir filtro de status
-        function setStatusFilter(status) {
-            const form = document.getElementById('filterForm')
-            const statusInput = document.getElementById('statusInput')
-          
-            if (statusInput) {
-                statusInput.value = status
-            }
-          
-            // Atualizar visual dos botões
-            const buttons = document.querySelectorAll('button[onclick^="setStatusFilter"]')
-            buttons.forEach((button) => {
-                const onclickText = button.getAttribute('onclick')
-                const match = onclickText.match(/setStatusFilter\('([^']*)'\)/)
-                if (match) {
-                    const buttonStatus = match[1]
-          
-                    button.classList.remove('bg-[#00594C]', 'text-white', 'bg-orange-500', 'bg-green-600')
-                    button.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-          
-                    if (buttonStatus === status) {
-                        if (status === '') {
-                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-                            button.classList.add('bg-[#00594C]', 'text-white')
-                        } else if (status === 'pendentes') {
-                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-                            button.classList.add('bg-orange-500', 'text-white')
-                        } else if (status === 'finalizadas') {
-                            button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
-                            button.classList.add('bg-green-600', 'text-white')
-                        }
+document.addEventListener("DOMContentLoaded", function() {
+    // Função para definir filtro de status
+    window.setStatusFilter = function(status) {
+        const form = document.getElementById('filterForm');
+        const statusInput = document.getElementById('statusInput');
+        
+        if (statusInput) {
+            statusInput.value = status === 'todas' ? '' : status;
+        }
+        
+        // Atualizar visual dos botões
+        const buttons = document.querySelectorAll('button[onclick^="setStatusFilter"]');
+        buttons.forEach((button) => {
+            const onclickText = button.getAttribute('onclick');
+            const match = onclickText.match(/setStatusFilter\('([^']*)'\)/);
+            if (match) {
+                const buttonStatus = match[1];
+                
+                // Reset classes
+                button.classList.remove('bg-orange-500', 'bg-[#00594C]', 'text-white', 'shadow-sm');
+                button.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                
+                // Apply active classes
+                if (buttonStatus === status) {
+                    if (status === 'pendentes') {
+                        button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                        button.classList.add('bg-orange-500', 'text-white', 'shadow-sm');
+                    } else if (status === 'todas' || !status) {
+                        button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                        button.classList.add('bg-[#00594C]', 'text-white', 'shadow-sm');
                     }
                 }
-            })
-          
-            form.submit()
-        }
-        
-        // Função para exportar dados
-        function exportarDados() {
-            const currentUrl = new URL(window.location.href)
-            const params = new URLSearchParams(currentUrl.search)
-            params.delete('page')
-            const exportUrl = "{% url 'exportar_saidas_portaria_excel' %}?" + params.toString()
-            window.location.href = exportUrl
-        }
-        
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.querySelector('input[name="busca"]')
-          
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault()
-                        document.getElementById('filterForm').submit()
-                    }
-                })
             }
-        })
+        });
         
-        // Função para atualizar lista de cards (apenas para o contador)
-        function atualizarListaCards() {
-            // Apenas recarrega a página para mostrar os novos dados
-            location.reload()
-        }
-    })
+        form.submit();
+    };
+    
+    // Enter key no campo de busca
+    const searchInput = document.querySelector('input[name="busca"]');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('filterForm').submit();
+            }
+        });
+    }
+});
 </script>
 
 {% endblock %}

@@ -86,9 +86,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
         email.send(fail_silently=True)
 
-
-
-# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM) - AQUI  CRIA A SOLICITAÇÃPO, MAS SE FOR GESTOR/ADM JÁ APROVA AUTOMATICAMENTE
+# SOLICITAR VEÍCULO (Solicitante, Gestor ou ADM)
 @login_required
 def solicitar_veiculo(request, veiculo_id):
 
@@ -139,7 +137,7 @@ def solicitar_veiculo(request, veiculo_id):
             motorista_id = request.POST.get("motorista")
             destino = request.POST.get("destino")
             justificativa = request.POST.get("justificativa", "")
-
+            observacao = request.POST.get("observacao", "")  # <-- CAMPO ADICIONADO
 
             previsao_saida_str = request.POST.get("previsao_saida")
             previsao_saida = None
@@ -154,7 +152,6 @@ def solicitar_veiculo(request, veiculo_id):
                 except:
                     previsao_saida = None
 
-            # 
             previsao_retorno_str = request.POST.get("previsao_retorno")
             previsao_retorno = None
 
@@ -168,13 +165,12 @@ def solicitar_veiculo(request, veiculo_id):
                 except ValueError:
                     previsao_retorno = None
 
-            #  Validação de datas
+            # Validação de datas
             if previsao_saida and previsao_retorno:
                 if previsao_retorno <= previsao_saida:
                     messages.error(request, "Retorno deve ser após a saída.")
                     return redirect("solicitar_veiculo", veiculo_id=veiculo.id)    
 
-            
             if not motorista_id:
                 messages.error(request, "Selecione um motorista.")
                 return redirect("solicitar_veiculo", veiculo_id=veiculo.id)
@@ -185,7 +181,7 @@ def solicitar_veiculo(request, veiculo_id):
                 contrato=contrato
             )
 
-            #  REGRA: gestor/adm já cria aprovado
+            # REGRA: gestor/adm já cria aprovado
             if perfil.nivel == "gestor" or perfil.nivel == "adm":
                 status_inicial = "AGUARDANDO_SAIDA_PORTARIA"
                 data_aprovacao = timezone.now()
@@ -197,7 +193,7 @@ def solicitar_veiculo(request, veiculo_id):
                 gestor_responsavel = None
                 gestor_responsavel_nome = None
 
-            # CRIA SOLICITAÇÃO
+            # CRIA SOLICITAÇÃO COM OBSERVAÇÃO (SEM OS METADADOS)
             solicitacao = SolicitacaoVeiculo.objects.create(
                 origem="SISTEMA",
                 veiculo=veiculo,
@@ -206,6 +202,7 @@ def solicitar_veiculo(request, veiculo_id):
                 id_contrato=contrato.id if contrato else None,
                 destino=destino,
                 justificativa=justificativa,
+                observacao=observacao,  # <-- SOMENTE O CAMPO PRINCIPAL
                 previsao_retorno=previsao_retorno,
                 status=status_inicial,
                 data_aprovacao=data_aprovacao,
@@ -218,17 +215,24 @@ def solicitar_veiculo(request, veiculo_id):
                 previsao_saida=previsao_saida
             )
 
+            # REMOVA ESTA PARTE QUE TENTA SALVAR OS METADADOS:
+            # if observacao:
+            #     solicitacao.observacao_por = 'solicitante'
+            #     solicitacao.observacao_por_nome = nome_solicitante
+            #     solicitacao.observacao_data = timezone.now()
+            #     solicitacao.save(update_fields=['observacao_por', 'observacao_por_nome', 'observacao_data'])
+
             # NOTIFICA GESTORES SE FOR SOLICITANTE (GESTOR/ADM JÁ APROVA, ENTÃO NÃO PRECISA NOTIFICAR)
-            if perfil.nivel != "gestor":
+            if perfil.nivel != "gestor" and perfil.nivel != "adm":
                 notificar_gestores_nova_solicitacao(request, solicitacao)
 
+            # Atualiza status do veículo
             Veiculo.objects.filter(id=veiculo.id).update(status="Reservado")
 
             if perfil.nivel == "gestor" or perfil.nivel == "adm":
                 messages.success(request, "Solicitação criada e aprovada automaticamente.")
             else:
                 messages.success(request, "Solicitação enviada ao gestor.")
-        
 
             return redirect("lista_veiculos")
 
@@ -1375,103 +1379,92 @@ def exportar_excel_solicitacoes(request):
 
 # EDITAR SOLICITAÇÃO (APENAS SE ESTIVER PENDENTE E FOR O SOLICITANTE)
 @login_required
-def editar_solicitacao(request, pk):
-    solicitacao = get_object_or_404(SolicitacaoVeiculo, pk=pk)
-
-    perfil = getattr(request.user, "perfilusuario", None)
-
-    #  PERMISSÃO
-    pode_editar = False
-
-    if perfil:
-        if perfil.nivel == "adm":
-            pode_editar = True
-
-        elif perfil.nivel == "gestor":
-            if solicitacao.contrato == perfil.contrato:
-                pode_editar = True
-
-        elif perfil.nivel == "basico":
-            if (
-                solicitacao.solicitante == request.user and
-                solicitacao.status == "PENDENTE"
-            ):
-                pode_editar = True
-
-    if not pode_editar:
-        messages.error(request, "Você não tem permissão.")
-        return redirect("gestor_solicitacoes")
-
-    #  REGRA DE NEGÓCIO
-    if solicitacao.status not in ["PENDENTE", "AGUARDANDO_SAIDA_PORTARIA"]:
-        messages.error(request, "Não é possível editar após a saída.")
-        return redirect("gestor_solicitacoes")
-
+def editar_solicitacao(request, solicitacao_id):
+    
+    solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
+    
+    # Verifica permissão (apquem criou ou gestor/adm do mesmo contrato)
+    perfil = request.user.perfilusuario
+    
+    if solicitacao.solicitante != request.user and perfil.nivel not in ['gestor', 'adm']:
+        messages.error(request, "Você não tem permissão para editar esta solicitação.")
+        return redirect('minhas_solicitacoes')
+    
+    # Verifica se a solicitação pode ser editada (apenas PENDENTE ou REPROVADA)
+    if solicitacao.status not in ['PENDENTE', 'REPROVADA']:
+        messages.error(request, "Esta solicitação não pode mais ser editada.")
+        return redirect('detalhes_solicitacao', solicitacao_id=solicitacao.id)
+    
+    veiculo = solicitacao.veiculo
     contrato = solicitacao.contrato
     motoristas = Motorista.objects.filter(contrato=contrato)
-
+    
     if request.method == "POST":
-
-        motorista_id = request.POST.get("motorista")
-        destino = request.POST.get("destino")
-        justificativa = request.POST.get("justificativa", "")
-
-        previsao_retorno_str = request.POST.get("previsao_retorno")
-        previsao_retorno = None
-
-        if previsao_retorno_str:
-            try:
-                previsao_retorno = datetime.strptime(
-                    previsao_retorno_str,
-                    "%Y-%m-%dT%H:%M"
-                )
-                previsao_retorno = timezone.make_aware(previsao_retorno)
-            except:
-                pass
-
-
-        previsao_saida_str = request.POST.get("previsao_saida")
-
-        if previsao_saida_str:
-            try:
-                previsao_saida = datetime.strptime(
-                    previsao_saida_str,
-                    "%Y-%m-%dT%H:%M"
-                )
-                previsao_saida = timezone.make_aware(previsao_saida)
-            except: 
-                previsao_saida = None
-
-        solicitacao.previsao_saida = previsao_saida    
-
-        motorista = get_object_or_404(
-            Motorista,
-            id=motorista_id,
-            contrato=contrato
-        )
-
-        solicitacao.motorista = motorista
-        solicitacao.destino = destino
-        solicitacao.justificativa = justificativa
-        solicitacao.previsao_retorno = previsao_retorno
-
-        #  auditoria
-        solicitacao.editado_por = request.user
-        solicitacao.editado_por_nome = request.user.get_full_name() or request.user.username
-        solicitacao.data_edicao = timezone.now()
-
-        solicitacao.save()
-
-        messages.success(request, "Solicitação atualizada.")
-        return redirect("gestor_solicitacoes")
-
-    return render(request, "solicitantes/solicitar.html", {
-        "veiculo": solicitacao.veiculo,
-        "motoristas": motoristas,
+        with transaction.atomic():
+            motorista_id = request.POST.get("motorista")
+            destino = request.POST.get("destino")
+            justificativa = request.POST.get("justificativa", "")
+            observacao = request.POST.get("observacao", "")  # <-- CAMPO ADICIONADO
+            
+            previsao_saida_str = request.POST.get("previsao_saida")
+            previsao_retorno_str = request.POST.get("previsao_retorno")
+            
+            # Processa datas...
+            previsao_saida = None
+            if previsao_saida_str:
+                try:
+                    previsao_saida = datetime.strptime(previsao_saida_str, "%Y-%m-%dT%H:%M")
+                    previsao_saida = timezone.make_aware(previsao_saida)
+                except:
+                    pass
+            
+            previsao_retorno = None
+            if previsao_retorno_str:
+                try:
+                    previsao_retorno = datetime.strptime(previsao_retorno_str, "%Y-%m-%dT%H:%M")
+                    previsao_retorno = timezone.make_aware(previsao_retorno)
+                except:
+                    pass
+            
+            # Validações
+            if not motorista_id:
+                messages.error(request, "Selecione um motorista.")
+                return redirect('editar_solicitacao', solicitacao_id=solicitacao.id)
+            
+            if previsao_saida and previsao_retorno and previsao_retorno <= previsao_saida:
+                messages.error(request, "Retorno deve ser após a saída.")
+                return redirect('editar_solicitacao', solicitacao_id=solicitacao.id)
+            
+            motorista = get_object_or_404(Motorista, id=motorista_id, contrato=contrato)
+            
+            # Atualiza os campos
+            solicitacao.motorista = motorista
+            solicitacao.destino = destino
+            solicitacao.justificativa = justificativa
+            solicitacao.observacao = observacao  # <-- CAMPO ADICIONADO
+            solicitacao.previsao_saida = previsao_saida
+            solicitacao.previsao_retorno = previsao_retorno
+            solicitacao.data_edicao = timezone.now()
+            solicitacao.editado_por = request.user
+            solicitacao.editado_por_nome = request.user.get_full_name() or request.user.username
+            
+            # Se houver observação, atualiza os metadados
+            if observacao:
+                solicitacao.observacao_por = 'solicitante'
+                solicitacao.observacao_por_nome = request.user.get_full_name() or request.user.username
+                solicitacao.observacao_data = timezone.now()
+            
+            solicitacao.save()
+            
+            messages.success(request, "Solicitação atualizada com sucesso.")
+            return redirect('detalhes_solicitacao', solicitacao_id=solicitacao.id)
+    
+    return render(request, "solicitantes/editar_solicitacao.html", {
         "solicitacao": solicitacao,
-        "modo_edicao": True
+        "veiculo": veiculo,
+        "motoristas": motoristas,
+        "modo_edicao": True,
     })
-
 
 
 # EXPORTAR MINHAS SOLICITAÇÕES PARA EXCEL (USUÁRIOS PERFIL)
