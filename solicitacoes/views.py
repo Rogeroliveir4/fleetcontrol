@@ -27,6 +27,7 @@ from django.db import transaction
 from django.http import JsonResponse
 
 
+
 # FUNÇÃO PARA NOTIFICAR GESTORES VIA EMAIL SOBRE NOVA SOLICITAÇÃO
 def notificar_gestores_nova_solicitacao(request, solicitacao):
 
@@ -1453,6 +1454,11 @@ def editar_solicitacao(request, pk):
         solicitacao.destino = destino
         solicitacao.justificativa = justificativa
         solicitacao.previsao_retorno = previsao_retorno
+
+        #  auditoria
+        solicitacao.editado_por = request.user
+        solicitacao.editado_por_nome = request.user.get_full_name() or request.user.username
+        solicitacao.data_edicao = timezone.now()
 
         solicitacao.save()
 

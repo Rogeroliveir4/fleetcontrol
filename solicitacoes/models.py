@@ -102,6 +102,16 @@ class SolicitacaoVeiculo(models.Model):
         blank=True
     )
 
+    editado_por = models.ForeignKey(
+    User,
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name="solicitacoes_editadas"
+    )
+
+    editado_por_nome = models.CharField(max_length=150, null=True, blank=True)
+    data_edicao = models.DateTimeField(null=True, blank=True)
     
 
     # AUDITORIA – APROVAÇÃO

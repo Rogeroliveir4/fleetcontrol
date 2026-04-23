@@ -954,6 +954,9 @@
 
 <script>
 
+    function estaNaTelaPortaria() {
+    return window.location.pathname.includes("/portaria");
+}
 
 // CONTADOR DE APROVAÇÕES PENDENTES (RELOAD AUTOMÁTICO SE AUMENTAR)     - VISÃO DO GESTOR
 let ultimaId = null;
@@ -1006,27 +1009,27 @@ function atualizarContadorAprovacoes() {
             const total = data.total;
             const novaId = data.ultima_id;
 
-            // 🔢 Atualiza badge sempre
+            //  Atualiza badge sempre
             el.innerText = total;
             el.style.display = total > 0 ? "flex" : "none";
 
-            // 🔥 PRIMEIRA EXECUÇÃO
+            //  PRIMEIRA EXECUÇÃO
             if (primeiraExecucao) {
                 ultimaId = novaId;
                 primeiraExecucao = false;
                 return;
             }
 
-            // 🔔 NOVA SOLICITAÇÃO (SEM RELOAD)
+            //  NOVA SOLICITAÇÃO (SEM RELOAD)
             if (novaId !== ultimaId && novaId) {
-                console.log("🔔 Nova solicitação detectada");
+                console.log(" Nova solicitação detectada");
 
                 if (!document.getElementById("aviso-nova-aprovacao")) {
                     mostrarAvisoNovaAprovacao();
                 }
             }
 
-            // 🔁 Atualiza estado
+            //  Atualiza estado
             ultimaId = novaId;
         })
         .catch(err => console.error('Erro gestor:', err));
@@ -1145,6 +1148,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (!document.getElementById("aviso-nova-solicitacao")) {
                         mostrarAvisoNovaSolicitacao();
+                    }
+
+                    //  SÓ RECARREGA NA LISTA
+                    if (estaNaTelaPortaria() && !usuarioEstaInteragindo()) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
                     }
                 }
 
