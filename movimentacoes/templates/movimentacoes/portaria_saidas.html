@@ -276,9 +276,9 @@
           {% if status_filtro and status_filtro != 'todas' or busca %}
           <div class="mt-4">
             <a href="{% url 'listar_saidas_portaria' %}" 
-               class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#00594C] text-white rounded-md text-sm hover:bg-[#004238] transition-colors">
-              <i class="fa-solid fa-rotate-right text-xs"></i>
-              <span>Limpar filtros</span>
+               class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#00594C] !text-white rounded-md text-sm hover:bg-[#004238] transition-colors">
+              <i class="fa-solid fa-rotate-right text-xs !text-white"></i>
+              <span class="!text-white">Limpar filtros</span>
             </a>
           </div>
           {% endif %}

@@ -5,42 +5,61 @@
 
 <div class="max-w-3xl mx-auto px-4 py-4">
 
-    <!-- CABEÇALHO -->
-    <div class="bg-[#00594C] text-white rounded-xl p-4 mb-5 shadow-sm">
-        <h1 class="text-xl font-bold">Registrar Retorno</h1>
-        <p class="text-xs opacity-90 mt-1">Confirme KM real, foto do hodômetro e observações.</p>
+    <!-- CABEÇALHO COM GRADIENTE VERDE -->
+    <div class="bg-gradient-to-r from-[#00594C] to-[#008A6E] text-white rounded-xl p-4 mb-5 shadow-md">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket text-white text-lg"></i>
+                    Registrar Retorno
+                </h1>
+                <p class="text-xs opacity-90 mt-1">Confirme KM real, foto do hodômetro e observações</p>
+            </div>
+            <div class="bg-white/20 rounded-full p-2">
+                <i class="fa-solid fa-truck-fast text-white text-xl"></i>
+            </div>
+        </div>
     </div>
 
     <!-- CARD PRINCIPAL -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-l-[#00594C]">
         <form method="POST" enctype="multipart/form-data" id="retornoForm">
             {% csrf_token %}
 
-            <!-- DADOS DO VEÍCULO -->
+            <!-- DADOS DO VEÍCULO - CARD VERDE CLARO -->
             <div class="mb-5 pb-3 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-2 mb-2">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100">
-                            {{ mov.veiculo.tag_interna}}
+                <div class="flex items-center gap-3 mb-3 p-3 bg-gradient-to-r from-[#E8F3F0] dark:from-gray-800 dark:to-gray-800 rounded-lg border dark:border-gray-700">
+                    <div class="w-10 h-10 bg-[#00594C] rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-truck !text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-bold text-[#00594C] dark:text-[#008A6E]">
+                            {{ mov.veiculo.tag_interna }}
                         </h2>
-                        <p class="text-xs text-gray-600 dark:text-gray-300">
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
                             {{ mov.veiculo.marca }} {{ mov.veiculo.modelo }} • {{ mov.veiculo.cor }}
                         </p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3 mt-3">
-                    <div>
-                        <p class="text-xs font-medium text-gray-500">Motorista</p>
-                        <p class="text-sm text-gray-800">{{ mov.motorista.nome }}</p>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-user text-[#00594C] dark:text-[#008A6E] text-xs"></i> Motorista
+                        </p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 font-semibold">{{ mov.motorista.nome }}</p>
                     </div>
-                    <div>
-                        <p class="text-xs font-medium text-gray-500">Destino</p>
-                        <p class="text-sm text-gray-800">{{ mov.destino }}</p>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-[#00594C] dark:text-[#008A6E] text-xs"></i> Destino
+                        </p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 font-semibold">{{ mov.destino }}</p>
                     </div>
-                    <div class="col-span-2">
-                        <p class="text-xs font-medium text-gray-500">Saída</p>
-                        <p class="text-sm text-gray-800">{{ mov.data_saida|date:"d/m/Y H:i" }}</p>
+                    <div class="col-span-2 bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-regular fa-calendar text-[#00594C] dark:text-[#008A6E] text-xs"></i> Saída
+                        </p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 font-semibold">{{ mov.data_saida|date:"d/m/Y H:i" }}</p>
                     </div>
                 </div>
             </div>
@@ -49,22 +68,28 @@
             <div class="mb-5">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">🛣️ KM Saída</label>
-                        <div class="p-2 rounded-lg bg-blue-50 border border-blue-200 text-lg font-bold text-blue-700 text-center">
-                            {{ mov.veiculo.km_atual }}
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-road text-[#00594C] dark:text-[#008A6E]"></i> KM Saída
+                        </label>
+                        <div class="p-2 rounded-lg bg-[#E8F3F0] dark:bg-gray-700 border border-[#00594C]/20 dark:border-gray-600 text-lg font-bold text-[#00594C] dark:text-[#008A6E] text-center">
+                            {{ mov.veiculo.km_atual|floatformat:0 }}
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">📍 KM Retorno *</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-flag-checkered text-[#00594C] dark:text-[#008A6E]"></i> KM Retorno <span class="text-red-500">*</span>
+                        </label>
                         <input type="text" name="km_retorno" id="km_retorno"
-                            class="w-full p-2 rounded-lg bg-gray-50 border border-gray-300 text-lg font-bold text-center"
-                            placeholder="Ex: 45.678" required>
+                            class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-lg font-bold text-center focus:border-[#00594C] focus:ring-1 focus:ring-[#00594C] transition dark:text-white"
+                            placeholder="0" required>
                     </div>
                 </div>
                 <div class="mt-3">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">📏 Distância</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                        <i class="fa-solid fa-arrows-left-right text-[#00594C] dark:text-[#008A6E]"></i> Distância Percorrida
+                    </label>
                     <div id="distancia"
-                        class="p-2 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-xl font-bold text-green-700 text-center">
+                        class="p-2 rounded-lg bg-gradient-to-r from-[#E8F3F0] to-[#D4EAE4] dark:from-gray-700 dark:to-gray-700 border border-[#00594C]/20 dark:border-gray-600 text-xl font-bold text-[#00594C] dark:text-[#008A6E] text-center">
                         0 km
                     </div>
                 </div>
@@ -73,109 +98,111 @@
             <!-- FOTOS -->
             <div class="mb-5">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-base font-semibold text-gray-800">📸 Fotos</h3>
-                    <span class="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded">* Hodômetro obrigatório</span>
+                    <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-[#00594C] dark:text-[#008A6E]"></i> Registro Fotográfico
+                    </h3>
+                    <span class="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-full border border-red-200 dark:border-red-800">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i>Hodômetro obrigatório
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <!-- FOTO HODÔMETRO (OBRIGATÓRIA) -->
                     <div class="col-span-2">
-                        <label class="block text-xs font-medium text-red-700 mb-1">⚠️ Foto do Hodômetro *</label>
+                        <label class="block text-xs font-medium text-red-700 dark:text-red-400 mb-2 flex items-center gap-1">
+                            <i class="fa-solid fa-gauge-high"></i> ⚠️ Foto do Hodômetro <span class="text-red-600 font-bold">(OBRIGATÓRIA)</span>
+                        </label>
                         <input type="file" name="foto_retorno_painel" id="foto_retorno_painel" accept="image/*" capture="environment" class="hidden">
                         <label for="foto_retorno_painel" id="painelLabel"
-                            class="block p-2 border-2 border-dashed border-red-400 rounded-lg text-center cursor-pointer hover:bg-red-50 bg-red-50/30">
+                            class="block p-3 border-2 border-dashed border-red-400 dark:border-red-600 rounded-lg text-center cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 bg-red-50/30 dark:bg-red-900/10 transition-all hover:scale-[1.01]">
                             <div class="flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-gauge-high text-red-600 text-lg"></i>
-                                <span class="text-sm font-medium">Tirar foto</span>
+                                <div class="bg-red-100 dark:bg-red-800 rounded-full p-1.5">
+                                    <i class="fa-solid fa-gauge-high text-red-600 dark:text-red-400 text-lg"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tirar foto do hodômetro</span>
                             </div>
                         </label>
-                        <div id="preview_foto_retorno_painel" class="mt-1 hidden">
+                        <div id="preview_foto_retorno_painel" class="mt-2 hidden">
                             <div class="relative">
-                                <img src="" class="w-full h-24 object-cover rounded border border-green-300">
+                                <img src="" class="w-full h-28 object-cover rounded-lg border-2 border-[#00594C] dark:border-[#008A6E] shadow-sm">
                                 <button type="button" onclick="removerFoto('foto_retorno_painel', 'preview_foto_retorno_painel')"
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 transition">×</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- FOTO GERAL -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">📸 Geral</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-car text-[#00594C] dark:text-[#008A6E]"></i> Geral
+                        </label>
                         <input type="file" name="foto_retorno_geral" id="foto_retorno_geral" accept="image/*" capture="environment" class="hidden">
                         <label for="foto_retorno_geral"
-                            class="block p-2 border border-dashed border-blue-300 rounded-lg text-center cursor-pointer hover:bg-blue-50">
-                            <i class="fa-solid fa-car text-blue-600 text-sm"></i>
+                            class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-[#00594C] dark:group-hover:text-[#008A6E] text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_geral" class="mt-1 hidden">
-                            <div class="relative">
-                                <img src="" class="w-full h-20 object-cover rounded border">
-                                <button type="button" onclick="removerFoto('foto_retorno_geral', 'preview_foto_retorno_geral')"
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
-                            </div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_geral', 'preview_foto_retorno_geral')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
 
                     <!-- FOTO AVARIA -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">⚠️ Avaria</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-triangle-exclamation text-orange-500"></i> Avaria
+                        </label>
                         <input type="file" name="foto_retorno_avaria" id="foto_retorno_avaria" accept="image/*" capture="environment" class="hidden">
                         <label for="foto_retorno_avaria"
-                            class="block p-2 border border-dashed border-orange-300 rounded-lg text-center cursor-pointer hover:bg-orange-50">
-                            <i class="fa-solid fa-triangle-exclamation text-orange-600 text-sm"></i>
+                            class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-orange-500 text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_avaria" class="mt-1 hidden">
-                            <div class="relative">
-                                <img src="" class="w-full h-20 object-cover rounded border">
-                                <button type="button" onclick="removerFoto('foto_retorno_avaria', 'preview_foto_retorno_avaria')"
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
-                            </div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_avaria', 'preview_foto_retorno_avaria')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
 
                     <!-- FOTO EQUIPAMENTO -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">🔧 Equipamento</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-tools text-[#00594C] dark:text-[#008A6E]"></i> Equipamento
+                        </label>
                         <input type="file" name="foto_retorno_equipamento" id="foto_retorno_equipamento" accept="image/*" capture="environment" class="hidden">
                         <label for="foto_retorno_equipamento"
-                            class="block p-2 border border-dashed border-green-300 rounded-lg text-center cursor-pointer hover:bg-green-50">
-                            <i class="fa-solid fa-tools text-green-600 text-sm"></i>
+                            class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-[#E8F3F0] dark:hover:bg-gray-700 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-[#00594C] dark:group-hover:text-[#008A6E] text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_equipamento" class="mt-1 hidden">
-                            <div class="relative">
-                                <img src="" class="w-full h-20 object-cover rounded border">
-                                <button type="button" onclick="removerFoto('foto_retorno_equipamento', 'preview_foto_retorno_equipamento')"
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
-                            </div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_equipamento', 'preview_foto_retorno_equipamento')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
 
                     <!-- FOTO PORTA-MALAS -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">🧳 Porta-malas</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-suitcase text-blue-600"></i> Porta-malas
+                        </label>
                         <input type="file" name="foto_retorno_porta_malas" id="foto_retorno_porta_malas" accept="image/*" capture="environment" class="hidden">
                         <label for="foto_retorno_porta_malas"
-                            class="block p-2 border border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:bg-gray-50">
-                            <i class="fa-solid fa-suitcase text-gray-600 text-sm"></i>
+                            class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-blue-600 text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_porta_malas" class="mt-1 hidden">
-                            <div class="relative">
-                                <img src="" class="w-full h-20 object-cover rounded border">
-                                <button type="button" onclick="removerFoto('foto_retorno_porta_malas', 'preview_foto_retorno_porta_malas')"
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
-                            </div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_porta_malas', 'preview_foto_retorno_porta_malas')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
 
                     <!-- FOTO CAÇAMBA -->
                     {% if mov.com_cacamba %}
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">🚛 Caçamba</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-dumpster text-purple-600"></i> Caçamba
+                        </label>
                         <input type="file" name="foto_retorno_cacamba" id="foto_retorno_cacamba" accept="image/*" class="hidden">
-                        <label for="foto_retorno_cacamba" class="block p-2 border border-dashed border-purple-300 rounded-lg text-center cursor-pointer">
-                            <i class="fa-solid fa-dumpster text-purple-600 text-sm"></i>
+                        <label for="foto_retorno_cacamba" class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-purple-600 text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_cacamba" class="mt-1 hidden">
-                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded"><button type="button" onclick="removerFoto('foto_retorno_cacamba', 'preview_foto_retorno_cacamba')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_cacamba', 'preview_foto_retorno_cacamba')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
                     {% endif %}
@@ -183,13 +210,15 @@
                     <!-- FOTO PRANCHA -->
                     {% if mov.com_prancha %}
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">🚚 Prancha</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-trailer text-indigo-600"></i> Prancha
+                        </label>
                         <input type="file" name="foto_retorno_prancha" id="foto_retorno_prancha" accept="image/*" class="hidden">
-                        <label for="foto_retorno_prancha" class="block p-2 border border-dashed border-purple-300 rounded-lg text-center cursor-pointer">
-                            <i class="fa-solid fa-trailer text-purple-600 text-sm"></i>
+                        <label for="foto_retorno_prancha" class="block p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition group">
+                            <i class="fa-solid fa-camera text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 text-xl"></i>
                         </label>
                         <div id="preview_foto_retorno_prancha" class="mt-1 hidden">
-                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded"><button type="button" onclick="removerFoto('foto_retorno_prancha', 'preview_foto_retorno_prancha')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
+                            <div class="relative"><img src="" class="w-full h-20 object-cover rounded border dark:border-gray-600"><button type="button" onclick="removerFoto('foto_retorno_prancha', 'preview_foto_retorno_prancha')" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button></div>
                         </div>
                     </div>
                     {% endif %}
@@ -198,39 +227,43 @@
 
             <!-- OBSERVAÇÃO -->
             <div class="mb-5">
-                <label class="block text-xs font-medium mb-1 text-gray-700">📝 Observações</label>
+                <label class="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <i class="fa-regular fa-note-sticky text-[#00594C] dark:text-[#008A6E]"></i> Observações
+                </label>
                 <textarea name="observacao" id="observacao" rows="2"
-                    class="w-full rounded-lg bg-gray-50 px-3 py-2 text-sm border border-gray-300"
+                    class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 focus:border-[#00594C] focus:ring-1 focus:ring-[#00594C] transition dark:text-white dark:placeholder-gray-400"
                     placeholder="Anote detalhes importantes..."></textarea>
             </div>
 
             <!-- BOTÕES -->
-            <div class="flex gap-3 pt-3 border-t border-gray-200">
+            <div class="flex gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <a href="{% url 'portaria_retorno_list' %}"
-                    class="flex-1 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-center text-sm font-medium">
-                    Cancelar
+                    class="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-center text-sm font-medium transition flex items-center justify-center gap-2 text-gray-800 dark:text-gray-200">
+                    <i class="fa-solid fa-times"></i> Cancelar
                 </a>
                 <button type="submit" id="submitBtn"
-                    class="flex-1 px-4 py-2 rounded-lg bg-[#00594C] hover:bg-[#00463C] text-white font-semibold text-sm">
-                    Registrar
+                    class="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#00594C] to-[#008A6E] hover:from-[#00463C] hover:to-[#00594C] !text-white font-semibold text-sm transition-all hover:shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i> Registrar Retorno
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL VERDE -->
 <div id="obrigatoryPhotoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-3">
-    <div class="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-5">
+    <div class="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-5 shadow-xl">
         <div class="text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fa-solid fa-camera-retro text-red-600 text-2xl"></i>
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-camera-retro text-red-600 dark:text-red-400 text-2xl"></i>
             </div>
-            <h3 class="text-xl font-bold mb-2">⚠️ Foto Obrigatória!</h3>
-            <p class="text-sm text-gray-600 mb-3">Você precisa tirar a <strong class="text-red-600">FOTO DO HODÔMETRO</strong> mostrando o KM atual.</p>
+            <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">⚠️ Foto Obrigatória!</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Você precisa tirar a <strong class="text-[#00594C] dark:text-[#008A6E]">FOTO DO HODÔMETRO</strong> mostrando o KM atual.</p>
             <div class="flex gap-2">
-                <button type="button" onclick="fecharModalEHighlight()" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm">Tirar Foto</button>
-                <button type="button" onclick="fecharModal()" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg text-sm">Cancelar</button>
+                <button type="button" onclick="fecharModalEHighlight()" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#00594C] to-[#008A6E] hover:from-[#00463C] hover:to-[#00594C] text-white rounded-lg text-sm font-medium transition">
+                    <i class="fa-solid fa-camera mr-1"></i> Tirar Foto
+                </button>
+                <button type="button" onclick="fecharModal()" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg text-sm transition text-gray-800 dark:text-gray-200">Cancelar</button>
             </div>
         </div>
     </div>
@@ -240,10 +273,10 @@
     function compressImage(file){return new Promise((resolve,reject)=>{if(file.size<=5*1024*1024)resolve(file);else{const r=new FileReader;r.readAsDataURL(file);r.onload=e=>{const i=new Image;i.src=e.target.result;i.onload=()=>{let w=i.width,h=i.height;if(w>h){if(w>1920){h=h*1920/w;w=1920}}else{if(h>1920){w=w*1920/h;h=1920}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);c.toBlob(b=>{resolve(new File([b],file.name,{type:'image/jpeg'}))},'image/jpeg',0.7)}};r.onerror=reject}})}
     async function setupPhotoWithCompression(i,p){if(!i.files[0])return;let f=i.files[0];if(f.size>5*1024*1024){try{f=await compressImage(f);const dt=new DataTransfer;dt.items.add(f);i.files=dt.files}catch(e){}}const r=new FileReader;r.onload=e=>{const pc=document.getElementById(p);if(pc){pc.querySelector('img').src=e.target.result;pc.classList.remove('hidden')}};r.readAsDataURL(f)}
     window.removerFoto=(i,p)=>{document.getElementById(i).value='';document.getElementById(p).classList.add('hidden')};
-    function calcDistancia(){let ks=parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g,''))||0;let kr=parseFloat(document.getElementById("km_retorno").value.replace(/\./g,''))||0;let d=document.getElementById("distancia");if(kr<=ks)d.innerHTML="Inválido";else d.innerHTML=Math.round(kr-ks).toLocaleString('pt-BR')+" km"}
+    function calcDistancia(){let ks=parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g,''))||0;let kr=parseFloat(document.getElementById("km_retorno").value.replace(/\./g,''))||0;let d=document.getElementById("distancia");if(kr<=ks)d.innerHTML="<span class='text-red-600 dark:text-red-400'><i class='fa-solid fa-circle-exclamation mr-1'></i>Inválido</span>";else d.innerHTML=`<i class="fa-solid fa-road mr-1"></i> ${Math.round(kr-ks).toLocaleString('pt-BR')} km`}
     function abrirModal(){document.getElementById('obrigatoryPhotoModal').style.display='flex';document.body.style.overflow='hidden'}
     function fecharModal(){document.getElementById('obrigatoryPhotoModal').style.display='none';document.body.style.overflow=''}
-    function fecharModalEHighlight(){fecharModal();const pl=document.getElementById('painelLabel');if(pl){pl.style.border='3px solid red';pl.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>pl.style.border='',3000);setTimeout(()=>document.getElementById('foto_retorno_painel').click(),300)}}
+    function fecharModalEHighlight(){fecharModal();const pl=document.getElementById('painelLabel');if(pl){pl.style.border='3px solid #00594C';pl.style.backgroundColor='#E8F3F0';pl.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{pl.style.border='';pl.style.backgroundColor=''},3000);setTimeout(()=>document.getElementById('foto_retorno_painel').click(),300)}}
     document.addEventListener('DOMContentLoaded',()=>{
         calcDistancia();
         const fotoInputs=['foto_retorno_painel','foto_retorno_geral','foto_retorno_avaria','foto_retorno_equipamento','foto_retorno_cacamba','foto_retorno_prancha','foto_retorno_porta_malas'];
@@ -252,7 +285,7 @@
         document.getElementById('retornoForm').addEventListener('submit',function(e){
             if(!document.getElementById('km_retorno').value){e.preventDefault();alert('❌ Informe o KM de retorno!');return}
             let ks=parseFloat("{{ mov.veiculo.km_atual }}".replace(/\./g,'')),kr=parseFloat(document.getElementById('km_retorno').value.replace(/\./g,''));
-            if(kr<=ks){e.preventDefault();alert(`❌ KM inválido! Deve ser maior que ${ks}`);return}
+            if(kr<=ks){e.preventDefault();alert(`❌ KM inválido! Deve ser maior que ${ks.toLocaleString('pt-BR')} km`);return}
             if(!document.getElementById('foto_retorno_painel').files[0]){e.preventDefault();abrirModal();return}
             document.getElementById('km_retorno').value=document.getElementById('km_retorno').value.replace(/\./g,'');
         });
