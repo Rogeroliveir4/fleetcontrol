@@ -12,18 +12,34 @@ class LoginRequiredMiddleware:
             reverse("password_reset_done"),
         ]
 
+        #  ROTAS DINÂMICAS
+        self.public_prefixes = [
+            "/reset/",
+            "/password-reset-confirm/",   #  ADICIONA ISSO
+        ]
+
     def __call__(self, request):
 
-        # Liberar static e media
-        if request.path.startswith("/static/") or request.path.startswith("/media/"):
+        path = request.path
+
+        # Static / media
+        if path.startswith("/static/") or path.startswith("/media/"):
             return self.get_response(request)
 
-        #  LIBERAR ADMIN (ESSENCIAL)
-        if request.path.startswith("/admin/"):
+        # Admin
+        if path.startswith("/admin/"):
             return self.get_response(request)
 
-        # Proteção padrão
-        if not request.user.is_authenticated and request.path not in self.public_urls:
+        #  LIBERA PREFIXOS DINÂMICOS
+        if any(path.startswith(p) for p in self.public_prefixes):
+            return self.get_response(request)
+
+        # URLs públicas exatas
+        if path in self.public_urls:
+            return self.get_response(request)
+
+        # Proteção
+        if not request.user.is_authenticated:
             return redirect("login")
 
         return self.get_response(request)

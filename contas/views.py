@@ -80,37 +80,27 @@ def logout_view(request):
     return redirect("login")
 
 
-# View personalizada para solicitação de recuperação de senha
+
 def password_reset_request(request):
 
+    #  SEMPRE cria o form
     if request.method == "POST":
-
-        # --- Proteção contra múltiplos pedidos ---
-        last_request = request.session.get("last_reset_request")
-
-        if last_request:
-            last_request_time = timezone.datetime.fromisoformat(last_request)
-
-            if timezone.now() - last_request_time < timedelta(minutes=5):
-                # Apenas redireciona silenciosamente (sem mensagem)
-                return redirect("password_reset")
-        # ----------------------------------------
-
         password_reset_form = PasswordResetForm(request.POST)
 
         if password_reset_form.is_valid():
-            data = password_reset_form.cleaned_data['email'].strip()
+            email_input = password_reset_form.cleaned_data['email'].strip()
 
-            # Busca usuário pelo email (case insensitive)
-            user = User.objects.filter(email__iexact=data).first()
+            # Busca usuário (case insensitive)
+            user = User.objects.filter(email__iexact=email_input).first()
 
             if user:
                 try:
-                    subject = "FleetControl - Redefinição de senha da sua conta"
+                    subject = "FleetControl - Redefinição de senha"
 
                     token = default_token_generator.make_token(user)
                     uid = urlsafe_base64_encode(force_bytes(user.pk))
 
+                    # 🔥 IMPORTANTE (funciona melhor com nginx)
                     protocol = 'https' if request.is_secure() else 'http'
                     domain = request.get_host()
 
@@ -124,10 +114,6 @@ def password_reset_request(request):
                     context = {
                         'user': user,
                         'reset_url': reset_url,
-                        'protocol': protocol,
-                        'domain': domain,
-                        'uid': uid,
-                        'token': token,
                     }
 
                     html_message = render_to_string(
@@ -138,18 +124,13 @@ def password_reset_request(request):
                     plain_message = f"""
 Olá {user.get_full_name() or user.username},
 
-Recebemos uma solicitação para redefinir a senha da sua conta no FleetControl.
+Recebemos uma solicitação para redefinir sua senha.
 
-Acesse o link abaixo para criar uma nova senha:
+Acesse o link abaixo:
 
 {reset_url}
 
-Este link é válido por 24 horas.
-
-Se você não solicitou essa redefinição, ignore este email.
-
-Equipe FleetControl
-fleetcontrol.app@gmail.com
+Se não foi você, ignore este email.
 """
 
                     email = EmailMultiAlternatives(
@@ -157,23 +138,19 @@ fleetcontrol.app@gmail.com
                         body=plain_message,
                         from_email="FleetControl <fleetcontrol.app@gmail.com>",
                         to=[user.email],
-                        headers={"Reply-To": "fleetcontrol.app@gmail.com"},
                     )
 
                     email.attach_alternative(html_message, "text/html")
                     email.send(fail_silently=False)
 
-                    print(f"[INFO] Email de recuperação enviado para {user.email}")
-
-                    # Registrar horário da solicitação
-                    request.session["last_reset_request"] = timezone.now().isoformat()
+                    print(f"[INFO] Email enviado para {user.email}")
 
                 except Exception as e:
-                    print(f"[ERRO] Erro ao enviar email para {user.email}: {e}")
+                    print(f"[ERRO] {e}")
 
                     messages.error(
                         request,
-                        "Ocorreu um erro ao enviar o email. Tente novamente."
+                        "Erro ao enviar o email. Tente novamente."
                     )
 
                     return render(
@@ -182,10 +159,10 @@ fleetcontrol.app@gmail.com
                         {"form": password_reset_form}
                     )
 
-            # Mensagem genérica (segurança)
+            # 🔒 Segurança (não revela se email existe)
             messages.success(
                 request,
-                "Se o email estiver cadastrado, você receberá instruções em alguns minutos."
+                "Se o email estiver cadastrado, você receberá instruções."
             )
 
             return redirect("password_reset_done")
