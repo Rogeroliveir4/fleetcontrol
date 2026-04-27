@@ -9,7 +9,7 @@
 
     <!-- HEADER SECTION -->
     <div class="mb-4 md:mb-6">
-        <!-- BANNER - Enhanced with animation -->
+        <!-- BANNER -->
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00594C] via-[#0A7C6C] to-[#00594C] p-4 md:p-8 text-white shadow-xl mb-4 md:mb-6 transform transition-all duration-300 hover:shadow-2xl">
             <div class="absolute inset-0 bg-black/10"></div>
             <div class="relative z-10">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 
-                <!-- STATS BAR - Modern glassmorphism -->
+                <!-- STATS BAR -->
                 <div class="mt-3 md:mt-6 overflow-x-auto md:overflow-visible pb-1 -mx-1 px-1 md:mx-0 md:px-0">
                     <div class="flex md:grid md:grid-cols-7 gap-2 min-w-max md:min-w-0">
                         <a href="?status=PENDENTE" class="stat-card group bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-3 hover:bg-white/30 transition-all flex-shrink-0 w-20 md:w-auto transform hover:scale-105">
@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        <!-- CONTROL BAR - Enhanced -->
+        <!-- CONTROL BAR -->
         <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl shadow-lg p-3 md:p-4 mb-4 border border-gray-200/50 dark:border-gray-700/50">
             <form method="get" id="mainForm">
                 <div class="flex flex-col md:flex-row md:items-center gap-3">
@@ -136,60 +136,14 @@
                     <!-- ACTION BUTTONS -->
                     <div class="flex flex-wrap gap-2">
                         <!-- FILTER BUTTON - Desktop -->
-                        <div class="relative hidden md:block" x-data="{ open: false }">
-                            <button type="button" @click="open = !open" 
-                                    class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
-                                           bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
-                                           border border-gray-200 dark:border-gray-600
-                                           hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover:shadow-md">
-                                <i class="fa-solid fa-filter text-xs"></i>
-                                <span>Filtrar</span>
-                                <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" :class="{'rotate-180': open}"></i>
-                            </button>
-
-                            <!-- DROPDOWN MENU -->
-                            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2" @click.outside="open = false"
-                                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 p-5">
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Status</label>
-                                        <select name="status"
-                                            class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border-0 focus:ring-2 focus:ring-[#00594C]">
-                                            <option value="">Todos os status</option>
-                                            {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
-                                                {% if key != "AGUARDANDO_CHECKLIST" and key != "AGUARDANDO_CHECKLIST_RETORNO" %}
-                                                    <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
-                                                        {{ label }}
-                                                    </option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">De</label>
-                                            <input type="date" name="inicio" value="{{ request.GET.inicio }}"
-                                                class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Até</label>
-                                            <input type="date" name="fim" value="{{ request.GET.fim }}"
-                                                class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-3 pt-2">
-                                        <a href="{% url 'gestor_solicitacoes' %}"
-                                            class="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 text-center rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                                            Limpar
-                                        </a>
-                                        <button type="submit"
-                                            class="flex-1 px-3 py-2 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all">
-                                            Aplicar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <button type="button" id="filterButtonDesktop" 
+                                class="hidden md:flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
+                                       bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
+                                       border border-gray-200 dark:border-gray-600
+                                       hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover:shadow-md">
+                            <i class="fa-solid fa-filter text-xs"></i>
+                            <span>Filtrar</span>
+                        </button>
 
                         <!-- FILTER MOBILE -->
                         <button type="button" onclick="openModalFiltro()" 
@@ -260,7 +214,7 @@
         </div>
     </div>
 
-    <!-- SOLICITAÇÕES SECTION - Enhanced Cards -->
+    <!-- SOLICITAÇÕES SECTION -->
     <div>
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -289,7 +243,7 @@
                                 </h3>
                                 
                                 <div class="flex items-center gap-1.5 mt-1">
-                                    <span class=" inline-flex items-center gap-1 px-2 py-2 rounded-md bg-green-900 dark:bg-green-900 !text-white dark:text-gray-300 font-sans text-[12px] ">
+                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-900 !text-white text-[11px] font-medium">
                                         <i class="fa-solid fa-tag text-[9px] !text-white"></i>
                                         {{ s.veiculo.tag_interna|default:s.veiculo.placa }}
                                     </span>
@@ -331,24 +285,22 @@
                     {% endif %}
                 </div>
 
-                <!-- CARD ACTIONS - Modern Button Grid -->
+                <!-- CARD ACTIONS -->
                 <div class="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        <!-- Details Button -->
                         <a href="{% url 'detalhes_solicitacao' s.id %}"
-                           class="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold
-                                  bg-gray-800 hover:bg-blue-600 text-white shadow-md hover:shadow-lg 
-                                  transition-all duration-200 transform hover:scale-105">
+                           class="flex items-center justify-center gap-1.5 px-2 py-1 rounded-xl text-xs font-semibold
+                                   bg-gray-800 hover:bg-blue-600 text-white shadow-md hover:shadow-lg 
+                                   transition-all duration-200 transform hover:scale-105">
                             <i class="fa-solid fa-eye text-xs !text-white"></i>
                             <span class="hidden md:inline !text-white">Detalhes</span>
                             <span class="md:hidden !text-white">Ver</span>
                         </a>
 
-                        <!-- Cancel Button -->
                         {% if s.status == "PENDENTE" or s.status == "AGUARDANDO_SAIDA_PORTARIA" %}
                             <button onclick="openCancelarModal({{ s.id }})"
                                     class="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold
-                                           bg-gray-600 hover:bg-red-600 text-white shadow-md hover:shadow-lg 
+                                           bg-red-600 hover:bg-red-600 !text-white shadow-md hover:shadow-lg 
                                            transition-all duration-200 transform hover:scale-105">
                                 <i class="fa-solid fa-ban text-xs !text-white"></i>
                                 <span class="hidden md:inline !text-white">Cancelar</span>
@@ -358,7 +310,6 @@
                             <div class="hidden sm:block"></div>
                         {% endif %}
                     
-                        <!-- Edit Button -->
                         {% if s.status == "PENDENTE" or s.status == "AGUARDANDO_SAIDA_PORTARIA" %}
                             <a href="{% url 'editar_solicitacao' s.id %}"
                                class="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold
@@ -372,29 +323,27 @@
                             <div class="hidden sm:block"></div>
                         {% endif %}
 
-                        <!-- Approve Button -->
                         {% if s.status == "PENDENTE" %}
                             <button onclick="openAprovarModal({{ s.id }})"
                                     class="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold
                                            bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg 
                                            transition-all duration-200 transform hover:scale-105">
-                                <i class="fa-solid fa-check text-xs !text-white"></i>
-                                <span class="hidden md:inline !text-white">Aprovar</span>
-                                <span class="md:hidden !text-white">Aprovar</span>
+                                <i class="fa-solid fa-check text-xs text-white"></i>
+                                <span class="hidden md:inline text-white">Aprovar</span>
+                                <span class="md:hidden text-white">Aprovar</span>
                             </button>
                         {% else %}
                             <div class="hidden sm:block"></div>
                         {% endif %}
 
-                        <!-- Reject Button -->
                         {% if s.status == "PENDENTE" %}
                             <button onclick="openReprovarModal({{ s.id }})"
                                     class="flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold
                                            bg-rose-600 hover:bg-rose-700 text-white shadow-md hover:shadow-lg 
                                            transition-all duration-200 transform hover:scale-105">
-                                <i class="fa-solid fa-xmark text-xs !text-white"></i>
-                                <span class="hidden md:inline !text-white">Reprovar</span>
-                                <span class="md:hidden !text-white">Reprovar</span>
+                                <i class="fa-solid fa-xmark text-xs text-white"></i>
+                                <span class="hidden md:inline text-white">Reprovar</span>
+                                <span class="md:hidden text-white">Reprovar</span>
                             </button>
                         {% else %}
                             <div class="hidden sm:block"></div>
@@ -405,7 +354,7 @@
             {% endfor %}
         </div>
         
-        <!-- PAGINATION - Enhanced -->
+        <!-- PAGINATION -->
         {% if solicitacoes.has_other_pages %}
         <div class="mt-6 md:mt-8 flex justify-center">
             <div class="flex items-center gap-1.5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-1">
@@ -451,8 +400,63 @@
     </div>
 </div>
 
+<!-- FILTER MODAL - Desktop (aparece na frente de tudo) -->
+<div id="filterModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl transform transition-all">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#00594C] to-[#0A7C6C] flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-filter text-white text-lg"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Filtrar Solicitações</h2>
+                </div>
+                <button onclick="closeFilterModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all">
+                    <i class="fa-solid fa-xmark text-xl text-gray-500"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-5 space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select id="filterStatus"
+                    class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border-0 focus:ring-2 focus:ring-[#00594C]">
+                    <option value="">Todos os status</option>
+                    {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
+                        {% if key != "AGUARDANDO_CHECKLIST" and key != "AGUARDANDO_CHECKLIST_RETORNO" %}
+                            <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Data inicial</label>
+                <input type="date" id="filterInicio" value="{{ request.GET.inicio }}"
+                    class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Data final</label>
+                <input type="date" id="filterFim" value="{{ request.GET.fim }}"
+                    class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
+            </div>
+            <div class="flex gap-3 pt-4">
+                <a href="{% url 'gestor_solicitacoes' %}"
+                    class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-center text-sm font-bold hover:bg-gray-300 transition-colors">
+                    Limpar
+                </a>
+                <button type="button" onclick="applyFilter()"
+                    class="flex-1 px-4 py-3 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">
+                    Aplicar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MOBILE FILTER MODAL -->
-<div id="modalFiltroMobile" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-end justify-center z-[200] md:hidden">
+<div id="modalFiltroMobile" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-end justify-center z-[99999] md:hidden">
     <div class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-h-[85vh] overflow-hidden animate-slide-up shadow-2xl">
         <div class="sticky top-0 z-10 p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div class="flex items-center justify-between">
@@ -468,7 +472,7 @@
         <div class="p-5 space-y-5 overflow-y-auto">
             <div>
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                <select name="status_mobile" id="status_mobile"
+                <select id="status_mobile"
                     class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm text-gray-900 dark:text-white border-0 focus:ring-2 focus:ring-[#00594C]">
                     <option value="">Todos</option>
                     {% for key, label in SolicitacaoVeiculo.STATUS_CHOICES %}
@@ -482,12 +486,12 @@
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Data inicial</label>
-                <input type="date" name="inicio_mobile" id="inicio_mobile" value="{{ request.GET.inicio }}"
+                <input type="date" id="inicio_mobile" value="{{ request.GET.inicio }}"
                     class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Data final</label>
-                <input type="date" name="fim_mobile" id="fim_mobile" value="{{ request.GET.fim }}"
+                <input type="date" id="fim_mobile" value="{{ request.GET.fim }}"
                     class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-[#00594C]">
             </div>
             <div class="flex gap-3 pt-4">
@@ -495,7 +499,7 @@
                     class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-center text-sm font-bold hover:bg-gray-300 transition-colors">
                     Limpar
                 </a>
-                <button type="button" onclick="aplicarFiltroMobile()"
+                <button type="button" onclick="applyMobileFilter()"
                     class="flex-1 px-4 py-3 bg-gradient-to-r from-[#00594C] to-[#0A7C6C] text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">
                     Aplicar
                 </button>
@@ -505,7 +509,7 @@
 </div>
 
 <!-- APPROVE MODAL -->
-<div id="modalAprovar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+<div id="modalAprovar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl transform transition-all">
         <div class="p-5 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center justify-between">
@@ -535,7 +539,7 @@
 </div>
 
 <!-- REJECT MODAL -->
-<div id="modalReprovar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+<div id="modalReprovar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl">
         <div class="p-5 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center justify-between">
@@ -565,13 +569,13 @@
 </div>
 
 <!-- CANCEL MODAL -->
-<div id="modalCancelar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+<div id="modalCancelar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl">
         <div class="p-5 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-gray-600 to-gray-700 flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-ban !text-white text-lg"></i>
+                        <i class="fa-solid fa-ban text-white text-lg"></i>
                     </div>
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Cancelar Solicitação</h2>
                 </div>
@@ -613,7 +617,6 @@
         animation: slide-up 0.3s ease-out;
     }
     
-    /* Custom scrollbar for modals */
     .overflow-y-auto::-webkit-scrollbar {
         width: 6px;
     }
@@ -632,7 +635,6 @@
         background: #a8a8a8;
     }
     
-    /* Line clamp utility */
     .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -642,7 +644,35 @@
 </style>
 
 <script>
-// Mobile filter modal functions
+// Filter Modal functions
+function openFilterModal() {
+    document.getElementById('filterModal').classList.remove('hidden');
+    document.getElementById('filterModal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFilterModal() {
+    document.getElementById('filterModal').classList.add('hidden');
+    document.getElementById('filterModal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+function applyFilter() {
+    const status = document.getElementById('filterStatus').value;
+    const inicio = document.getElementById('filterInicio').value;
+    const fim = document.getElementById('filterFim').value;
+    const search = '{{ request.GET.search|default:"" }}';
+    
+    let url = '{% url "gestor_solicitacoes" %}?';
+    if (status) url += `status=${status}&`;
+    if (inicio) url += `inicio=${inicio}&`;
+    if (fim) url += `fim=${fim}&`;
+    if (search) url += `search=${search}&`;
+    
+    window.location.href = url;
+}
+
+// Mobile filter functions
 function openModalFiltro() {
     document.getElementById('modalFiltroMobile').classList.remove('hidden');
     document.getElementById('modalFiltroMobile').classList.add('flex');
@@ -655,7 +685,7 @@ function closeModalFiltro() {
     document.body.style.overflow = '';
 }
 
-function aplicarFiltroMobile() {
+function applyMobileFilter() {
     const status = document.getElementById('status_mobile').value;
     const inicio = document.getElementById('inicio_mobile').value;
     const fim = document.getElementById('fim_mobile').value;
@@ -669,6 +699,9 @@ function aplicarFiltroMobile() {
     
     window.location.href = url;
 }
+
+// Attach click event to desktop filter button
+document.getElementById('filterButtonDesktop')?.addEventListener('click', openFilterModal);
 
 // Modal functions for approvals
 {% url 'aprovar_solicitacao' 0 as aprovar_url %}
@@ -721,6 +754,7 @@ document.addEventListener('keydown', function(e) {
         closeModal('modalAprovar');
         closeModal('modalReprovar');
         closeModal('modalCancelar');
+        closeFilterModal();
         closeModalFiltro();
     }
 });
@@ -730,6 +764,7 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'modalAprovar') closeModal('modalAprovar');
     if (e.target.id === 'modalReprovar') closeModal('modalReprovar');
     if (e.target.id === 'modalCancelar') closeModal('modalCancelar');
+    if (e.target.id === 'filterModal') closeFilterModal();
     if (e.target.id === 'modalFiltroMobile') closeModalFiltro();
 });
 
