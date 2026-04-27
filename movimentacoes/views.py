@@ -736,7 +736,7 @@ def registrar_retorno(request, pk):
     perfil = getattr(request.user, "perfilusuario", None)
     
     # Template por perfil
-    if perfil and perfil.nivel == "portaria":
+    if perfil and perfil.nivel == "portaria"  or perfil.nivel == "gestor" :
         template = "movimentacoes/retorno_portaria.html"
     else:
         template = "movimentacoes/retorno.html"
