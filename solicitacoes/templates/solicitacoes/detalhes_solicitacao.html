@@ -262,12 +262,12 @@
                                 <div class="relative flex gap-3">
                                     <div class="flex-shrink-0 z-10">
                                         <div class="w-8 h-8 rounded-full 
-                                            {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}bg-green-500 shadow-md
+                                            {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA'  or solicitacao.status == 'FINALIZADA' or solicitacao.status == 'EM_TRANSITO' %}bg-green-500 shadow-md
                                             {% elif solicitacao.status == 'REPROVADA' %}bg-red-500 shadow-md
                                             {% elif solicitacao.status == 'CANCELADA' %}bg-gray-500 shadow-md
                                             {% else %}bg-gray-400 dark:bg-gray-600 shadow{% endif %} flex items-center justify-center">
                                             <i class="fa-solid 
-                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}fa-check
+                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA'  or solicitacao.status == 'FINALIZADA' or solicitacao.status == 'EM_TRANSITO' %}fa-check 
                                                 {% elif solicitacao.status == 'REPROVADA' %}fa-xmark
                                                 {% elif solicitacao.status == 'CANCELADA' %}fa-ban
                                                 {% else %}fa-clock{% endif %} text-white text-xs"></i>
@@ -275,17 +275,30 @@
                                     </div>
                                     <div class="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
                                         <div class="flex flex-wrap items-center justify-between gap-2 mb-0.5">
-                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' %}
+                                            <h3 class="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
+                                                {% if solicitacao.status == 'APROVADA' or solicitacao.status == 'AGUARDANDO_SAIDA_PORTARIA' or solicitacao.status == 'EM_TRANSITO' or solicitacao.status == 'FINALIZADA' %}
+                                                    
+                                                    <i class="fa-regular fa-circle-check !text-green-600"></i>
                                                     Solicitação Aprovada
+
                                                 {% elif solicitacao.status == 'REPROVADA' %}
+                                                    
+                                                    <i class="fa-solid fa-thumbs-down !text-red-600"></i>
                                                     Solicitação Reprovada
+
                                                 {% elif solicitacao.status == 'CANCELADA' %}
+                                                    
+                                                    <i class="fa-solid fa-trash-can !text-gray-500"></i>
                                                     Solicitação Cancelada
+
                                                 {% else %}
+                                                    
+                                                    <i class="fa-regular fa-hourglass-half !text-yellow-500"></i>
                                                     Aguardando Aprovação
+
                                                 {% endif %}
                                             </h3>
+
                                             {% if solicitacao.data_aprovacao or solicitacao.data_reprovacao %}
                                             <span class="text-[10px] text-gray-500">
                                                 {{ solicitacao.data_aprovacao|date:"d/m/Y • H:i"|default:solicitacao.data_reprovacao|date:"d/m/Y • H:i" }}
