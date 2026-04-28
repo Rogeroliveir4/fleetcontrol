@@ -34,8 +34,8 @@ urlpatterns = [
     # Cancelar solicitação (USUÁRIO) 
     path("cancelar/<int:pk>/", views.cancelar_solicitacao,  name="cancelar_solicitacao"),
 
-    # Editar solicitação (USUÁRIO)
-    path("editar/<int:pk>/", views.editar_solicitacao,  name="editar_solicitacao"),
+    # Editar solicitação (USUÁRIO - Gestor)
+    path("editar/<int:solicitacao_id>/", views.editar_solicitacao, name="editar_solicitacao"),
 
     # API para contar solicitações pendentes de aprovação (Gestor)
     path("pendentes-aprovacao/", api_pendentes_aprovacao),

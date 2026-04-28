@@ -1378,38 +1378,41 @@ def exportar_excel_solicitacoes(request):
 
 
 # EDITAR SOLICITAÇÃO (APENAS SE ESTIVER PENDENTE E FOR O SOLICITANTE)
+# views.py - VERSÃO CORRIGIDA E COMPLETA
 @login_required
 def editar_solicitacao(request, solicitacao_id):
-    
     solicitacao = get_object_or_404(SolicitacaoVeiculo, id=solicitacao_id)
     
-    # Verifica permissão (apquem criou ou gestor/adm do mesmo contrato)
+    # Verifica permissão (apenas quem criou ou gestor/adm do mesmo contrato)
     perfil = request.user.perfilusuario
     
     if solicitacao.solicitante != request.user and perfil.nivel not in ['gestor', 'adm']:
         messages.error(request, "Você não tem permissão para editar esta solicitação.")
         return redirect('minhas_solicitacoes')
     
-    # Verifica se a solicitação pode ser editada (apenas PENDENTE ou REPROVADA)
-    if solicitacao.status not in ['PENDENTE', 'REPROVADA']:
-        messages.error(request, "Esta solicitação não pode mais ser editada.")
+    # Status que permitem edição
+    status_permitidos = ['PENDENTE', 'REPROVADA', 'AGUARDANDO_SAIDA_PORTARIA', 'AGUARDANDO_CHECKLIST']
+    
+    if solicitacao.status not in status_permitidos:
+        messages.error(request, f"Esta solicitação não pode mais ser editada. Status atual: {solicitacao.get_status_display()}")
         return redirect('detalhes_solicitacao', solicitacao_id=solicitacao.id)
     
     veiculo = solicitacao.veiculo
     contrato = solicitacao.contrato
     motoristas = Motorista.objects.filter(contrato=contrato)
     
+    # PROCESSAR FORMULÁRIO (POST)
     if request.method == "POST":
         with transaction.atomic():
             motorista_id = request.POST.get("motorista")
             destino = request.POST.get("destino")
             justificativa = request.POST.get("justificativa", "")
-            observacao = request.POST.get("observacao", "")  # <-- CAMPO ADICIONADO
+            observacao = request.POST.get("observacao", "")
             
             previsao_saida_str = request.POST.get("previsao_saida")
             previsao_retorno_str = request.POST.get("previsao_retorno")
             
-            # Processa datas...
+            # Processa datas
             previsao_saida = None
             if previsao_saida_str:
                 try:
@@ -1441,29 +1444,25 @@ def editar_solicitacao(request, solicitacao_id):
             solicitacao.motorista = motorista
             solicitacao.destino = destino
             solicitacao.justificativa = justificativa
-            solicitacao.observacao = observacao  # <-- CAMPO ADICIONADO
+            solicitacao.observacao = observacao
             solicitacao.previsao_saida = previsao_saida
             solicitacao.previsao_retorno = previsao_retorno
             solicitacao.data_edicao = timezone.now()
             solicitacao.editado_por = request.user
             solicitacao.editado_por_nome = request.user.get_full_name() or request.user.username
             
-            # Se houver observação, atualiza os metadados
-            if observacao:
-                solicitacao.observacao_por = 'solicitante'
-                solicitacao.observacao_por_nome = request.user.get_full_name() or request.user.username
-                solicitacao.observacao_data = timezone.now()
-            
             solicitacao.save()
             
             messages.success(request, "Solicitação atualizada com sucesso.")
             return redirect('detalhes_solicitacao', solicitacao_id=solicitacao.id)
     
-    return render(request, "solicitantes/editar_solicitacao.html", {
+    # RENDERIZAR TEMPLATE (GET)
+    return render(request, "solicitantes/solicitar.html", {
         "solicitacao": solicitacao,
         "veiculo": veiculo,
         "motoristas": motoristas,
         "modo_edicao": True,
+        "STATUS_CHOICES": SolicitacaoVeiculo.STATUS_CHOICES,
     })
 
 
