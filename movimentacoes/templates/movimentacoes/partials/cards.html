@@ -4,7 +4,7 @@
   <!-- VERSÃO MOBILE PROFISSIONAL COM AJUSTE PARA TEXTOS LONGOS -->
   <div class="md:hidden space-y-4">
     {% for mov in movimentacoes %}
-      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-400 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
         <!-- CARD HEADER COM GRADIENTE SUTIL -->
         <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
             {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20{% endif %}">
@@ -15,8 +15,7 @@
                 <div class="relative">
                   <div class="absolute -inset-0.5 bg-gradient-to-r 
                                 {% if mov.data_retorno %}
-                      
-                      
+      
                       from-green-600 to-emerald-600
 
 
@@ -208,7 +207,7 @@
   <div class="hidden md:block">
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
       {% for mov in movimentacoes %}
-        <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
+        <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
           <!-- CARD HEADER -->
           <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
                                         {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/30 to-transparent dark:from-amber-950/10{% endif %}">
