@@ -75,17 +75,7 @@ def aplicar_filtros_movimentacoes(request, queryset):
     return queryset
 
 
-# NOVA VIEW: Lista para portaria registrar retorno (movs em andamento)
-def portaria_retorno_list(request):
-    movimentacoes = Movimentacao.objects.filter(
-        status="em_andamento"
-    ).select_related(
-        "veiculo", "motorista", "solicitacao"
-    ).order_by("-data_saida")
 
-    return render(request, "portaria/retorno_list.html", {
-        "movimentacoes": movimentacoes
-    })
 
 
 # LISTA DE MOVIMENTAÇÕES COM FILTROS E PAGINAÇÃO

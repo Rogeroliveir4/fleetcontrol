@@ -28,7 +28,7 @@ urlpatterns = [
     path("portaria/saida/<int:movimentacao_id>/", views.portaria_registrar_saida, name="portaria_registrar_saida"),
 
     #  PORTARIA — RETORNO
-    path("portaria/retorno/", views.portaria_retorno_list,name="portaria_retorno_list",),
+    #path("portaria/retorno/", views.portaria_retorno_list,name="portaria_retorno_list",),
 
     # CONTADOR DE SOLICITAÇÕES PENDENTES PARA PORTARIA
     path("portaria/contador/", views.contador_portaria, name="contador_portaria"),
