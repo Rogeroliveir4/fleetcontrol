@@ -1,0 +1,272 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Ajustar KM #{{ mov.id|stringformat:'06d' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-2 sm:px-3 py-3 md:py-4 space-y-3 md:space-y-4">
+    
+    <!-- ============================================ -->
+    <!-- HEADER (REDUZIDO EM 30% PARA DESKTOP) -->
+    <!-- ============================================ -->
+    <div class="relative overflow-hidden rounded-lg md:rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 p-3 md:p-4 sm:p-5 shadow-lg">
+        <div class="absolute -right-4 -top-4 opacity-10">
+            <i class="fa-solid fa-pen-to-square text-60px md:text-80px sm:text-100px"></i>
+        </div>
+        
+        <div class="relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-3">
+                <div>
+                    <h1 class="text-lg md:text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Ajustar KM de Retorno #{{ mov.id|stringformat:'06d' }}
+                    </h1>
+                    <p class="text-xs md:text-sm text-white/70 mt-0.5 md:mt-1">Corrija a quilometragem e justifique o motivo do ajuste</p>
+                </div>
+                
+                <a href="{% url 'lista_movimentacoes' %}" 
+                   class="inline-flex items-center gap-1 md:gap-1.5 px-2.5 md:px-3 py-1.5 md:py-2 bg-white/10 hover:bg-white/20 text-white rounded-md md:rounded-lg text-xs md:text-sm font-medium backdrop-blur-sm border border-white/20 transition-all">
+                    <i class="fa-solid fa-arrow-left text-[10px] md:text-xs"></i>
+                    <span>Voltar para Lista</span>
+                </a>
+            </div>
+            
+            <!-- Quick Info Cards (REDUZIDOS) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2 mt-3 md:mt-4">
+                <div class="bg-white/10 backdrop-blur-sm p-2 md:p-2.5 rounded-md md:rounded-lg border border-white/20">
+                    <p class="text-[10px] md:text-[11px] text-white/60 mb-0.5 uppercase tracking-wider font-medium">Veículo</p>
+                    <p class="text-white font-semibold text-xs md:text-sm">{{ mov.veiculo.placa }}</p>
+                    <p class="text-white/60 text-[10px] md:text-xs">{{ mov.veiculo.tag_interna }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-2 md:p-2.5 rounded-md md:rounded-lg border border-white/20">
+                    <p class="text-[10px] md:text-[11px] text-white/60 mb-0.5 uppercase tracking-wider font-medium">Motorista</p>
+                    <p class="text-white font-semibold text-xs md:text-sm truncate">{{ mov.motorista.nome }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-2 md:p-2.5 rounded-md md:rounded-lg border border-white/20">
+                    <p class="text-[10px] md:text-[11px] text-white/60 mb-0.5 uppercase tracking-wider font-medium">KM Saída</p>
+                    <p class="text-white font-semibold text-xs md:text-sm">{{ mov.km_saida|default:"---" }} <span class="text-white/60 text-[10px] md:text-xs">KM</span></p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-2 md:p-2.5 rounded-md md:rounded-lg border border-white/20">
+                    <p class="text-[10px] md:text-[11px] text-white/60 mb-0.5 uppercase tracking-wider font-medium">KM Atual Retorno</p>
+                    <p class="text-white font-semibold text-xs md:text-sm">{{ mov.km_retorno|default:"---" }} <span class="text-white/60 text-[10px] md:text-xs">KM</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- FORMULÁRIO (REDUZIDO EM 30% PARA DESKTOP) -->
+    <!-- ============================================ -->
+    <div class="bg-white dark:bg-gray-900 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        
+        <!-- Cabeçalho do formulário (REDUZIDO) -->
+        <div class="bg-gray-50 dark:bg-gray-800/50 px-4 md:px-5 py-2.5 md:py-3.5 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-7 h-7 md:w-9 md:h-9 rounded-md md:rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
+                    <i class="fa-solid fa-gauge text-sm text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <div>
+                    <h2 class="text-xs md:text-sm font-bold text-gray-900 dark:text-white">Correção de Quilometragem</h2>
+                    <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">
+                        Status: 
+                        <span class="inline-flex items-center px-1.5 md:px-2 py-0.5 rounded-full text-[10px] md:text-xs font-medium 
+                            {% if mov.status == 'encerrado_sem_retorno' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                            {% elif mov.data_retorno %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                            {% else %}bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300{% endif %}">
+                            {{ mov.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Corpo do formulário (REDUZIDO) -->
+        <form method="POST" class="p-4 md:p-5 sm:p-6" autocomplete="off">
+            {% csrf_token %}
+            
+            <!-- Campos ocultos - preservam valores originais -->
+            <input type="hidden" name="destino" value="{{ mov.destino }}">
+            <input type="hidden" name="observacao" value="{{ mov.observacao|default:'' }}">
+            
+            <div class="space-y-3.5 md:space-y-5">
+                
+                <!-- INFORMAÇÕES NÃO EDITÁVEIS (REDUZIDO) -->
+                <div class="bg-gray-50 dark:bg-gray-800/30 rounded-md md:rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-[10px] md:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 md:mb-3">
+                        <i class="fa-solid fa-lock mr-1 md:mr-1.5"></i>Informações da Movimentação (não editáveis)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 text-xs md:text-sm">
+                        <div>
+                            <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">Destino</p>
+                            <p class="font-semibold text-gray-900 dark:text-white truncate">{{ mov.destino }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">KM Saída</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ mov.km_saida|default:"---" }} KM</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">KM Retorno Atual</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ mov.km_retorno|default:"---" }} KM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KM SAÍDA (EDITÁVEL - REDUZIDO) -->
+                <div>
+                    <label class="block text-xs md:text-sm font-semibold mb-2">
+                        <i class="fa-solid fa-pen text-green-500 mr-2"></i>Novo KM de Saída
+                    </label>
+
+                    <input 
+                        type="text"
+                        inputmode="numeric"
+                        name="km_saida"
+                        id="km_saida"
+                        value="{{ mov.km_saida|default:'' }}"
+                        class="block w-full rounded-lg border-2 border-green-300 px-3 py-2"
+                        placeholder="Ex: 37750"
+                    >
+                    <p id="erroKm" class="hidden text-red-500 text-xs mt-2"></p>
+                </div>
+
+                <!-- KM RETORNO (EDITÁVEL - REDUZIDO) -->
+                <div>
+                    <label class="block text-xs md:text-sm font-semibold mb-2">
+                        <i class="fa-solid fa-pen text-green-500 mr-2"></i>Novo KM de Retorno
+                    </label>
+
+                    <input 
+                        type="text"
+                        inputmode="numeric"
+                        name="km_retorno"
+                        id="km_retorno"
+                        value="{{ mov.km_retorno|default:'' }}"
+                        class="block w-full rounded-lg border-2 border-green-300 px-3 py-2"
+                        placeholder="Ex: 37750"
+                    >
+                    <p id="erroKm" class="hidden text-red-500 text-xs mt-2"></p>
+                </div>
+
+                <!-- MOTIVO DO AJUSTE (REDUZIDO) -->
+                <div>
+                    <label for="motivo_edicao" class="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1.5 md:mb-2">
+                        <i class="fa-solid fa-clipboard-question text-amber-500 mr-1.5 md:mr-2"></i>Justificativa do Ajuste <span class="text-red-500">*</span>
+                    </label>
+                    <textarea 
+                        name="motivo_edicao" 
+                        id="motivo_edicao" 
+                        rows="2"
+                        class="block w-full rounded-md md:rounded-lg border-2 border-amber-300 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-950/20 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 dark:focus:border-amber-400 dark:focus:ring-amber-400/30 text-xs md:text-sm px-3 md:px-4 py-2.5 md:py-3 transition-all resize-none"
+                        placeholder="Explique o motivo da correção do KM de retorno (mínimo 10 caracteres)..."
+                    >{{ motivo_edicao|default:'' }}</textarea>
+                    <p class="mt-1 md:mt-1.5 text-[10px] md:text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-gray-400 text-[8px] md:text-[10px]"></i>
+                        Esta justificativa será registrada para fins de auditoria
+                    </p>
+                </div>
+                
+                <!-- ALERTA INFORMATIVO (REDUZIDO) -->
+                <div class="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md md:rounded-lg p-2.5 md:p-3.5 flex items-start gap-2 md:gap-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xs md:text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs md:text-sm font-semibold text-amber-800 dark:text-amber-300 mb-0.5">Registro de Auditoria</p>
+                        <p class="text-[10px] md:text-xs text-amber-700 dark:text-amber-400">
+                            Este ajuste será registrado com seu usuário, data/hora e a justificativa fornecida. 
+                            O KM anterior será preservado para consulta futura.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões (REDUZIDO) -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 md:gap-3 mt-4 md:mt-6 pt-3.5 md:pt-5 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'lista_movimentacoes' %}" 
+                   class="flex items-center justify-center gap-1.5 md:gap-2 px-4 md:px-5 py-2.5 md:py-3 rounded-md md:rounded-lg border border-gray-300 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                    <i class="fa-solid fa-arrow-left text-[10px] md:text-xs"></i>
+                    <span>Cancelar</span>
+                </a>
+                <button type="submit" 
+                        class="flex items-center justify-center gap-1.5 md:gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-md md:rounded-lg text-xs md:text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200">
+                    <i class="fa-solid fa-check !text-white"></i>
+                    <span class="!text-white">Salvar Ajuste</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .text-60px { font-size: 60px; }
+    .text-80px { font-size: 80px; }
+    .text-100px { font-size: 100px; }
+    
+    input:focus, textarea:focus {
+        outline: none;
+    }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
+<script>
+function parseKm(valor) {
+    if (!valor) return null;
+    const num = parseInt(valor.replace(/\D/g, ""));
+    return isNaN(num) ? null : num;
+}
+
+function validarKm() {
+    const saidaInput = document.getElementById("km_saida");
+    const retornoInput = document.getElementById("km_retorno");
+
+    const saida = parseKm(saidaInput.value);
+    const retorno = parseKm(retornoInput.value);
+
+    const erroBox = document.getElementById("erroKm");
+
+    // reset
+    saidaInput.classList.remove("border-red-500");
+    retornoInput.classList.remove("border-red-500");
+    erroBox.classList.add("hidden");
+
+    // validação só quando ambos existem
+    if (saida !== null && retorno !== null) {
+        if (saida > retorno) {
+            saidaInput.classList.add("border-red-500");
+            retornoInput.classList.add("border-red-500");
+
+            erroBox.innerText = "KM de saída não pode ser maior que o KM de retorno";
+            erroBox.classList.remove("hidden");
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// eventos
+document.addEventListener("DOMContentLoaded", function () {
+    const saida = document.getElementById("km_saida");
+    const retorno = document.getElementById("km_retorno");
+    const form = document.querySelector("form");
+
+    saida.addEventListener("input", validarKm);
+    retorno.addEventListener("input", validarKm);
+
+    form.addEventListener("submit", function(e) {
+        if (!validarKm()) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}
+

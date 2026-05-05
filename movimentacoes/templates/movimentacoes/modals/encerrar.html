@@ -1,0 +1,186 @@
+<!-- movimentacoes/templates/movimentacoes/modals/encerrar.html -->
+<!-- NÃO usar extends, pois é carregado via AJAX -->
+
+<!-- Backdrop Animation Style -->
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+        20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+    
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
+    }
+</style>
+
+<!-- Modal Container -->
+<div id="modalEncerrar" 
+     style="animation: fadeIn 0.2s ease-out;"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4" 
+     role="dialog" 
+     aria-modal="true" 
+     aria-labelledby="modal-title"
+     tabindex="-1">
+    
+   <div id="modalBackdrop" 
+         class="fixed inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm" >
+    </div>
+
+    <!-- Modal Content -->
+    <div style="animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);" 
+         class="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-10">
+        
+        <!-- Header com gradiente -->
+        <div class="relative bg-gradient-to-r from-red-600 to-rose-600 px-6 py-5">
+            <div class="absolute top-0 right-0 opacity-10">
+                <i class="fa-solid fa-lock text-white text-8xl transform rotate-12 -mr-4 -mt-4"></i>
+            </div>
+            
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                        <i class="fa-solid fa-triangle-exclamation text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-title" class="text-xl font-bold !text-white">Encerrar Movimentação</h3>
+                        <p class="text-red-100 text-sm !text-white">Sem registro de retorno</p>
+                    </div>
+                </div>
+                
+                          <!-- Botão X -->
+                <button type="button"  
+                        class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 text-white transition-all duration-200 hover:scale-110"
+                        title="Fechar">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulário -->
+        <form id="formEncerrar" method="POST" action="{% url 'encerrar_movimentacao' mov.id %}">
+            {% csrf_token %}
+            
+            <div class="px-6 py-5 space-y-5">
+                <!-- Card de informações -->
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-circle-info mr-1"></i>Detalhes da Movimentação
+                    </h4>
+                    
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between py-1.5 border-b border-gray-200/60 dark:border-gray-700/60">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <i class="fa-solid fa-truck text-gray-400 text-xs w-4"></i>Veículo
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ mov.veiculo.placa }}</span>
+                                <span class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded">
+                                    {{ mov.veiculo.tag_interna }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between py-1.5 border-b border-gray-200/60 dark:border-gray-700/60">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <i class="fa-solid fa-user text-gray-400 text-xs w-4"></i>Motorista
+                            </span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ mov.motorista.nome }}</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between py-1.5 border-b border-gray-200/60 dark:border-gray-700/60">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-gray-400 text-xs w-4"></i>Destino
+                            </span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white text-right max-w-[200px] truncate" title="{{ mov.destino }}">
+                                {{ mov.destino|truncatechars:35 }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between py-1.5">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <i class="fa-solid fa-flag text-gray-400 text-xs w-4"></i>Status
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1.5 animate-pulse"></span>
+                                {{ mov.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerta -->
+                <div class="relative overflow-hidden rounded-xl border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-500"></div>
+                    <div class="p-4 pt-5">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-hand text-red-600 dark:text-red-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-red-800 dark:text-red-300 mb-2">⚠️ Atenção! Ação irreversível</h4>
+                                <ul class="space-y-1.5 text-sm text-red-700 dark:text-red-300">
+                                    <li>• O veículo será marcado como <strong>Inativo</strong></li>
+                                    <li>• Não será possível <strong>registrar o retorno</strong></li>
+                                    <li>• A movimentação será <strong>finalizada imediatamente</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campo Motivo -->
+                <div>
+                    <label for="motivo" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Motivo do Encerramento <span class="text-red-500">*</span>
+                    </label>
+                    <textarea 
+                        id="motivo" 
+                        name="motivo" 
+                        rows="4" 
+                        required
+                        class="block w-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm shadow-sm transition-all duration-200 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:focus:border-red-400 dark:focus:ring-red-400/10 placeholder-gray-400 dark:placeholder-gray-500"
+                        placeholder="Descreva detalhadamente o motivo do encerramento sem retorno do veículo..."
+                    ></textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fa-solid fa-circle-info mr-1"></i>Mínimo de 10 caracteres
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+                <div class="flex items-center justify-between gap-3">
+                    <button type="button" 
+                            
+                            class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <i class="fa-solid fa-arrow-left mr-2"></i>Cancelar
+                    </button>
+                    
+                    <button type="submit"
+                            id="btnEncerrar"
+                            class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white text-sm font-semibold shadow-lg transition-all disabled:opacity-50">
+                        <i class="fa-solid fa-lock mr-2  !text-white"></i>
+                        <span id="btnText" class="!text-white">Confirmar Encerramento</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
