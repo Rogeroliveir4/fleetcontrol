@@ -6,6 +6,7 @@ from contratos.models import Contrato
 from django.contrib.auth.models import User
 from solicitacoes.models import SolicitacaoVeiculo
 
+
 class Movimentacao(models.Model):
     STATUS_CHOICES = (
         ("aguardando_checklist_saida", "Aguardando Checklist de Saída"),
@@ -15,6 +16,7 @@ class Movimentacao(models.Model):
         ("aguardando_retorno_portaria", "Aguardando Retorno da Portaria"),
         ("divergencia_km", "Divergência de KM"),
         ("finalizado", "Finalizado"),
+        ("encerrado_sem_retorno", "Encerrado sem retorno"),
     )
 
     ORIGEM_CHOICES = (
@@ -22,6 +24,32 @@ class Movimentacao(models.Model):
         ("MANUAL", "Criada manualmente"),
     )
 
+
+    # CAMPOS PARA AUDITORIA DE EDIÇÃO (ADICIONAR ESTES)
+    editado_por = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="movimentacoes_editadas",
+        verbose_name="Última edição por"
+    )
+    editado_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Data/hora da última edição"
+    )
+    motivo_edicao = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="Motivo da edição/ajuste"
+    )
+    km_retorno_anterior = models.BigIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="KM Retorno anterior"
+    )
+    
     # RELACIONAMENTOS
     solicitacao = models.ForeignKey(
         SolicitacaoVeiculo,
@@ -41,6 +69,17 @@ class Movimentacao(models.Model):
         default="SISTEMA",
         db_index=True
     )
+
+    #CAMPOS PARA ENCERRAMENTO (ADICIONAR)
+    encerrado_por = models.ForeignKey(
+        User, 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL,
+        related_name="movimentacoes_encerradas"
+    )
+    encerrado_em = models.DateTimeField(null=True, blank=True)
+    motivo_encerramento = models.TextField(null=True, blank=True)
     
     destino = models.CharField(max_length=255)
     finalidade = models.CharField(max_length=255, blank=True)
@@ -596,3 +635,25 @@ class MovimentacaoTerceiro(models.Model):
         verbose_name = "Movimentação de Terceiro"
         verbose_name_plural = "Movimentações de Terceiros"
         ordering = ['-data_entrada']
+
+
+# Model separado para auditoria de edições
+class HistoricoEdicao(models.Model):
+    movimentacao = models.ForeignKey(
+        Movimentacao,
+        on_delete=models.CASCADE,
+        related_name="historico_edicoes"
+    )
+    editado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    editado_em = models.DateTimeField(auto_now_add=True)
+    motivo_edicao = models.TextField()
+    km_retorno_anterior = models.BigIntegerField(null=True, blank=True)
+    km_retorno_novo = models.BigIntegerField(null=True, blank=True)
+    km_saida_anterior = models.BigIntegerField(null=True, blank=True)
+    km_saida_novo = models.BigIntegerField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-editado_em']
+        verbose_name = "Histórico de Edição"
+        verbose_name_plural = "Histórico de Edições"
+        

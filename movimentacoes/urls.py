@@ -24,6 +24,9 @@ urlpatterns = [
 
     #  CHECKLIST MOTORISTA (CORRIGIDO)
     # path("solicitacao/<int:solicitacao_id>/checklist-saida/",views.checklist_saida_motorista, name="checklist_saida_motorista", ),
+    path('editar/<int:pk>/', views.editar_movimentacao, name='editar_movimentacao'),
+    path('encerrar/<int:pk>/', views.encerrar_movimentacao, name='encerrar_movimentacao'),
+    path('api/encerrar/<int:pk>/', views.api_encerrar_movimentacao, name='api_encerrar_movimentacao'),
 
     path("portaria/saida/<int:movimentacao_id>/", views.portaria_registrar_saida, name="portaria_registrar_saida"),
 

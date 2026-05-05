@@ -1,355 +1,414 @@
+<!-- movimentacoes/templates/movimentacoes/partials/cards.html -->
 {% load l10n humanize %}
 
 {% if movimentacoes %}
-  <!-- VERSÃO MOBILE PROFISSIONAL COM AJUSTE PARA TEXTOS LONGOS -->
+
+  <!-- VERSÃO MOBILE PROFISSIONAL -->
   <div class="md:hidden space-y-4">
     {% for mov in movimentacoes %}
-      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-400 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-        <!-- CARD HEADER COM GRADIENTE SUTIL -->
-        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
-            {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20{% endif %}">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+        
+        <!-- CARD HEADER COM STATUS VISUAL -->
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 {% if not mov.data_retorno and mov.status != 'encerrado_sem_retorno' %}bg-gradient-to-r from-amber-50/30 to-transparent dark:from-amber-950/20{% elif mov.status == 'encerrado_sem_retorno' %}bg-gradient-to-r from-red-50/30 to-transparent dark:from-red-950/20{% endif %}">
           <div class="flex justify-between items-start gap-2">
-            <!-- TAG E MODELO -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
+                <!-- TAG VEÍCULO -->
                 <div class="relative">
                   <div class="absolute -inset-0.5 bg-gradient-to-r 
-                                {% if mov.data_retorno %}
-                      
-                      
-                      from-green-600 to-emerald-600
-
-
-                    {% else %}
-                      
-                      
-                      from-amber-500 to-orange-500
-
-
-                    {% endif %} 
-                                rounded-lg blur opacity-30"></div>
+                    {% if mov.data_retorno %}from-green-600 to-emerald-600
+                    {% elif mov.status == 'encerrado_sem_retorno' %}from-red-600 to-rose-600
+                    {% else %}from-amber-500 to-orange-500{% endif %} 
+                    rounded-lg blur opacity-30"></div>
                   <div class="relative px-3 py-1.5 rounded-lg shadow-sm" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
-                    <span class="text-lg font-black tracking-wider text-white" style="color: #ffffff !important;">{{ mov.veiculo.tag_interna|upper }}</span>
+                    <span class="text-base font-black tracking-wider !text-white">{{ mov.veiculo.tag_interna|upper }}</span>
                   </div>
                 </div>
+                
+                <!-- PLACA 
+                <span class="text-sm font-mono font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                  {{ mov.veiculo.placa }}
+                </span>
+                -->
+                <!-- MODELO -->
                 {% if mov.veiculo.modelo %}
-                  <span class="text-base font-bold text-gray-800 dark:text-gray-200 truncate max-w-[180px]" title="{{ mov.veiculo.modelo }}">{{ mov.veiculo.marca|truncatechars:20 }} - {{ mov.veiculo.modelo|truncatechars:20 }}</span>
+                  <span class="text-sm font-medium text-gray-600 dark:text-gray-400 truncate max-w-[150px]" title="{{ mov.veiculo.modelo }}">
+                    {{ mov.veiculo.marca|truncatechars:12 }} {{ mov.veiculo.modelo|truncatechars:12 }}
+                  </span>
                 {% endif %}
               </div>
+            </div>
+            
+            <!-- INDICADOR DE STATUS -->
+            <div class="flex-shrink-0">
+                {% if mov.status == 'finalizado' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      <i class="fa-solid fa-check mr-1 text-[10px]"></i>Finalizado
+                    </span>
+
+                  {% elif mov.status == 'encerrado_sem_retorno' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      <i class="fa-solid fa-lock mr-1 text-[10px]"></i>Encerrado
+                    </span>
+
+                  {% else %}
+                    <div class="relative">
+                      <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+                      <div class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
+                    </div>
+                {% endif %}
             </div>
           </div>
         </div>
 
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="p-4">
-          <!-- MOTORISTA COM ÍCONE E TRUNCAMENTO -->
+          <!-- MOTORISTA -->
           <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
             <div class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
               <i class="fa-solid fa-user text-blue-600 dark:text-blue-400 text-xs"></i>
             </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate" title="{{ mov.motorista.nome }}">{{ mov.motorista.nome|truncatechars:25 }}</span>
-          </div>
-
-          <!-- DESTINO COM DESTAQUE E TRUNCAMENTO -->
-          <div class="mb-4 p-2.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-l-3 border-blue-500">
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-location-dot text-blue-500 text-sm flex-shrink-0"></i>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white truncate" title="{{ mov.destino }}">{{ mov.destino|truncatechars:35 }}</span>
-            </div>
-          </div>
-
-          <!-- KMS COM DESTAQUE PROFISSIONAL -->
-          <div class="grid grid-cols-3 gap-2 mb-4">
-            <!-- KM SAÍDA -->
-            <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20">
-              <div class="text-xl font-black text-blue-600 dark:text-blue-400">{{ mov.km_saida|intcomma|default:'---' }}</div>
-              <div class="text-[10px] font-semibold text-blue-600/70 dark:text-blue-400/70 mt-0.5">KM SAÍDA</div>
-            </div>
-
-            <!-- KM PERCORRIDO -->
-            <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 
-                            {% if mov.distancia_percorrida %}ring-1 ring-emerald-300 dark:ring-emerald-700{% endif %}">
-              <div class="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                {% if mov.distancia_percorrida %}
-                  {{ mov.distancia_percorrida|intcomma }}
-                {% else %}
-                  <span class="text-gray-400">---</span>
-                {% endif %}
-              </div>
-              <div class="text-[10px] font-semibold text-emerald-600/70 dark:text-emerald-400/70 mt-0.5">KM PERCORRIDOS</div>
-            </div>
-
-            <!-- KM RETORNO -->
-            <div class="text-center rounded-xl py-2.5 px-1 
-                {% if mov.km_retorno and mov.km_retorno > 0 %}
-                
-                    bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20
-
-              {% else %}
-                     
-                    bg-gray-50 dark:bg-gray-800/50
-
-              {% endif %}">
-              <div class="text-xl font-black 
-                    {% if mov.km_retorno and mov.km_retorno > 0 %}
-                  
-                        text-green-600 dark:text-green-400
-
-                {% else %}
-                                  
-                        text-gray-400
-
-                {% endif %}">
-                {% if mov.km_retorno and mov.km_retorno > 0 %}
-                  {{ mov.km_retorno|intcomma }}
-                {% else %}
-                  ---
-                {% endif %}
-              </div>
-              <div class="text-[10px] font-semibold 
-                    {% if mov.km_retorno and mov.km_retorno > 0 %}
-                  
-                        text-green-600/70 dark:text-green-400/70
-
-                {% else %}
-                  
-                        text-gray-500
-
-                {% endif %} mt-0.5">KM RETORNO</div>
-            </div>
-          </div>
-
-          <!-- STATUS COM DESTAQUE -->
-          <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-            <div class="flex items-center gap-2">
-              <div class="relative">
-                <div class="w-2 h-2 rounded-full 
-                {% if mov.data_retorno %}
-                    bg-green-500
-                  {% else %}
-                    bg-amber-500 animate-pulse
-                 {% endif %}"></div>
-
-                {% if not mov.data_retorno %}
-                    <div class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
-                {% endif %}
-              </div>
-
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full
-                {% if mov.data_retorno %}
-                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-                {% else %}
-                    bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
-                {% endif %}">
-
-                {% if mov.data_retorno %}
-                     <i class="fa-solid fa-check-circle mr-1 text-xs"></i>Finalizada
-                {% else %}
-                   {{ mov.data_saida|timesince }} 
-                {% endif %}
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate block" title="{{ mov.motorista.nome }}">
+                {{ mov.motorista.nome|truncatechars:30 }}
               </span>
             </div>
+          </div>
 
-            <!-- AÇÕES -->
-<!-- AÇÕES -->
-<div class="flex gap-2 mt-2">
+          <!-- DESTINO -->
+          <div class="mb-4 p-2.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-location-dot text-blue-500 text-sm mt-0.5 flex-shrink-0"></i>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold text-gray-900 dark:text-white break-words" title="{{ mov.destino }}">
+                  {{ mov.destino|truncatechars:50 }}
+                </div>
+                
+                {% if mov.status == 'encerrado_sem_retorno' and mov.motivo_encerramento %}
+                  <div class="mt-2 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                    <div class="flex items-start gap-1.5">
+                      <i class="fa-solid fa-circle-info text-red-500 text-xs mt-0.5"></i>
+                      <p class="text-xs text-red-700 dark:text-red-300 line-clamp-2">
+                        {{ mov.motivo_encerramento|truncatechars:100 }}
+                      </p>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
 
-  <!-- DETALHES -->
-  <a href="{% url 'movimentacao_detalhe' mov.id %}"
-     class="flex items-center gap-1.5 px-3 h-10 rounded-lg 
-            bg-gray-100 dark:bg-gray-700 
-            hover:bg-gray-200 dark:hover:bg-gray-600 
-            text-gray-700 dark:text-gray-300 
-            text-xs font-medium transition-all">
+          <!-- KMs -->
+          <div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20">
+              <div class="text-lg font-black text-blue-600 dark:text-blue-400">
+                {% if mov.km_saida %}{{ mov.km_saida|intcomma }}{% else %}---{% endif %}
+              </div>
+              <div class="text-[10px] font-semibold text-blue-600/70">SAÍDA</div>
+            </div>
 
-      <i class="fa-regular fa-eye text-sm"></i>
-      <span>Detalhes</span>
-  </a>
+            <div class="text-center rounded-xl py-2.5 px-1 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20">
+              <div class="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                {% if mov.distancia_percorrida %}{{ mov.distancia_percorrida|intcomma }}{% else %}---{% endif %}
+              </div>
+              <div class="text-[10px] font-semibold text-emerald-600/70">PERCORRIDO</div>
+            </div>
 
-  <!-- RETORNO -->
-  {% if not mov.data_retorno %}
-  <a href="{% url 'registrar_retorno' mov.id %}"
-     class="flex items-center gap-1.5 px-3 h-10 rounded-lg 
-            bg-gradient-to-r from-green-500 to-emerald-500 
-            hover:from-green-600 hover:to-emerald-600 
-            text-white text-xs font-semibold shadow-sm transition-all">
+            <div class="text-center rounded-xl py-2.5 px-1 
+              {% if mov.km_retorno %}bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20
+              {% else %}bg-gray-50 dark:bg-gray-800/50{% endif %}">
+              <div class="text-lg font-black 
+                {% if mov.km_retorno %}text-green-600 dark:text-green-400
+                {% else %}text-gray-400{% endif %}">
+                {% if mov.km_retorno %}{{ mov.km_retorno|intcomma }}{% else %}---{% endif %}
+              </div>
+              <div class="text-[10px] font-semibold 
+                {% if mov.km_retorno %}text-green-600/70{% else %}text-gray-500{% endif %}">RETORNO</div>
+            </div>
+          </div>
 
-      <i class="fa-solid fa-flag-checkered text-sm"></i>
-      <span>Retorno</span>
-  </a>
-  {% endif %}
+          <!-- BOTÕES DE AÇÃO (GRID 2x2) -->
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <!-- DETALHES (SEMPRE VISÍVEL) -->
+            <a href="{% url 'movimentacao_detalhe' mov.id %}" 
+               class="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium transition-all">
+              <i class="fa-regular fa-eye text-xs"></i>
+              <span>Detalhes</span>
+            </a>
 
-</div>
+            <!-- EDITAR (APENAS PARA GESTOR/ADMIN) -->
+            {% if user.perfilusuario.nivel == "gestor" or user.perfilusuario.nivel == "adm" or user.is_superuser %}
+              <a href="{% url 'editar_movimentacao' mov.id %}" 
+                 class="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-xs font-medium transition-all border border-amber-200 dark:border-amber-800">
+                <i class="fa-regular fa-pen-to-square text-xs"></i>
+                <span>Editar</span>
+              </a>
+            {% endif %}
+
+            <!-- REGISTRAR RETORNO (APENAS SE NÃO FINALIZADO/NÃO ENCERRADO) -->
+            {% if mov.status != 'finalizado' and mov.status != 'encerrado_sem_retorno' %}
+              <a href="{% url 'registrar_retorno' mov.id %}" 
+                 class="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-xs font-semibold shadow-sm transition-all">
+                <i class="fa-solid fa-flag-checkered text-xs"></i>
+                <span>Retorno</span>
+              </a>
+            {% endif %}
+
+            <!-- ENCERRAR (APENAS PARA GESTOR/ADMIN E SE STATUS PERMITIR) -->
+            {% if mov.status == 'em_andamento' or mov.status == 'aguardando_checklist_retorno' or mov.status == 'aguardando_retorno_portaria' or mov.status == 'divergencia_km' %}
+              {% if user.perfilusuario.nivel == "gestor" or user.perfilusuario.nivel == "adm" or user.is_superuser %}
+                <button type="button"
+                        data-modal-encerrar="{{ mov.id }}"
+                        class="btn-encerrar-movimentacao flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold shadow-sm transition-all">
+                  <i class="fa-solid fa-lock text-xs"></i>
+                  <span>Encerrar sem Retorno</span>
+                </button>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
 
-        <!-- TIMELINE SUTIL COM DATAS COMPLETAS (LINHA ÚNICA) -->
-        {% if mov.data_retorno %}
-          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+        <!-- RODAPÉ COM DATAS -->
+        <div class="px-4 py-2.5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+          <div class="flex flex-col gap-1.5 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <i class="fa-solid fa-right-long text-blue-500 text-[10px]"></i>
+                <span class="text-gray-500 dark:text-gray-400">Saída:</span>
+                <span class="text-gray-700 dark:text-gray-300 font-medium">{{ mov.data_saida|date:'d/m/Y H:i' }}</span>
+              </div>
+            </div>
+            
+            {% if mov.data_retorno %}
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-left-long text-green-500 text-[10px]"></i>
+                  <span class="text-gray-500 dark:text-gray-400">Retorno:</span>
+                  <span class="text-green-600 dark:text-green-400 font-medium">{{ mov.data_retorno|date:'d/m/Y H:i' }}</span>
+                </div>
+              </div>
+            {% elif mov.status == 'encerrado_sem_retorno' and mov.encerrado_em %}
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-lock text-red-500 text-[10px]"></i>
+                  <span class="text-gray-500 dark:text-gray-400">Encerrado:</span>
+                  <span class="text-red-600 dark:text-red-400 font-medium">{{ mov.encerrado_em|date:'d/m/Y H:i' }}</span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- ============================================ -->
+  <!-- VERSÃO DESKTOP -->
+  <!-- ============================================ -->
+  <div class="hidden md:block">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
+      {% for mov in movimentacoes %}
+        <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
+          
+          <!-- HEADER -->
+          <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 
+            {% if not mov.data_retorno and mov.status != 'encerrado_sem_retorno' %}bg-gradient-to-r from-amber-50/30 to-transparent dark:from-amber-950/10
+            {% elif mov.status == 'encerrado_sem_retorno' %}bg-gradient-to-r from-red-50/30 to-transparent dark:from-red-950/10{% endif %}">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0">
+                <!-- TAG + PLACA -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <div class="relative inline-block">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r 
+                      {% if mov.data_retorno %}from-green-600 to-emerald-600
+                      {% elif mov.status == 'encerrado_sem_retorno' %}from-red-600 to-rose-600
+                      {% else %}from-amber-500 to-orange-500{% endif %} 
+                      rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+                    <span class="relative inline-block px-3 py-1.5 rounded-lg text-lg font-black tracking-wider !text-white" 
+                          style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                      {{ mov.veiculo.tag_interna|upper }}
+                    </span>
+                  </div>
+                  
+                  <!-- PLACA 
+                  <span class="font-mono font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-sm">
+                    {{ mov.veiculo.placa }}
+                  </span>
+                  --> 
+                </div>
+                
+                {% if mov.veiculo.modelo %}
+                  <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400 truncate max-w-[250px]" title="{{ mov.veiculo.marca }} {{ mov.veiculo.modelo }}">
+                    {{ mov.veiculo.marca|upper }} {{ mov.veiculo.modelo|truncatechars:50 }}
+                  </h3>
+                {% endif %}
+              </div>
+              
+              <!-- DATA + STATUS -->
+              <div class="text-right flex-shrink-0 ml-3"> 
+                
+                {% if mov.status == 'encerrado_sem_retorno' %}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 mt-1">
+                    <i class="fa-solid fa-lock mr-1 text-[10px]"></i>Encerrado
+                  </span>
+                {% elif mov.status == 'em_andamento' or mov.status == 'aguardando_retorno_portaria' %}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 mt-1">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1 animate-pulse"></span>
+                    Em trânsito
+                  </span>
+
+                {% elif mov.status == 'finalizado' %}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 mt-1">
+                    <i class="fa-solid fa-check mr-1 text-[10px]"></i>Finalizado
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTEÚDO -->
+          <div class="p-5">
+            <!-- MOTORISTA -->
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-user text-blue-600 dark:text-blue-400 text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate" title="{{ mov.motorista.nome }}">
+                {{ mov.motorista.nome }}
+              </span>
+            </div>
+
+            <!-- DESTINO -->
+            <div class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+              <div class="flex items-start gap-2">
+                <i class="fa-solid fa-location-dot text-blue-500 text-sm mt-0.5 flex-shrink-0"></i>
+                <div class="flex-1 min-w-0">
+                  <span class="text-sm text-gray-900 dark:text-white font-medium break-words">{{ mov.destino }}</span>
+                  
+                  {% if mov.status == 'encerrado_sem_retorno' and mov.motivo_encerramento %}
+                    <div class="mt-2 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                      <div class="flex items-start gap-1.5">
+                        <i class="fa-solid fa-circle-info text-red-500 text-xs mt-0.5"></i>
+                        <p class="text-xs text-red-700 dark:text-red-300 line-clamp-2">
+                          <span class="font-semibold">Motivo:</span> {{ mov.motivo_encerramento|truncatechars:120 }}
+                        </p>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- KMs -->
+            <div class="grid grid-cols-3 gap-3 mb-5">
+              <div class="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+                <div class="text-base font-bold text-blue-600 dark:text-blue-400">
+                  {% if mov.km_saida %}{{ mov.km_saida|intcomma }}{% else %}---{% endif %}
+                </div>
+                <div class="text-[10px] text-blue-500/70 font-semibold">KM SAÍDA</div>
+              </div>
+
+              <div class="text-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20">
+                <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">
+                  {% if mov.distancia_percorrida %}{{ mov.distancia_percorrida|intcomma }}{% else %}---{% endif %}
+                </div>
+                <div class="text-[10px] text-emerald-500/70 font-semibold">PERCORRIDO</div>
+              </div>
+
+              <div class="text-center p-2 rounded-lg 
+                {% if mov.km_retorno %}bg-green-50 dark:bg-green-950/20
+                {% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
+                <div class="text-base font-bold 
+                  {% if mov.km_retorno %}text-green-600 dark:text-green-400
+                  {% else %}text-gray-400{% endif %}">
+                  {% if mov.km_retorno %}{{ mov.km_retorno|intcomma }}{% else %}---{% endif %}
+                </div>
+                <div class="text-[10px] 
+                  {% if mov.km_retorno %}text-green-500/70{% else %}text-gray-500{% endif %} font-semibold">KM RETORNO</div>
+              </div>
+            </div>
+
+            <!-- BOTÕES DE AÇÃO (GRID 2x2) -->
+            <div class="grid grid-cols-2 gap-2.5 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <!-- DETALHES (SEMPRE VISÍVEL) -->
+              <a href="{% url 'movimentacao_detalhe' mov.id %}" 
+                 class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium transition-all">
+                <i class="fa-regular fa-eye text-sm"></i>
+                <span>Detalhes</span>
+              </a>
+
+              <!-- EDITAR (APENAS GESTOR/ADMIN) -->
+              {% if user.perfilusuario.nivel == "gestor" or user.perfilusuario.nivel == "adm" or user.is_superuser %}
+                <a href="{% url 'editar_movimentacao' mov.id %}" 
+                   class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-sm font-medium transition-all border border-amber-200 dark:border-amber-800">
+                  <i class="fa-regular fa-pen-to-square text-sm"></i>
+                  <span>Editar</span>
+                </a>
+              {% endif %}
+
+              <!-- REGISTRAR RETORNO (APENAS SE NÃO FINALIZADO/NÃO ENCERRADO) -->
+              {% if mov.status != 'finalizado' and mov.status != 'encerrado_sem_retorno' %}
+                <a href="{% url 'registrar_retorno' mov.id %}" 
+                   class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold shadow-sm transition-all">
+                  <i class="fa-solid fa-flag-checkered text-sm"></i>
+                  <span>Retorno</span>
+                </a>
+              {% endif %}
+
+              <!-- ENCERRAR (APENAS GESTOR/ADMIN E SE STATUS PERMITIR) -->
+              {% if mov.status == 'em_andamento' or mov.status == 'aguardando_checklist_retorno' or mov.status == 'aguardando_retorno_portaria' or mov.status == 'divergencia_km' %}
+                {% if user.perfilusuario.nivel == "gestor" or user.perfilusuario.nivel == "adm" or user.is_superuser %}
+                  <button type="button"
+                          data-modal-encerrar="{{ mov.id }}"
+                          class="btn-encerrar-movimentacao flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold shadow-sm transition-all">
+                    <i class="fa-solid fa-lock text-sm"></i>
+                    <span>Encerrar</span>
+                  </button>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- RODAPÉ COM DATAS -->
+          <div class="px-5 py-2.5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
             <div class="flex items-center justify-between text-xs">
               <div class="flex items-center gap-2">
                 <i class="fa-solid fa-right-long text-blue-500 text-[10px]"></i>
                 <span class="text-gray-500">Saída:</span>
                 <span class="text-gray-700 dark:text-gray-300 font-medium">{{ mov.data_saida|date:'d/m/Y H:i' }}</span>
               </div>
-              <div class="flex items-center gap-2">
-                <i class="fa-solid fa-left-long text-green-500 text-[10px]"></i>
-                <span class="text-gray-500">Retorno:</span>
-                <span class="text-green-600 dark:text-green-400 font-medium">{{ mov.data_retorno|date:'d/m/Y H:i' }}</span>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
-
-  <!-- VERSÃO DESKTOP PROFISSIONAL -->
-  <div class="hidden md:block">
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-      {% for mov in movimentacoes %}
-        <div class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-400 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
-          <!-- CARD HEADER -->
-          <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 
-                                        {% if not mov.data_retorno %}bg-gradient-to-r from-amber-50/30 to-transparent dark:from-amber-950/10{% endif %}">
-            <div class="flex justify-between items-start">
-              <div>
-                <!-- TAG COM FUNDO VERDE E TEXTO BRANCO (FORÇADO) -->
-                <div class="relative inline-block">
-                  <div class="absolute -inset-0.5 bg-gradient-to-r 
-                                {% if mov.data_retorno %}
-                      
-                      
-                      from-green-600 to-emerald-600
-
-
-                    {% else %}
-                      
-                      
-                      from-amber-500 to-orange-500
-
-
-                    {% endif %} 
-                                rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                  <span class="relative inline-block px-3 py-1.5 rounded-lg text-xl font-black tracking-wider" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff !important;">{{ mov.veiculo.tag_interna|upper }}</span>
+              
+              {% if mov.data_retorno %}
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-left-long text-green-500 text-[10px]"></i>
+                  <span class="text-gray-500">Retorno:</span>
+                  <span class="text-green-600 dark:text-green-400 font-medium">{{ mov.data_retorno|date:'d/m/Y H:i' }}</span>
                 </div>
-                {% if mov.veiculo.modelo %}
-                  <div class="text-xs text-gray-400 dark:text-gray-500 mt-1.5">{{ mov.veiculo.modelo }}</div>
-                {% endif %}
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-gray-500 dark:text-gray-400">{{ mov.data_saida|date:'d/m/Y' }}</div>
-                <div class="text-sm font-bold text-gray-900 dark:text-white">{{ mov.data_saida|date:'H:i' }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CONTEÚDO -->
-          <div class="p-4">
-            <!-- MOTORISTA -->
-            <div class="flex items-center gap-2 mb-2">
-              <i class="fa-solid fa-user-circle text-gray-400 text-sm"></i>
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ mov.motorista.nome }}</span>
-            </div>
-
-            <!-- DESTINO -->
-            <div class="flex items-center gap-2 mb-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-              <i class="fa-solid fa-location-dot text-blue-500 text-xs"></i>
-              <span class="text-sm text-gray-900 dark:text-white font-medium truncate" title="{{ mov.destino }}">{{ mov.destino }}</span>
-            </div>
-
-            <!-- KMS EM GRID - DESKTOP (VERSÃO SIMPLES E FUNCIONAL) -->
-            <div class="grid grid-cols-3 gap-2 mb-4">
-              <!-- KM SAÍDA -->
-              <div class="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                <div class="text-base font-bold text-blue-600 dark:text-blue-400">
-                  {% if mov.km_saida %}
-                    {{ mov.km_saida|intcomma }}
-                  {% else %}
-                    ---
-                  {% endif %}
+              {% elif mov.status == 'encerrado_sem_retorno' and mov.encerrado_em %}
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-lock text-red-500 text-[10px]"></i>
+                  <span class="text-gray-500">Encerrado:</span>
+                  <span class="text-red-600 dark:text-red-400 font-medium">{{ mov.encerrado_em|date:'d/m/Y H:i' }}</span>
                 </div>
-                <div class="text-[10px] text-blue-500/70">SAÍDA</div>
-              </div>
-
-              <!-- KM PERCORRIDO -->
-              <div class="text-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20">
-                <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">
-                  {% if mov.distancia_percorrida %}
-                    {{ mov.distancia_percorrida|intcomma }}
-                  {% else %}
-                    ---
-                  {% endif %}
+              {% else %}
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                    Em andamento
+                  </span>
                 </div>
-                <div class="text-[10px] text-emerald-500/70">KM PERCORRIDOS</div>
-              </div>
-
-              <!-- KM RETORNO -->
-              <div class="text-center p-2 rounded-lg 
-        {% if mov.km_retorno %}
-                  bg-green-50 dark:bg-green-950/20
-                {% else %}
-                  bg-gray-50 dark:bg-gray-800
-                {% endif %}">
-                <div class="text-base font-bold 
-            {% if mov.km_retorno %}
-                    text-green-600 dark:text-green-400
-                  {% else %}
-                    text-gray-400
-                  {% endif %}">
-                  {% if mov.km_retorno %}
-                    {{ mov.km_retorno|intcomma }}
-                  {% else %}
-                    ---
-                  {% endif %}
-                </div>
-                <div class="text-[10px] 
-            {% if mov.km_retorno %}
-                    text-green-500/70
-                  {% else %}
-                    text-gray-500
-                  {% endif %}">RETORNO</div>
-              </div>
-            </div>
-
-            <!-- STATUS E AÇÕES -->
-            <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-              <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full
-                {% if mov.data_retorno %}
-                                    bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-                {% else %}
-                        bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300
-                {% endif %}">
-
-                <i class="fa-solid 
-                {% if mov.data_retorno %}                 
-                    fa-check-circle
-                {% else %}  
-                    fa-clock
-                  {% endif %} text-xs">
-
-                </i>
-                {% if mov.data_retorno %}
-                  Finalizada
-                {% else %}
-                  Em trânsito
-                {% endif %}
-              </span>
-
-              <div class="flex gap-1.5">
-                <a href="{% url 'movimentacao_detalhe' mov.id %}" class="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-all" title="Detalhes"><i class="fa-regular fa-eye text-xs"></i></a>
-                {% if not mov.data_retorno %}
-                  <a href="{% url 'registrar_retorno' mov.id %}" class="w-7 h-7 rounded-lg bg-green-500 hover:bg-green-600 flex items-center justify-center text-white shadow-sm transition-all" title="Registrar retorno"><i class="fa-solid fa-flag-checkered text-xs"></i></a>
-                {% endif %}
-              </div>
+              {% endif %}
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
   </div>
+  
 {% else %}
-  <!-- EMPTY STATE PROFISSIONAL -->
+
+  <!-- EMPTY STATE -->
+  <!-- ============================================ -->
   <div class="text-center py-16 md:py-20">
     <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center mb-4 shadow-inner">
       <i class="fa-solid fa-truck-fast text-3xl text-gray-400 dark:text-gray-500"></i>
@@ -358,40 +417,196 @@
     <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Nenhum registro encontrado com os filtros atuais</p>
   </div>
 {% endif %}
+<!-- Substitua a seção de SCRIPTS no cards.html por este código -->
+<script>
+(function () {
+    'use strict';
+
+    console.log(' Modal v3 isolado');
+
+    let modalAberto = null;
+
+    // ABRIR MODAL
+    // =========================
+    function abrirModalEncerrar(id) {
+
+        if (modalAberto) {
+            modalAberto.remove();
+            modalAberto = null;
+        }
+
+        document.body.style.overflow = 'hidden';
+
+        fetch(`/movimentacoes/encerrar/${id}/`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const temp = document.createElement('div');
+            temp.innerHTML = data.html;
+
+            const modal = temp.querySelector('#modalEncerrar');
+
+            if (!modal) throw new Error('Modal não encontrado');
+
+            document.body.appendChild(modal);
+            modalAberto = modal;
+
+            bindModal(modal);
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erro ao abrir modal');
+            document.body.style.overflow = '';
+        });
+    }
+
+    function fecharModalEncerrar() {
+        if (!modalAberto) return;
+
+        modalAberto.remove();
+        modalAberto = null;
+
+        document.body.style.overflow = '';
+
+        // 🔥 limpa qualquer referência perdida
+        document.removeEventListener('keydown', escHandler);
+      }
+
+    // =========================
+    // BIND EVENTOS
+    // =========================
+    function bindModal(modal) {
+
+        // bloquear clique dentro
+        const content = modal.querySelector('.relative');
+        if (content) {
+            content.addEventListener('click', e => e.stopPropagation());
+        }
+
+        // clicar fora fecha
+        const backdrop = modal.querySelector('#modalBackdrop');
+
+        if (backdrop) {
+            backdrop.addEventListener('click', function (e) {
+                e.stopPropagation();
+                fecharModalEncerrar();
+            });
+        }
+
+        // botão X + cancelar
+        modal.querySelectorAll('button').forEach(btn => {
+            if (
+                btn.innerText.toLowerCase().includes('cancelar') ||
+                btn.querySelector('.fa-xmark')
+            ) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fecharModalEncerrar();
+                });
+            }
+        });
+
+        // ESC
+        document.addEventListener('keydown', escHandler);
+
+        // FORM
+        const form = modal.querySelector('#formEncerrar');
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const motivo = form.querySelector('#motivo').value.trim();
+
+                if (motivo.length < 10) {
+                    alert('Motivo mínimo de 10 caracteres');
+                    return;
+                }
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: new FormData(form)
+                })
+                .then(res => {
+                    // 🔥 se for redirect → segue normalmente
+                    if (res.redirected) {
+                        window.location.href = res.url;
+                        return;
+                    }
+
+                    // 🔥 se não for JSON, força reload
+                    const contentType = res.headers.get("content-type");
+
+                    if (!contentType || !contentType.includes("application/json")) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        window.location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Erro ao encerrar');
+                });
+            });
+        }
+    }
+
+    function escHandler(e) {
+        if (e.key === 'Escape') {
+            fecharModalEncerrar();
+            document.removeEventListener('keydown', escHandler);
+        }
+    }
+
+    // =========================
+    // DELEGAÇÃO
+    // =========================
+    if (!window.__modalEncerrarBound) {
+          window.__modalEncerrarBound = true;
+
+          document.addEventListener('click', function (e) {
+              const btn = e.target.closest('[data-modal-encerrar]');
+              if (!btn) return;
+
+              e.preventDefault();
+              e.stopPropagation();
+
+              abrirModalEncerrar(btn.dataset.modalEncerrar);
+          });
+    }
+
+})();
+</script>
 
 <style>
-  .truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .group { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  button, a { cursor: pointer; user-select: none; transition: all 0.2s ease; }
+  button:active, a:active { transform: scale(0.98); }
+  .grid a, .grid button { min-width: 0; white-space: nowrap; }
+  [class*='rounded-lg']:hover, [class*='rounded-xl']:hover { transform: translateY(-1px); }
+  button:focus-visible, a:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  
+  @media (max-width: 640px) {
+    .grid a span, .grid button span { font-size: 12px; }
+    .grid a, .grid button { padding-left: 8px; padding-right: 8px; }
   }
   
-  /* Animação suave para cards */
-  .group {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  /* Melhorias de acessibilidade */
-  button,
-  a {
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  /* Efeito de hover nos cards de KM */
-  [class*='rounded-xl']:hover {
-    transform: translateY(-1px);
-  }
-  
-  /* Ajustes para o modo dark nos botões de filtro (adicionar no seu arquivo de filtros) */
-  .dark .filter-button {
-    background-color: #1f2937 !important;
-    color: #e5e7eb !important;
-    border-color: #374151 !important;
-  }
-  
-  .dark .filter-button-active {
-    background-color: #3b82f6 !important;
-    color: white !important;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   }
 </style>

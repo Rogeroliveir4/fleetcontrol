@@ -280,16 +280,18 @@ class Veiculo(models.Model):
         if self.km_atual < 0:
             raise ValidationError({'km_atual': 'KM não pode ser negativo'})
 
+        
+
 
     def save(self, *args, **kwargs):
+        skip_clean = kwargs.pop("skip_clean", False)
+
         tipos_veiculo = [
             "Carro", "Caminhao", "Utilitario", "Van",
             "Onibus", "Caminhonete", "Veiculo", "Veiculos"
         ]
 
-        # -------------------------
-        # NORMALIZAÇÃO SEGURA
-        # -------------------------
+        # NORMALIZAÇÃO
         if self.placa:
             self.placa = str(self.placa).strip()
             if self.placa.lower() in ["nan", "none", "n/a", ""]:
@@ -301,9 +303,7 @@ class Veiculo(models.Model):
         if self.tag_interna:
             self.tag_interna = self.tag_interna.upper().strip().replace(" ", "")
 
-        # -------------------------
-        # FORMATAÇÃO DE PLACA (SÓ VEÍCULO)
-        # -------------------------
+        # FORMATAÇÃO DE PLACA
         if self.tipo in tipos_veiculo and self.placa:
             placa_limpa = self.placa.upper()
             placa_sem_hifen = placa_limpa.replace("-", "")
@@ -315,10 +315,9 @@ class Veiculo(models.Model):
             elif re.match(r'^[A-Z]{3}\d{4}$', placa_limpa):
                 self.placa = f"{placa_limpa[:3]}-{placa_limpa[3:]}"
 
-        # -------------------------
-        # VALIDAÇÃO FINAL
-        # -------------------------
-        self.full_clean()
+        #  CONTROLE DE VALIDAÇÃO
+        if not skip_clean:
+            self.full_clean()
 
         super().save(*args, **kwargs)
     

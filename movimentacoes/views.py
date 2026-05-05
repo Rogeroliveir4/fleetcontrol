@@ -23,6 +23,7 @@ from django.db import transaction
 
 
 # FUNÇÃO AUXILIAR PARA APLICAR FILTROS (REUTILIZÁVEL)
+@login_required
 def aplicar_filtros_movimentacoes(request, queryset):
     status = request.GET.get("status", "")
         
@@ -61,9 +62,16 @@ def aplicar_filtros_movimentacoes(request, queryset):
 
     #  STATUS
     if status == "transito":
-        queryset = queryset.filter(data_retorno__isnull=True)
+        queryset = queryset.filter(
+            data_retorno__isnull=True
+        ).exclude(
+            status="encerrado_sem_retorno"
+        )
     elif status == "finalizada":
-        queryset = queryset.filter(data_retorno__isnull=False)
+        queryset = queryset.filter(
+            Q(data_retorno__isnull=False) | 
+            Q(status="encerrado_sem_retorno")
+        )
 
     #  DATA
     if inicio:
@@ -79,6 +87,7 @@ def aplicar_filtros_movimentacoes(request, queryset):
 
 
 # LISTA DE MOVIMENTAÇÕES COM FILTROS E PAGINAÇÃO
+@login_required
 def lista_movimentacoes(request):
     status = request.GET.get("status", "transito")
 
@@ -103,7 +112,7 @@ def lista_movimentacoes(request):
     # FILTRO INICIAL PARA EXIBIR APENAS MOVIMENTAÇÕES COM DATA DE SAÍDA (EVITAR RASCUNHOS)
     movs = movs.filter(data_saida__isnull=False)
 
-    #  FILTRO AUTOMÁTICO POR CONTRATO (GESTOR)
+    # FILTRO AUTOMÁTICO POR CONTRATO (GESTOR)
     perfil = getattr(request.user, "perfilusuario", None)
 
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
@@ -112,31 +121,40 @@ def lista_movimentacoes(request):
             Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
         )
 
-    # APLICAR FILTROS
+    # APLICAR FILTROS DE BUSCA
     if search:
         search = search.strip()
 
         if "-" in search and search.upper().startswith("VA"):
             movs = movs.filter(veiculo__tag_interna__iexact=search)
-
         elif "-" in search and len(search) >= 7:
             movs = movs.filter(veiculo__placa__iexact=search)
-
         elif search.isdigit():
             movs = movs.filter(id=int(search))
-
         else:
             movs = movs.filter(
                 Q(veiculo__placa__icontains=search) |
                 Q(motorista__nome__icontains=search) |
                 Q(veiculo__tag_interna__icontains=search)
-        )
-    # Filtro de status
+            )
+    
+    # FILTRO DE STATUS (CORRIGIDO)
     if status == "transito":
-        movs = movs.filter(data_retorno__isnull=True)
+        # Em trânsito: sem data_retorno E não encerrado
+        movs = movs.filter(
+            data_retorno__isnull=True
+        ).exclude(
+            status="encerrado_sem_retorno"
+        )
     elif status == "finalizada":
-        movs = movs.filter(data_retorno__isnull=False)
+        # Finalizadas: com data_retorno OU encerradas sem retorno
+        movs = movs.filter(
+            Q(data_retorno__isnull=False) | 
+            Q(status="encerrado_sem_retorno")
+        )
+    # Se status for vazio ou outro valor, mostra todas
 
+    # FILTROS DE DATA
     if inicio:
         movs = movs.filter(data_saida__date__gte=inicio)
     if fim:
@@ -147,17 +165,31 @@ def lista_movimentacoes(request):
     page = request.GET.get("page")
     movimentacoes = paginator.get_page(page)
 
-    # Contadores (respeitando perfil)
-    base_count = Movimentacao.objects.all()
-
+    # ============================================
+    # CONTADORES CORRIGIDOS
+    # ============================================
+    # Base com restrição de contrato (se aplicável)
+    base_count = Movimentacao.objects.filter(data_saida__isnull=False)
+    
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
         base_count = base_count.filter(
             Q(contrato=perfil.contrato) |
             Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
         )
 
-    total_transito = base_count.filter(data_retorno__isnull=True).count()
-    total_finalizada = base_count.filter(data_retorno__isnull=False).count()
+    #   Trânsito = sem retorno E não encerrado
+    total_transito = base_count.filter(
+        data_retorno__isnull=True
+    ).exclude(
+        status="encerrado_sem_retorno"
+    ).count()
+    
+    # Finalizadas = com retorno OU encerradas
+    total_finalizada = base_count.filter(
+        Q(data_retorno__isnull=False) | 
+        Q(status="encerrado_sem_retorno")
+    ).count()
+    
     total_geral = base_count.count()
 
     return render(request, "movimentacoes/lista.html", {
@@ -175,59 +207,383 @@ def lista_movimentacoes(request):
     })
 
 
+# ENCERRAR MOVIMENTAÇÃO SEM RETORNO (GESTOR/ADMIN)
+@login_required
+def encerrar_movimentacao(request, pk):
+    """Encerra uma movimentação sem retorno - apenas para gestores/admin"""
+    
+    mov = get_object_or_404(Movimentacao, pk=pk)
 
-# FILTRAR MOVIMENTAÇÕES (AJAX)
+    # Permissão
+    perfil = getattr(request.user, "perfilusuario", None)
+    if not perfil or perfil.nivel not in ["gestor", "adm"]:
+        messages.error(request, "Você não tem permissão para encerrar movimentações.")
+        return redirect("lista_movimentacoes")
+
+    # Status permitidos
+    status_permitidos = [
+        "em_andamento", 
+        "aguardando_checklist_retorno", 
+        "aguardando_retorno_portaria",
+        "divergencia_km"
+    ]
+
+    if mov.status not in status_permitidos:
+        messages.error(request, f"Movimentação com status '{mov.get_status_display()}' não pode ser encerrada.")
+        return redirect("lista_movimentacoes")
+
+    if request.method == "POST":
+        motivo = request.POST.get("motivo", "").strip()
+
+        if not motivo:
+            messages.error(request, "O motivo do encerramento é obrigatório.")
+            return redirect("lista_movimentacoes")
+
+        try:
+            # =========================================
+            # BLOCO CRÍTICO (ATOMIC)
+            # =========================================
+            with transaction.atomic():
+
+                mov.status = "encerrado_sem_retorno"
+                mov.encerrado_por = request.user
+                mov.encerrado_em = timezone.now()
+                mov.motivo_encerramento = motivo
+                mov.save()
+
+                if mov.solicitacao:
+                    mov.solicitacao.status = "FINALIZADA"
+                    mov.solicitacao.save()
+
+            # =========================================
+            # FORA DO ATOMIC (VEÍCULO)
+            # =========================================
+            veiculo = mov.veiculo
+
+            status_inativo = "Inativo"
+            status_validos = [s[0] for s in Veiculo.STATUS_CHOICES]
+
+            if status_inativo not in status_validos:
+                status_inativo = "Manutencao" if "Manutencao" in status_validos else "Disponivel"
+
+            try:
+                veiculo.status = status_inativo
+                veiculo.ativo = False
+                veiculo.save(update_fields=["status", "ativo"], skip_clean=True)
+            except Exception as e:
+                print("ERRO VEICULO >>>", str(e))
+
+            # =========================================
+            # SUCESSO
+            # =========================================
+            messages.success(request, "Movimentação encerrada com sucesso!")
+            return redirect("lista_movimentacoes")
+
+        except Exception as e:
+            import traceback
+            print("ERRO ENCERRAR >>>", traceback.format_exc())
+
+            messages.error(request, "Erro ao encerrar movimentação.")
+            return redirect("lista_movimentacoes")
+
+    # GET
+    context = {
+        "mov": mov,
+        "acao": "encerrar",
+    }
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        html = render_to_string(
+            "movimentacoes/modals/encerrar.html",
+            context,
+            request=request
+        )
+        return JsonResponse({"html": html})
+
+    return render(request, "movimentacoes/modals/encerrar.html", context)
+
+
+# EDITAR MOVIMENTAÇÃO (GESTOR/ADMIN)
+@login_required
+def editar_movimentacao(request, pk):
+    mov = get_object_or_404(Movimentacao, pk=pk)
+
+    perfil = getattr(request.user, "perfilusuario", None)
+    if not perfil or perfil.nivel not in ["gestor", "adm"]:
+        messages.error(request, "Você não tem permissão para editar movimentações.")
+        return redirect("lista_movimentacoes")
+
+    if request.method == "POST":
+
+        try:
+            with transaction.atomic():
+
+                # =========================================
+                # CAPTURA VALORES ANTIGOS (AUDITORIA)
+                # =========================================
+                km_saida_antigo = mov.km_saida
+                km_retorno_antigo = mov.km_retorno
+
+                # =========================================
+                # CAMPOS
+                # =========================================
+                destino = request.POST.get("destino", "").strip().upper()
+                observacao = request.POST.get("observacao", "").strip()
+
+                km_saida_str = request.POST.get("km_saida", "").strip()
+                km_retorno_str = request.POST.get("km_retorno", "").strip()
+                motivo_ajuste = request.POST.get("motivo_edicao", "").strip()
+
+                erros = []
+
+                # =========================================
+                # PARSE INTELIGENTE
+                # =========================================
+                def parse_km(valor, atual):
+                    if not valor:
+                        return atual, False
+                    try:
+                        return int(valor.replace(".", "").replace(",", "")), True
+                    except:
+                        return None, True
+
+                km_saida_novo, alterou_saida = parse_km(km_saida_str, mov.km_saida)
+                km_retorno_novo, alterou_retorno = parse_km(km_retorno_str, mov.km_retorno)
+
+                # =========================================
+                # VALIDAÇÕES
+                # =========================================
+                if alterou_saida and km_saida_novo is None:
+                    erros.append("KM de saída inválido.")
+
+                if alterou_retorno and km_retorno_novo is None:
+                    erros.append("KM de retorno inválido.")
+
+                if not alterou_saida and not alterou_retorno:
+                    erros.append("Nenhuma alteração foi realizada.")
+
+                if km_saida_novo and km_retorno_novo:
+                    if km_saida_novo > km_retorno_novo:
+                        erros.append("KM de saída não pode ser maior que KM de retorno.")
+
+                if (alterou_saida or alterou_retorno):
+                    if not motivo_ajuste or len(motivo_ajuste) < 10:
+                        erros.append("Informe um motivo válido (mínimo 10 caracteres).")
+
+                if erros:
+                    for erro in erros:
+                        messages.error(request, erro)
+                    return render(request, "movimentacoes/editar.html", {
+                        "mov": mov,
+                        "motivo_edicao": motivo_ajuste,
+                    })
+
+                # =========================================
+                # AUDITORIA (LOG COMPLETO)
+                # =========================================
+                from .models import HistoricoEdicao
+
+                HistoricoEdicao.objects.create(
+                    movimentacao=mov,
+                    editado_por=request.user,
+                    motivo_edicao=motivo_ajuste,
+                    km_saida_anterior=km_saida_antigo,
+                    km_saida_novo=km_saida_novo,
+                    km_retorno_anterior=km_retorno_antigo,
+                    km_retorno_novo=km_retorno_novo,
+                )
+
+                # SALVAR ANTERIORES (PARA TEMPLATE)
+                if km_saida_antigo != km_saida_novo:
+                    mov.km_saida_anterior = km_saida_antigo
+
+                if km_retorno_antigo != km_retorno_novo:
+                    mov.km_retorno_anterior = km_retorno_antigo
+
+                # ATUALIZAÇÃO
+                mov.destino = destino
+                mov.observacao = observacao
+                mov.km_saida = km_saida_novo
+                mov.km_retorno = km_retorno_novo
+
+                if km_saida_novo and km_retorno_novo:
+                    mov.distancia_percorrida = km_retorno_novo - km_saida_novo
+
+                mov.editado_por = request.user
+                mov.editado_em = timezone.now()
+                mov.motivo_edicao = motivo_ajuste
+
+                mov.save()
+
+                # ATUALIZAÇÃO DO VEÍCULO
+                veiculo = mov.veiculo
+
+                if mov.data_saida:
+                    existe_mov_mais_recente = Movimentacao.objects.filter(
+                        veiculo=veiculo,
+                        data_saida__gt=mov.data_saida
+                    ).exists()
+
+                    if not existe_mov_mais_recente:
+
+                        # ATUALIZA KM (SEM INTERFERIR NO STATUS)
+                        km_base = None
+
+                        # só usa retorno se existir
+                        if mov.km_retorno:
+                            km_base = mov.km_retorno
+
+                        # só usa saída se NÃO existe retorno
+                        elif mov.km_saida and not mov.km_retorno:
+                            km_base = mov.km_saida
+
+                        if km_base:
+                            veiculo.km_atual = km_base
+
+                        veiculo.save(update_fields=["km_atual", "status"])
+
+                # FEEDBACK
+                messages.success(
+                    request,
+                    f"Ajuste realizado com sucesso! "
+                    f"Saída: {km_saida_antigo} → {mov.km_saida} | "
+                    f"Retorno: {km_retorno_antigo} → {mov.km_retorno}"
+                )
+
+                return redirect("lista_movimentacoes")
+
+        except Exception as e:
+            messages.error(request, f"Erro ao editar movimentação: {str(e)}")
+            return render(request, "movimentacoes/editar.html", {"mov": mov})
+
+    return render(request, "movimentacoes/editar.html", {
+        "mov": mov,
+        "acao": "editar",
+        "status_choices": Movimentacao.STATUS_CHOICES,
+    })
+
+
+
+# API PARA ENCERRAR (ALTERNATIVA VIA AJAX)
+@login_required
+def api_encerrar_movimentacao(request, pk):
+    """Endpoint AJAX para encerrar movimentação"""
+    if request.method != "POST":
+        return JsonResponse({"error": "Método não permitido"}, status=405)
+    
+    mov = get_object_or_404(Movimentacao, pk=pk)
+    
+    # Verificar permissão
+    perfil = getattr(request.user, "perfilusuario", None)
+    if not perfil or perfil.nivel not in ["gestor", "adm"]:
+        return JsonResponse({"error": "Permissão negada"}, status=403)
+    
+    motivo = request.POST.get("motivo", "").strip()
+    if not motivo:
+        return JsonResponse({"error": "Motivo é obrigatório"}, status=400)
+    
+    try:
+        with transaction.atomic():
+            # Atualizar movimentação
+            mov.status = "encerrado_sem_retorno"
+            mov.encerrado_por = request.user
+            mov.encerrado_em = timezone.now()
+            mov.motivo_encerramento = motivo
+            mov.save()
+            
+            # Atualizar solicitação vinculada
+            if mov.solicitacao:
+                mov.solicitacao.status = "FINALIZADA"
+                mov.solicitacao.save()
+            
+            #  CORRIGIDO: Mudar status do veículo para "Inativo"
+            veiculo = mov.veiculo
+            
+            # Verificar status disponíveis no modelo Veiculo
+            status_validos = [s[0] for s in Veiculo.STATUS_CHOICES]
+            
+            if "Inativo" in status_validos:
+                veiculo.status = "Inativo"
+            elif "Baixado" in status_validos:
+                veiculo.status = "Baixado"
+            elif "Manutencao" in status_validos:
+                veiculo.status = "Manutencao"
+            else:
+                # Último fallback: manter como está mas logar erro
+                print(f"ALERTA: Nenhum status de inatividade encontrado para veículo {veiculo.id}")
+                veiculo.ativo = False  # Marcar como inativo
+            
+            veiculo.save()
+            
+        return JsonResponse({
+            "success": True,
+            "message": "Movimentação encerrada com sucesso",
+            "novo_status": mov.get_status_display()
+        })
+        
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+
+@login_required
 def filtrar_movimentacoes(request):
     # Verificar se é requisição AJAX
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    # Obter parâmetros (mantendo nomes originais)
+    # Parâmetros
     status = request.GET.get("status", "")
     search = request.GET.get("search", "").strip()
-    inicio = request.GET.get("inicio", "")  # Voltar para "inicio"
-    fim = request.GET.get("fim", "")  # Voltar para "fim"
+    inicio = request.GET.get("inicio", "")
+    fim = request.GET.get("fim", "")
     page = request.GET.get("page", 1)
 
-
-    # Limite de itens por página
+    # Limite por página
     try:
         limite = int(request.GET.get("limite", 12))
         if limite not in [5, 10, 15, 20, 30]:
             limite = 12
     except:
         limite = 12
-    
-    # Query base
-    movs = Movimentacao.objects.select_related("veiculo", "motorista").order_by("-data_saida")
 
-    #  FILTRO  DE CONTRATO
+    # Query base (mantida, só otimizada)
+    movs = Movimentacao.objects.select_related(
+        "veiculo", 
+        "motorista", 
+        "solicitacao", 
+        "solicitacao__contrato"
+    ).order_by("-data_saida")
+
+    # =========================================
+    # FILTRO POR CONTRATO
+    # =========================================
     perfil = getattr(request.user, "perfilusuario", None)
     
-    # se for gestor, filtrar por contrato (tanto no campo direto quanto na solicitação relacionada)
     if perfil and perfil.nivel == "gestor" and perfil.contrato:
         movs = movs.filter(
             Q(contrato=perfil.contrato) |
             Q(contrato__isnull=True, solicitacao__contrato=perfil.contrato)
-    )
-    
-    # Aplicar filtros
-    if search:
+        )
 
+    # =========================================
+    # BUSCA
+    # =========================================
+    if search:
         search = search.strip()
 
-        #  Busca por TAG do veículo (ex: VA-100)
+        # TAG (ex: VA-100)
         if "-" in search and search.upper().startswith("VA"):
             movs = movs.filter(veiculo__tag_interna__iexact=search)
 
-        #  Busca por placa exata (ABC-1234)
+        # PLACA (ABC-1234)
         elif "-" in search and len(search) >= 7:
             movs = movs.filter(veiculo__placa__iexact=search)
 
-        #  Busca por ID da movimentação
+        # ID
         elif search.isdigit():
             movs = movs.filter(id=int(search))
 
-        #  Busca geral
+        # Busca geral
         else:
             movs = movs.filter(
                 Q(veiculo__placa__icontains=search) |
@@ -236,13 +592,31 @@ def filtrar_movimentacoes(request):
                 Q(veiculo__marca__icontains=search) |
                 Q(veiculo__tag_interna__icontains=search)
             )
-    
-    # Filtro de status
+
+    # =========================================
+    # FILTRO DE STATUS (AJUSTADO — SEM QUEBRAR)
+    # =========================================
     if status == "transito":
-        movs = movs.filter(data_retorno__isnull=True)
+        movs = movs.filter(
+            status__in=[
+                "em_andamento",
+                "aguardando_checklist_retorno",
+                "aguardando_retorno_portaria",
+                "divergencia_km"
+            ]
+        )
+
     elif status == "finalizada":
-        movs = movs.filter(data_retorno__isnull=False)
-    
+        movs = movs.filter(
+            status__in=[
+                "finalizado",
+                "encerrado_sem_retorno"
+            ]
+        )
+
+    # =========================================
+    # FILTRO POR DATA
+    # =========================================
     if inicio:
         try:
             movs = movs.filter(data_saida__date__gte=inicio)
@@ -254,16 +628,18 @@ def filtrar_movimentacoes(request):
             movs = movs.filter(data_saida__date__lte=fim)
         except:
             pass
-    
-    # Paginação
+
+    # =========================================
+    # PAGINAÇÃO
+    # =========================================
     paginator = Paginator(movs, limite)
     
     try:
         movimentacoes = paginator.get_page(page)
     except:
         movimentacoes = paginator.get_page(1)
-    
-    # Contexto para templates
+
+    # Contexto
     context = {
         "movimentacoes": movimentacoes,
         "status": status,
@@ -273,10 +649,10 @@ def filtrar_movimentacoes(request):
         "page_obj": movimentacoes,
         "request": request,
     }
+
     
-    # SE for requisição AJAX, retorna JSON
+    # RESPOSTA AJAX
     if is_ajax:
-        # Renderizar templates
         html_cards = render_to_string(
             "movimentacoes/partials/cards.html",
             context,
@@ -304,9 +680,7 @@ def filtrar_movimentacoes(request):
             "total_pages": paginator.num_pages,
             "current_page": movimentacoes.number,
         })
-    
-    # SE for requisição normal, redirecionar para lista_movimentacoes
-    # (porque essa função agora é apenas para AJAX)
+
     return redirect("lista_movimentacoes")
 
 
@@ -334,7 +708,7 @@ def criar_movimentacao(request):
 
     # VEÍCULOS DISPONÍVEIS
     veiculos = Veiculo.objects.filter(
-        status="Disponivel"
+        status="Disponivel", ativo=True
     ).exclude(
         id__in=veiculos_em_uso
     )
@@ -701,12 +1075,9 @@ def portaria_registrar_saida(request, solicitacao_id):
             solicitacao.save(update_fields=["status", "data_saida"])
 
             # Atualiza status do veículo
-            from django.db import connection
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "UPDATE veiculos_veiculo SET status = %s WHERE id = %s",
-                    ["Em uso", solicitacao.veiculo.id]
-                )
+            veiculo = solicitacao.veiculo
+            veiculo.status = "EmTransito"
+            veiculo.save(update_fields=["status"])
 
             messages.success(request, "Saída registrada com sucesso.")
             return redirect("/movimentacoes/?status=transito")
@@ -730,6 +1101,18 @@ def registrar_retorno(request, pk):
         template = "movimentacoes/retorno_portaria.html"
     else:
         template = "movimentacoes/retorno.html"
+
+    status_permitidos = [
+    "aguardando_retorno_portaria",
+    "aguardando_checklist_retorno"
+    ]
+
+    if mov.status not in status_permitidos:
+        messages.error(
+            request,
+            f"Não é possível registrar retorno para uma movimentação com status '{mov.get_status_display()}'."
+        )
+        return redirect("lista_movimentacoes")    
     
     if request.method == "POST":
 
