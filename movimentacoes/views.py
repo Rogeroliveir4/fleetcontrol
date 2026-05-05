@@ -1103,6 +1103,7 @@ def registrar_retorno(request, pk):
         template = "movimentacoes/retorno.html"
 
     status_permitidos = [
+    "em_andamento",
     "aguardando_retorno_portaria",
     "aguardando_checklist_retorno"
     ]
