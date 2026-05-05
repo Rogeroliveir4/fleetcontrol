@@ -437,7 +437,7 @@
 
         document.body.style.overflow = 'hidden';
 
-        fetch(`/movimentacoes/encerrar/${id}/`, {
+        fetch(`${window.location.origin}/movimentacoes/encerrar/${id}/`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
