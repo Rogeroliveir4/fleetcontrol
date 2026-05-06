@@ -44,7 +44,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
 
     for gestor in gestores:
 
-        subject = "FleetControl - Nova solicitação aguardando aprovação"
+        subject = "Rota 360 - Nova solicitação aguardando aprovação"
 
         #  TEXTO (fallback - mantém compatibilidade)
         plain_message = f"""
@@ -59,7 +59,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
         Acesse o sistema:
         {url}
 
-        FleetControl
+        Rota 360 -
         Sistema de Gestão de pátio
         """
 
@@ -77,7 +77,7 @@ def notificar_gestores_nova_solicitacao(request, solicitacao):
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
-            from_email="FleetControl <fleetcontrol.app@gmail.com>",
+            from_email="Rota 360 <fleetcontrol.app@gmail.com>",
             to=[gestor.email],
         )
 

@@ -74,7 +74,7 @@ def enviar_alerta_licenciamento():
         
         <!-- HEADER -->
         <div style="background:#2f6f55; padding:20px; text-align:center;">
-            <h1 style="color:white; margin:0;">FleetControl</h1>
+            <h1 style="color:white; margin:0;">Rota 360</h1>
             <p style="color:#cfe7dd; margin:5px 0 0;">Alerta de Licenciamento</p>
         </div>
 
@@ -109,7 +109,7 @@ def enviar_alerta_licenciamento():
         <div style="background:#f9fafb; padding:15px; text-align:center; font-size:12px; color:#777;">
             Sistema de Gestão de Pátio<br>
             Este é um email automático, não responda.<br><br>
-            © 2026 FleetControl
+            © 2026 Rota 360clear
         </div>
 
     </div>

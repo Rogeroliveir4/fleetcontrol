@@ -14,8 +14,8 @@ print("=" * 50)
 try:
     # Enviar email de teste
     send_mail(
-        subject='✅ Teste SendGrid - FleetControl',
-        message='Olá! Este é um teste do sistema FleetControl.\n\nSe recebeu este email, seu SendGrid está configurado corretamente!',
+        subject='✅ Teste SendGrid - Rota 360',
+        message='Olá! Este é um teste do sistema Rota 360.\n\nSe recebeu este email, seu SendGrid está configurado corretamente!',
         from_email=None,  # Usará DEFAULT_FROM_EMAIL automaticamente
         recipient_list=['rogerquat13@gmail.com'],  # COLOCA SEU EMAIL AQUI
         html_message='''
@@ -33,7 +33,7 @@ try:
                 <p>Agora você pode implementar o sistema completo de recuperação de senha!</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-                    <p style="color: #666; font-size: 12px;">FleetControl - Sistema de Gestão de Frotas</p>
+                    <p style="color: #666; font-size: 12px;">Rota 360 - Sistema de Gestão de Frotas</p>
                 </div>
             </div>
         </div>

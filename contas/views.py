@@ -95,7 +95,7 @@ def password_reset_request(request):
 
             if user:
                 try:
-                    subject = "FleetControl - Redefinição de senha"
+                    subject = "Rota 360 - Redefinição de senha"
 
                     token = default_token_generator.make_token(user)
                     uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -136,7 +136,7 @@ Se não foi você, ignore este email.
                     email = EmailMultiAlternatives(
                         subject=subject,
                         body=plain_message,
-                        from_email="FleetControl <fleetcontrol.app@gmail.com>",
+                        from_email="Rota 360 <fleetcontrol.app@gmail.com>",
                         to=[user.email],
                     )
 
